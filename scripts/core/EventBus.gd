@@ -8,11 +8,16 @@ signal game_state_changed(old_state: StringName, new_state: StringName)
 # === 바 경영 ===
 signal bar_opened
 signal bar_closed
+signal business_started
+signal business_ended(total_income: int)
 signal customer_entered(customer_id: StringName)
 signal customer_left(customer_id: StringName)
+signal customer_seated(customer_id: StringName)
 signal order_placed(menu_id: StringName)
 signal order_served(menu_id: StringName)
 signal gold_changed(new_amount: int)
+signal menu_unlocked(menu_id: StringName)
+signal bar_upgraded(new_level: int)
 
 # === 전투 ===
 signal battle_session_started
