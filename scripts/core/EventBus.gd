@@ -22,6 +22,8 @@ signal chat_started(customer_id: StringName)
 signal chat_ended(customer_id: StringName)
 signal quest_proposed(customer_id: StringName, menu_id: StringName)
 signal quest_completed(menu_id: StringName)
+signal recipe_crafting_started(menu_id: StringName)
+signal recipe_crafting_finished(menu_id: StringName, quality: float)
 
 # === 전투 ===
 signal battle_session_started

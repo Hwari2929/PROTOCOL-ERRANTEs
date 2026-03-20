@@ -45,6 +45,8 @@ extends Resource
 @export var personality_prompt: String = ""
 ## 오프라인 폴백 대사 목록
 @export var fallback_lines: Array[String] = []
+## 대화 데이터 (문맥별 문답). 코드에서 빌드하거나 .tres로 지정.
+@export var dialogue: DialogueData = null
 
 @export_group("시그니처 주문 가중치")
 ## 시그니처 메뉴 선택 확률 가중치 (vs 일반 메뉴)

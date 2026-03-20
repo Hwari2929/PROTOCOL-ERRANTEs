@@ -11,6 +11,7 @@ signal crafting_started(order: Dictionary)
 signal crafting_completed(order: Dictionary)
 signal order_served(order: Dictionary)
 signal quest_completed(order: Dictionary)
+signal recipe_crafting_requested(session: CraftingSession)
 
 ## 동시 제작 가능한 슬롯 수 (바 레벨/알바생으로 확장 가능)
 @export var craft_slots: int = 1
@@ -23,6 +24,12 @@ var _order_queue: Array[Dictionary] = []
 
 ## 현재 제작 중인 주문 [{order, remaining_time}]
 var _crafting: Array[Dictionary] = []
+
+## 레시피 제조 대기 (플레이어 인터랙션 필요)
+var _recipe_queue: Array[Dictionary] = []
+
+## 현재 진행 중인 레시피 세션
+var _active_session: CraftingSession = null
 
 
 func _ready() -> void:
@@ -135,13 +142,83 @@ func _process_crafting(delta: float) -> void:
 func _try_start_next_craft() -> void:
 	while _crafting.size() < craft_slots and _order_queue.size() > 0:
 		var order := _order_queue.pop_front() as Dictionary
+		var item: MenuItemData = order["item"]
+
+		# 레시피가 있는 메뉴 → 레시피 큐로 이동
+		if item.has_recipe() and _active_session == null:
+			order["status"] = "recipe_pending"
+			_start_recipe_session(order)
+			continue
+		elif item.has_recipe():
+			# 이미 레시피 세션 진행 중이면 다시 큐에 넣지 않고 대기
+			_recipe_queue.append(order)
+			continue
+
 		order["status"] = "crafting"
 		var craft := {
 			"order": order,
-			"remaining_time": order["item"].craft_time,
+			"remaining_time": item.craft_time,
 		}
 		_crafting.append(craft)
 		crafting_started.emit(order)
+
+
+## 레시피 세션 시작. CraftingPanel(UI)로 전달.
+func _start_recipe_session(order: Dictionary) -> void:
+	var item: MenuItemData = order["item"]
+	var registry := _find_content_registry()
+	if registry == null:
+		# 레지스트리 없으면 자동 제작으로 폴백
+		_fallback_auto_craft(order)
+		return
+
+	var recipe: RecipeData = registry.get_recipe(item.recipe_id)
+	if recipe == null:
+		_fallback_auto_craft(order)
+		return
+
+	_active_session = CraftingSession.new(recipe, order)
+	_active_session.session_completed.connect(_on_recipe_completed.bind(order))
+	recipe_crafting_requested.emit(_active_session)
+
+
+## 레시피 제조 완료 콜백.
+func _on_recipe_completed(quality: float, choices: Dictionary, order: Dictionary) -> void:
+	var item: MenuItemData = order["item"]
+
+	# 품질에 따른 만족도/가격 보정
+	order["quality"] = quality
+	order["recipe_choices"] = choices
+	order["satisfaction_bonus"] = _active_session.total_satisfaction_modifier
+	order["price_bonus"] = _active_session.total_price_modifier
+
+	_active_session = null
+
+	# 마무리 시간 후 서빙
+	order["status"] = "crafting"
+	var recipe: RecipeData = _find_content_registry().get_recipe(item.recipe_id) if _find_content_registry() else null
+	var finish := recipe.finish_time if recipe else 0.5
+	var craft := {
+		"order": order,
+		"remaining_time": finish,
+	}
+	_crafting.append(craft)
+	crafting_completed.emit(order)
+
+	# 레시피 대기열에서 다음 세션 시작
+	if not _recipe_queue.is_empty():
+		var next_order := _recipe_queue.pop_front() as Dictionary
+		_start_recipe_session(next_order)
+
+
+func _fallback_auto_craft(order: Dictionary) -> void:
+	order["status"] = "crafting"
+	var craft := {
+		"order": order,
+		"remaining_time": order["item"].craft_time,
+	}
+	_crafting.append(craft)
+	crafting_started.emit(order)
 
 
 func _complete_order(order: Dictionary) -> void:
@@ -158,10 +235,11 @@ func _serve_order(order: Dictionary) -> void:
 	var item: MenuItemData = order["item"]
 	var customer: Node = order.get("customer")
 
-	# 골드 수입 처리
+	# 골드 수입 처리 (레시피 보정 포함)
+	var final_price := item.base_price + order.get("price_bonus", 0)
 	var bar_manager := get_parent()
 	if bar_manager and bar_manager.has_method("record_income"):
-		bar_manager.record_income(item.base_price)
+		bar_manager.record_income(final_price)
 
 	# 손님에게 서빙 알림
 	if customer and is_instance_valid(customer) and customer.has_method("receive_order"):
@@ -196,6 +274,15 @@ func _complete_quest(order: Dictionary) -> void:
 	if bus:
 		bus.order_served.emit(item.id)
 		bus.quest_completed.emit(item.id)
+
+
+## 현재 레시피 세션 반환 (UI 연결용).
+func get_active_session() -> CraftingSession:
+	return _active_session
+
+
+func _find_content_registry() -> Node:
+	return get_node_or_null("/root/ContentRegistry")
 
 
 ## resources/menus/ 폴더에서 메뉴 리소스를 자동 로드.
