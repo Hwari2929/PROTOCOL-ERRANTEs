@@ -18,6 +18,8 @@ signal customer_spawned(customer: Node)
 @export var customer_scene_path: String = "res://scenes/characters/CustomerNPC.tscn"
 ## 손님 입장 위치 (씬에서 Marker2D로 지정)
 @export var entrance_position: Vector2 = Vector2(-50, 200)
+## 생성 가능한 손님 유형 풀 (CustomerData 리소스)
+@export var customer_pool: Array[CustomerData] = []
 
 var is_spawning: bool = false
 
@@ -29,6 +31,7 @@ var _bar_manager: Node = null
 func _ready() -> void:
 	_bar_manager = get_parent()
 	_preload_customer_scene()
+	_load_customer_pool()
 
 
 func _process(delta: float) -> void:
@@ -70,6 +73,11 @@ func _try_spawn_customer() -> void:
 	# 손님 인스턴스 생성
 	var customer: Node2D = _customer_scene.instantiate()
 	customer.global_position = entrance_position
+
+	# CustomerData 주입
+	var data := _pick_customer_data()
+	if customer.has_method("setup") and data:
+		customer.setup(data)
 
 	# BarManager에 등록
 	if _bar_manager.has_method("register_customer"):
@@ -120,6 +128,33 @@ func _reset_spawn_timer() -> void:
 	_spawn_timer = max(_spawn_timer, 1.0)
 
 
+func _pick_customer_data() -> CustomerData:
+	if customer_pool.is_empty():
+		return null
+	return customer_pool.pick_random()
+
+
 func _preload_customer_scene() -> void:
 	if ResourceLoader.exists(customer_scene_path):
 		_customer_scene = load(customer_scene_path)
+
+
+## resources/customers/ 폴더에서 손님 유형 리소스를 자동 로드.
+func _load_customer_pool() -> void:
+	if not customer_pool.is_empty():
+		return
+	var dir_path := "res://resources/customers/"
+	if not DirAccess.dir_exists_absolute(dir_path):
+		return
+	var dir := DirAccess.open(dir_path)
+	if dir == null:
+		return
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while file_name != "":
+		if file_name.ends_with(".tres"):
+			var res := load(dir_path + file_name)
+			if res is CustomerData:
+				customer_pool.append(res)
+		file_name = dir.get_next()
+	dir.list_dir_end()

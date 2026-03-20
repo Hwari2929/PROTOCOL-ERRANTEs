@@ -18,6 +18,10 @@ signal order_served(menu_id: StringName)
 signal gold_changed(new_amount: int)
 signal menu_unlocked(menu_id: StringName)
 signal bar_upgraded(new_level: int)
+signal chat_started(customer_id: StringName)
+signal chat_ended(customer_id: StringName)
+signal quest_proposed(customer_id: StringName, menu_id: StringName)
+signal quest_completed(menu_id: StringName)
 
 # === 전투 ===
 signal battle_session_started

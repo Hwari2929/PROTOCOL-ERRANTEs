@@ -4,11 +4,13 @@ extends Node
 ##
 ## BarManager의 자식 노드로 동작.
 ## 주문 큐를 관리하고, 제작 시간 후 서빙 완료 처리.
+## 의뢰(QUEST)도 동일한 파이프라인으로 처리 (craft_time = 수행 시간).
 
 signal order_queued(order: Dictionary)
 signal crafting_started(order: Dictionary)
 signal crafting_completed(order: Dictionary)
 signal order_served(order: Dictionary)
+signal quest_completed(order: Dictionary)
 
 ## 동시 제작 가능한 슬롯 수 (바 레벨/알바생으로 확장 가능)
 @export var craft_slots: int = 1
@@ -37,7 +39,7 @@ func register_menu(item: MenuItemData) -> void:
 	_menu_registry[item.id] = item
 
 
-## 등록된 메뉴 목록 반환.
+## 전체 등록된 메뉴 목록 반환.
 func get_available_menus() -> Array[MenuItemData]:
 	var result: Array[MenuItemData] = []
 	for item in _menu_registry.values():
@@ -45,9 +47,39 @@ func get_available_menus() -> Array[MenuItemData]:
 	return result
 
 
+## 음식/음료 메뉴만 반환.
+func get_consumable_menus() -> Array[MenuItemData]:
+	var result: Array[MenuItemData] = []
+	for item in _menu_registry.values():
+		if item.is_consumable():
+			result.append(item)
+	return result
+
+
+## 의뢰 메뉴만 반환.
+func get_quest_menus() -> Array[MenuItemData]:
+	var result: Array[MenuItemData] = []
+	for item in _menu_registry.values():
+		if item.is_quest():
+			result.append(item)
+	return result
+
+
 ## 특정 메뉴 데이터 조회.
 func get_menu_item(menu_id: StringName) -> MenuItemData:
 	return _menu_registry.get(menu_id, null)
+
+
+## 손님의 메뉴 풀에서 주문 가능한 메뉴만 필터링.
+func get_menus_for_customer(customer_data: CustomerData) -> Array[MenuItemData]:
+	var result: Array[MenuItemData] = []
+	if customer_data == null:
+		return get_available_menus()
+	for menu_id in customer_data.get_all_menu_ids():
+		var item: MenuItemData = _menu_registry.get(menu_id, null)
+		if item:
+			result.append(item)
+	return result
 
 
 ## 주문 접수. 큐에 추가.
@@ -62,6 +94,7 @@ func place_order(menu_id: StringName, customer: Node) -> bool:
 		"item": item,
 		"customer": customer,
 		"status": "queued",
+		"is_quest": item.is_quest(),
 	}
 	_order_queue.append(order)
 	order_queued.emit(order)
@@ -114,7 +147,11 @@ func _try_start_next_craft() -> void:
 func _complete_order(order: Dictionary) -> void:
 	order["status"] = "completed"
 	crafting_completed.emit(order)
-	_serve_order(order)
+
+	if order.get("is_quest", false):
+		_complete_quest(order)
+	else:
+		_serve_order(order)
 
 
 func _serve_order(order: Dictionary) -> void:
@@ -136,6 +173,29 @@ func _serve_order(order: Dictionary) -> void:
 	var bus := get_node_or_null("/root/EventBus")
 	if bus:
 		bus.order_served.emit(item.id)
+
+
+func _complete_quest(order: Dictionary) -> void:
+	var item: MenuItemData = order["item"]
+	var customer: Node = order.get("customer")
+
+	# 의뢰 보수 지급
+	var bar_manager := get_parent()
+	if bar_manager and bar_manager.has_method("record_income"):
+		bar_manager.record_income(item.base_price)
+
+	# 손님에게 완료 알림
+	if customer and is_instance_valid(customer) and customer.has_method("receive_order"):
+		customer.receive_order(order)
+
+	order["status"] = "quest_completed"
+	quest_completed.emit(order)
+	order_served.emit(order)
+
+	var bus := get_node_or_null("/root/EventBus")
+	if bus:
+		bus.order_served.emit(item.id)
+		bus.quest_completed.emit(item.id)
 
 
 ## resources/menus/ 폴더에서 메뉴 리소스를 자동 로드.
