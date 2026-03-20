@@ -62,11 +62,13 @@ var _patience_remaining: float = 60.0
 var _max_patience: float = 60.0
 var _bar_manager: Node = null
 var _menu_system: Node = null
+var _dialogue_system: Node = null
 
 
 func _ready() -> void:
 	_bar_manager = _find_bar_manager()
 	_menu_system = _find_menu_system()
+	_dialogue_system = _find_dialogue_system()
 	_apply_customer_data()
 
 
@@ -139,6 +141,15 @@ func receive_order(order: Dictionary) -> void:
 func start_chat() -> void:
 	if current_state not in [State.IDLE, State.WAITING_FOR_ORDER, State.BROWSING]:
 		return
+
+	# DialogueSystem이 있으면 구조화된 대화 시작
+	if _dialogue_system and _dialogue_system.has_method("start_dialogue"):
+		if _dialogue_system.start_dialogue(self):
+			_change_state(State.CHATTING)
+			chat_started.emit()
+			return
+
+	# 폴백: 기존 타이머 기반 대화
 	_change_state(State.CHATTING)
 	chat_started.emit()
 
@@ -225,9 +236,13 @@ func _process_idle(delta: float) -> void:
 
 
 func _process_chatting(delta: float) -> void:
+	# DialogueSystem 기반 대화 → 시스템이 종료 시그널 보내면 전환
+	if _dialogue_system and _dialogue_system.get("is_active"):
+		return  # 대화 시스템이 진행 중이면 타이머 무시
+
+	# 폴백: 타이머 기반
 	_state_timer += delta
 	if _state_timer >= chat_duration:
-		# 대화 완료 → 인내심 회복
 		var bonus := customer_data.chat_patience_bonus if customer_data else 10.0
 		_patience_remaining = minf(_patience_remaining + bonus, _max_patience)
 		customer_satisfaction += 5
@@ -337,3 +352,23 @@ func _find_menu_system() -> Node:
 	if _bar_manager:
 		return _bar_manager.get_node_or_null("MenuSystem")
 	return null
+
+
+func _find_dialogue_system() -> Node:
+	if _bar_manager:
+		var ds := _bar_manager.get_node_or_null("DialogueSystem")
+		if ds:
+			ds.dialogue_ended.connect(_on_dialogue_ended)
+		return ds
+	return null
+
+
+func _on_dialogue_ended(customer: Node) -> void:
+	if customer != self:
+		return
+	if current_state == State.CHATTING:
+		var bonus := customer_data.chat_patience_bonus if customer_data else 10.0
+		_patience_remaining = minf(_patience_remaining + bonus, _max_patience)
+		customer_satisfaction += 5
+		chat_ended.emit(bonus)
+		_change_state(State.IDLE)

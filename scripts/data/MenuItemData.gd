@@ -26,6 +26,8 @@ enum MenuType {
 @export var ingredients: Dictionary = {}  ## {"재료ID": 수량}. QUEST는 비워둠.
 @export var satisfaction: int = 10        ## 손님 만족도 기여
 @export var unlock_level: int = 1         ## 해금에 필요한 바 레벨
+## 연결된 레시피 ID. 비어있으면 자동 제작 (craft_time 소요).
+@export var recipe_id: StringName = &""
 
 @export_group("의뢰 전용")
 ## 의뢰 보상 아이템 (아이템ID → 수량). QUEST 타입에서만 사용.
@@ -42,3 +44,8 @@ func is_consumable() -> bool:
 ## 의뢰인지 확인.
 func is_quest() -> bool:
 	return menu_type == MenuType.QUEST
+
+
+## 레시피가 있는지 확인 (단계별 제조 필요 여부).
+func has_recipe() -> bool:
+	return recipe_id != &""
