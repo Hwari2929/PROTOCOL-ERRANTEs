@@ -1,0 +1,366 @@
+{
+  "id": "dlg_velvet",
+  "entries": {
+    "greeting": [
+      {
+        "npc_line": "...좋은 밤이야. 별이 보이는 자리가 있을까?",
+        "tag": "opening",
+        "responses": [
+          { "text": "(창가 자리를 가리킨다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(고개를 끄덕인다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "여긴 조용하군. 글을 쓰기 좋겠어.",
+        "tag": "opening",
+        "responses": [
+          { "text": "(편히 앉으시라는 듯 자리를 안내한다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(노트와 펜이 보인다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "이 바의 간판이... 달빛에 젖어 있더군. 아름다웠어.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(뜻밖의 칭찬이다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "아, 문을 열 때 바람이 시를 한 줄 써줬어. 못 잡았지만.",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...바람이 시를요?", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(독특한 분이다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "달이 오늘따라 낮게 떠 있어. ...무슨 의미가 있을 거야.",
+        "tag": "boring",
+        "responses": [
+          { "text": "(끄덕인다)", "effect": "none", "effect_value": 0 },
+          { "text": "(달을 올려다본다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "한밤의 바에 홀로 들어오는 건... 시의 첫 행 같아.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(분위기 있는 말씀이다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(조용히 잔을 닦는다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      }
+    ],
+
+    "waiting": [
+      {
+        "npc_line": "기다림도 시의 일부야. 서두르지 않아도 돼.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(감사한 마음이다)", "effect": "patience_up", "effect_value": 12 },
+          { "text": "(고개를 숙인다)", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "잔이 비어 있어도 괜찮아. 빈 잔에도 의미가 있으니까.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(깊은 말씀이다)", "effect": "patience_up", "effect_value": 10 },
+          { "text": "(곧 채워드릴 마음으로 서두른다)", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "지금 한 편의 시가 떠올랐는데... 제목이 뭐였더라.",
+        "tag": "boring",
+        "responses": [
+          { "text": "(기다린다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(끄덕이며 듣는다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "기다리는 시간에 셋을 세. 하나, 둘... 오, 벌써 온 줄 알았는데.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(미안한 마음이다)", "effect": "patience_up", "effect_value": 8 },
+          { "text": "(서두른다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "...혹시 이 잔에 달빛이 담기는 각도를 알고 있나?",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...각도요?", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(잔을 돌려본다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "요즘 시가 안 써져서. 영감이 필요해. 이 바가 도와줄 것 같아.",
+        "tag": "story",
+        "responses": [
+          { "text": "(도움이 되길 바란다)", "effect": "patience_up", "effect_value": 10 },
+          { "text": "(귀를 기울인다)", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "누군가를 기다리는 시를 쓴 적이 있어. 결국 오지 않았지만.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(가슴이 아프다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(조용히 듣는다)", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "...아, 죄송. 멍하게 밖을 보고 있었어. 습관이야.",
+        "tag": "boring",
+        "responses": [
+          { "text": "(괜찮다는 듯 고개를 끄덕인다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(이해한다)", "effect": "none", "effect_value": 0 }
+        ]
+      }
+    ],
+
+    "idle": [
+      {
+        "npc_line": "이 바의 조명이 좋아. 어둡지만 외롭지 않은.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(뿌듯하다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(미소짓는다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "...어젯밤에 별이 떨어지는 꿈을 꿨어. 잔 안으로.",
+        "tag": "absurd",
+        "responses": [
+          { "text": "(신기한 꿈이다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "...잔 안으로요?", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "한 편의 시를 완성하는 데 3년이 걸린 적이 있어. 단 네 줄.",
+        "tag": "story",
+        "responses": [
+          { "text": "(놀랍다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "...들어봐도 될까요?", "effect": "satisfaction_up", "effect_value": 8, "next_context": "velvet_poem" }
+        ]
+      },
+      {
+        "npc_line": "물방울이 잔에 맺히는 순간이 있잖아. 그 짧은 영원에 대해 쓰고 싶어.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(감탄한다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(물방울을 바라본다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "낮에는 자고 밤에 일어나. 세상이 조용해지는 시간에 맞춰서.",
+        "tag": "story",
+        "responses": [
+          { "text": "(야행성이시구나)", "effect": "patience_up", "effect_value": 3 },
+          { "text": "밤이 더 좋으세요?", "effect": "patience_up", "effect_value": 5, "next_context": "velvet_night" }
+        ]
+      },
+      {
+        "npc_line": "...가끔 글을 쓰다가 울어. 왜 우는지는 몰라. 그냥 글이 그렇게 시켜.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "(마음이 아프다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "출판사에서 시집을 내자고 했는데 거절했어. 인쇄된 시는 죽은 시거든.",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...죽은 시요?", "effect": "patience_up", "effect_value": 5, "next_context": "velvet_dead_poem" },
+          { "text": "(독특한 생각이다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "아, 그러고 보니 오늘이 음력 보름이야. 달이 시를 써줄 날이지.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(달을 올려다본다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "예전에 사랑하는 사람에게 시를 써줬는데... 읽어보지도 않더라.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(가슴이 아프다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "...그 시는 어떻게 됐나요?", "effect": "satisfaction_up", "effect_value": 5, "next_context": "velvet_love_poem" }
+        ]
+      },
+      {
+        "npc_line": "...바텐더는 시인과 비슷해. 밤을 지키는 사람이라는 점에서.",
+        "tag": "praise",
+        "responses": [
+          { "text": "(뜻밖의 말에 놀란다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "내 시의 주제는 대부분 '부재'야. 없는 것에 대해 쓰는 거지.",
+        "tag": "story",
+        "responses": [
+          { "text": "(깊은 말이다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(끄덕이며 듣는다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "혹시 이 바에 유령이 나오나? ...유령이면 좋은 시 소재인데.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "...아직까지는 없어요.", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...창 밖에 고양이가 있어. 저 녀석도 밤을 사는 동료군.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(창 밖을 본다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(고양이도 시인일까)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "eating": [
+      {
+        "npc_line": "...한 모금에 밤 하나가 녹아드는 기분이야.",
+        "tag": "menu_review",
+        "responses": [
+          { "text": "(뿌듯하다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(고개를 끄덕인다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "이 투명함 안에 이야기가 있어. 읽히지 않는 시처럼.",
+        "tag": "menu_review",
+        "responses": [
+          { "text": "(아름다운 표현이다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(듣고 있다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "차갑군. ...좋은 차가움이야. 기억을 선명하게 해주는.",
+        "tag": "menu_review",
+        "responses": [
+          { "text": "(마음에 드신 것 같다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(끄덕인다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "물은 정직해. 아무것도 숨기지 않으니까.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(감탄한다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(새로운 관점이다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "잔에 입술을 대는 순간 시 한 줄이 떠올랐어. ...잊어버렸지만.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(아깝다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(웃음을 참는다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "이 얼음이 녹는 속도가... 내 시가 완성되는 속도와 비슷해.",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...꽤 빠른 건가요?", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(그렇게 느린 건가)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "farewell": [
+      {
+        "npc_line": "오늘 밤의 시는 여기서 끝. ...고마웠어.",
+        "tag": "closing",
+        "responses": [
+          { "text": "(손을 흔든다)", "effect": "satisfaction_up", "effect_value": 3 },
+          { "text": "(고개를 끄덕인다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "다음에 올 때는 시 한 편을 가져올게. 이 바를 위한.",
+        "tag": "closing",
+        "responses": [
+          { "text": "(기대된다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "...밤이 끝나기 전에 가야 해. 해가 뜨면 마법이 풀리거든.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(신데렐라 같으시다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "좋은 바는 좋은 시와 같아. 끝나도 여운이 남지.",
+        "tag": "praise",
+        "responses": [
+          { "text": "(감동이다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "(뿌듯하다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      }
+    ],
+
+    "velvet_poem": [
+      {
+        "npc_line": "'빈 잔 위에 / 달이 앉아 / 물을 마시고 / 떠났다.' ...전부야.",
+        "tag": "story",
+        "responses": [
+          { "text": "(아름답다)", "effect": "satisfaction_up", "effect_value": 12 },
+          { "text": "(여운이 남는다)", "effect": "satisfaction_up", "effect_value": 10 }
+        ]
+      }
+    ],
+    "velvet_night": [
+      {
+        "npc_line": "밤에는 모든 게 솔직해져. 낮의 가면을 벗으니까.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(공감한다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "...그래서 밤에 쓰시는 거군요.", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ],
+    "velvet_dead_poem": [
+      {
+        "npc_line": "시는 읽히는 순간에만 살아있어. 종이에 갇히면 박제가 되는 거야.",
+        "tag": "story",
+        "responses": [
+          { "text": "(생각해본 적 없는 관점이다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "그럼 어떻게 전하시나요?", "effect": "patience_up", "effect_value": 5, "next_context": "velvet_how_share" }
+        ]
+      }
+    ],
+    "velvet_how_share": [
+      {
+        "npc_line": "직접 읽어줘. 한 사람에게만. ...오늘은 네가 그 한 사람이야.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(가슴이 뛴다)", "effect": "satisfaction_up", "effect_value": 15 },
+          { "text": "(영광이다)", "effect": "satisfaction_up", "effect_value": 12 }
+        ]
+      }
+    ],
+    "velvet_love_poem": [
+      {
+        "npc_line": "강에 띄워 보냈어. 종이배를 접어서. ...아마 바다까지 갔겠지.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(가슴이 먹먹하다)", "effect": "satisfaction_up", "effect_value": 12 },
+          { "text": "(아름다운 이별이다)", "effect": "satisfaction_up", "effect_value": 10 }
+        ]
+      }
+    ]
+  }
+}

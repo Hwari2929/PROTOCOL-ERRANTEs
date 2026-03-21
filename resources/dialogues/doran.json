@@ -1,0 +1,378 @@
+{
+  "id": "dlg_doran",
+  "entries": {
+    "greeting": [
+      {
+        "npc_line": "...여기 괜찮군. 따뜻해.",
+        "tag": "opening",
+        "responses": [
+          { "text": "(자리를 안내한다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(고개를 끄덕인다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "오랜만에 나왔어. 집에만 있으니 뼈가 굳더라고.",
+        "tag": "opening",
+        "responses": [
+          { "text": "(반갑게 맞이한다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(편히 앉으시라는 듯 의자를 당긴다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "이 문 손잡이... 누가 만들었지? 균형이 안 맞아.",
+        "tag": "complaint",
+        "responses": [
+          { "text": "...그런가요?", "effect": "patience_up", "effect_value": 3 },
+          { "text": "(손잡이를 본다)", "effect": "none", "effect_value": 0 }
+        ]
+      },
+      {
+        "npc_line": "바닥의 나무가 좋군. 참나무인가. 30년은 됐겠어.",
+        "tag": "story",
+        "responses": [
+          { "text": "(관찰력이 날카로우시다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(끄덕인다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...허리가. 앉아도 되겠지.",
+        "tag": "boring",
+        "responses": [
+          { "text": "(당연하다는 듯 의자를 당긴다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(등받이 있는 자리를 안내한다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "바 구석에 앉아도 되나. 벽이 등을 받쳐주는 게 좋아서.",
+        "tag": "opening",
+        "responses": [
+          { "text": "(구석 자리를 안내한다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(끄덕인다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      }
+    ],
+
+    "waiting": [
+      {
+        "npc_line": "급할 것 없어. 좋은 건 천천히 만들어지는 법이지.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(감사하다)", "effect": "patience_up", "effect_value": 15 },
+          { "text": "(고개를 숙인다)", "effect": "patience_up", "effect_value": 10 }
+        ]
+      },
+      {
+        "npc_line": "쇠를 달굴 때도 그랬어. 서두르면 부러지지.",
+        "tag": "story",
+        "responses": [
+          { "text": "(귀를 기울인다)", "effect": "patience_up", "effect_value": 10 },
+          { "text": "(깊은 말씀이다)", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "...대장간에서는 하루에 열두 시간을 서서 일했어. 앉아서 기다리는 건 호사야.",
+        "tag": "story",
+        "responses": [
+          { "text": "(존경스럽다)", "effect": "patience_up", "effect_value": 12 },
+          { "text": "(듣고 있다)", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "...이 테이블 다리가 살짝 흔들리는군. 쐐기를 박으면 고칠 수 있어.",
+        "tag": "complaint",
+        "responses": [
+          { "text": "(고쳐주시겠다는 건가)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(살짝 흔들어본다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "예전에 검 하나 만드는 데 석 달이 걸렸어. 기다림이 뭔지 알지.",
+        "tag": "story",
+        "responses": [
+          { "text": "(석 달이나요)", "effect": "patience_up", "effect_value": 12 },
+          { "text": "어떤 검이었나요?", "effect": "patience_up", "effect_value": 10, "next_context": "doran_sword" }
+        ]
+      },
+      {
+        "npc_line": "...냄새가 좋군. 나무와 물 냄새. 대장간과는 다른 좋음이야.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(미소짓는다)", "effect": "patience_up", "effect_value": 8 },
+          { "text": "(뿌듯하다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "기다리면서 이 의자를 보고 있었는데... 접합부 처리가 깔끔하군.",
+        "tag": "boring",
+        "responses": [
+          { "text": "(의자를 본다)", "effect": "none", "effect_value": 0 },
+          { "text": "(장인의 눈이시다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "idle": [
+      {
+        "npc_line": "...이 자리가 마음에 들어. 좀 더 있겠어.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(천천히 계시라는 듯 끄덕인다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(미소짓는다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "40년 동안 매일 쇠를 두드렸어. 어느 날 갑자기 망치가 무겁더라고.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(마음이 무겁다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "내가 만든 검 중에... 사람을 벤 것도 있겠지. 생각하면 잠이 안 와.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(무거운 고백이다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "은퇴하고 나니까 손이 심심해. 뭘 만들어야 하는데.",
+        "tag": "boring",
+        "responses": [
+          { "text": "(끄덕인다)", "effect": "patience_up", "effect_value": 3 },
+          { "text": "(이해한다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "아내가 만들어준 반지가 있어. 내가 가르쳐줬지. ...나보다 잘 만들더라고.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(좋은 이야기다)", "effect": "satisfaction_up", "effect_value": 5, "next_context": "doran_wife" }
+        ]
+      },
+      {
+        "npc_line": "이 컵... 도자기인가. 성형이 균일해. 좋은 장인이 만들었군.",
+        "tag": "praise",
+        "responses": [
+          { "text": "(관찰력이 예리하시다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(끄덕인다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "쇠를 두드리면 노래가 돼. 땡, 땡, 땡. 리듬이 있어.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(상상해본다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "그리우시죠?", "effect": "satisfaction_up", "effect_value": 5, "next_context": "doran_miss" }
+        ]
+      },
+      {
+        "npc_line": "한 번은 왕실에서 주문이 들어왔어. 의전용 검. ...화려하기만 한 쓸모없는 것.",
+        "tag": "complaint",
+        "responses": [
+          { "text": "(불만이셨나보다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(듣고 있다)", "effect": "patience_up", "effect_value": 5, "next_context": "doran_royal" }
+        ]
+      },
+      {
+        "npc_line": "손자가 '할아버지는 뭘 만들었어?'라고 물어서 '세상을 지키는 것'이라고 했어.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(멋진 대답이다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "...요즘은 화분을 만들고 있어. 쇠 화분. 아내가 꽃을 좋아하거든.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(따뜻한 이야기다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "좋은 금속은 소리로 알 수 있어. 맑게 울리면 잘 된 거야.",
+        "tag": "story",
+        "responses": [
+          { "text": "(귀를 기울인다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(전문가의 말씀이다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "...이 바 카운터. 참나무 위에 철판을 깔면 물자국 안 생길 텐데.",
+        "tag": "complaint",
+        "responses": [
+          { "text": "(메모해둔다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(장인의 시선이다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "내 대장간 화덕은 아직 꺼지지 않았어. ...불씨만 남아 있지만.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(마음이 짠하다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "eating": [
+      {
+        "npc_line": "...좋아. 뼛속까지 따뜻해지는군.",
+        "tag": "menu_review",
+        "responses": [
+          { "text": "(다행이다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(끄덕인다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "물맛이 깨끗해. 불순물이 없어.",
+        "tag": "menu_review",
+        "responses": [
+          { "text": "(장인의 평가다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(뿌듯하다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "대장간에서 마시던 물은 쇠 냄새가 났지. 이건 좋아.",
+        "tag": "menu_review",
+        "responses": [
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(비교 대상이 독특하시다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "이 잔의 두께가 딱 좋군. 너무 얇으면 잘 깨지거든.",
+        "tag": "boring",
+        "responses": [
+          { "text": "(끄덕인다)", "effect": "none", "effect_value": 0 },
+          { "text": "(역시 장인이시다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...따뜻한 게 좋아. 대장간의 열기가 그리울 때 대신이 되어주지.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(마음이 짠하다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...잘 만들었어. 단순한 것일수록 잘 만들기 어려운 법이지.",
+        "tag": "praise",
+        "responses": [
+          { "text": "(최고의 칭찬이다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "(뿌듯하다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      }
+    ],
+
+    "farewell": [
+      {
+        "npc_line": "잘 쉬었어. ...또 올게.",
+        "tag": "closing",
+        "responses": [
+          { "text": "(고개를 끄덕인다)", "effect": "satisfaction_up", "effect_value": 3 },
+          { "text": "(손을 흔든다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...이 문 손잡이, 다음에 올 때 공구 가져올게. 고쳐줄 테니.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(진심이신 것 같다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "따뜻했어. 사람도, 음료도.",
+        "tag": "closing",
+        "responses": [
+          { "text": "(따뜻한 인사다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "좋은 바야. 좋은 금속처럼... 맑게 울려.",
+        "tag": "praise",
+        "responses": [
+          { "text": "(가슴이 뭉클하다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "(잊지 못할 칭찬이다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      }
+    ],
+
+    "doran_sword": [
+      {
+        "npc_line": "장검이었어. 기사단 단장의 주문. ...잘 쓰고 있었으면 좋겠군.",
+        "tag": "story",
+        "responses": [
+          { "text": "(듣고 있다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "...그 기사는 어떻게 됐나요?", "effect": "patience_up", "effect_value": 5, "next_context": "doran_knight" }
+        ]
+      }
+    ],
+    "doran_knight": [
+      {
+        "npc_line": "전쟁에서 돌아오지 못했어. 검은 돌아왔지만.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(말이 나오지 않는다)", "effect": "satisfaction_up", "effect_value": 12 },
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 10 }
+        ]
+      }
+    ],
+    "doran_wife": [
+      {
+        "npc_line": "50년을 같이 살았어. 처음엔 대장간이 시끄럽다고 싫어했는데.",
+        "tag": "story",
+        "responses": [
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "지금은요?", "effect": "satisfaction_up", "effect_value": 5, "next_context": "doran_wife2" }
+        ]
+      }
+    ],
+    "doran_wife2": [
+      {
+        "npc_line": "지금은... 조용한 게 더 싫대. 망치 소리가 그립다고.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(좋은 부부시다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      }
+    ],
+    "doran_miss": [
+      {
+        "npc_line": "...그립지 않다고 하면 거짓말이겠지. 하지만 이 손이 기억하고 있으니 됐어.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "(존경스럽다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      }
+    ],
+    "doran_royal": [
+      {
+        "npc_line": "보석을 박고, 금으로 감싸고. ...검이 아니라 장식품이었지.",
+        "tag": "complaint",
+        "responses": [
+          { "text": "(불만이셨구나)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "진짜 검은 어떤 건가요?", "effect": "satisfaction_up", "effect_value": 5, "next_context": "doran_real_sword" }
+        ]
+      }
+    ],
+    "doran_real_sword": [
+      {
+        "npc_line": "좋은 검은 단순해. 균형이 맞고, 손에 붙고, 배신하지 않는 것.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(깊은 말씀이다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "(물건도 사람도 마찬가지인 것 같다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      }
+    ]
+  }
+}

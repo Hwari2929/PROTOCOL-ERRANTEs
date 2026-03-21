@@ -1,0 +1,354 @@
+{
+  "id": "dlg_pike",
+  "entries": {
+    "greeting": [
+      {
+        "npc_line": "...한 잔.",
+        "tag": "opening",
+        "responses": [
+          { "text": "네, 바로 준비할게요.", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "용병이셨다면서요?", "effect": "patience_up", "effect_value": 3, "next_context": "merc_talk" }
+        ]
+      },
+      {
+        "npc_line": "복잡한 건 됐고. 차가운 거 하나.",
+        "tag": "opening",
+        "responses": [
+          { "text": "글레이셔 샷 어떠세요?", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "얼음물 바로 가져올게요.", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "...시끄러운 데는 질렸어. 여긴 조용하군.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(끄덕인다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(자리를 안내한다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "입구에서 출구까지 3초. ...습관이야.",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...탈출 경로를 보시는 건가요?", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(무서운 습관이다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...앉을 만한 자리가 있나. 벽쪽으로.",
+        "tag": "boring",
+        "responses": [
+          { "text": "(벽쪽 자리를 가리킨다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(끄덕인다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...간판이 찌그러져 있더군. 고쳐.",
+        "tag": "complaint",
+        "responses": [
+          { "text": "...감사합니다?", "effect": "patience_up", "effect_value": 3 },
+          { "text": "(메모해둔다)", "effect": "none", "effect_value": 0 }
+        ]
+      }
+    ],
+
+    "waiting": [
+      {
+        "npc_line": "...늦어지면 간다.",
+        "tag": "complaint",
+        "responses": [
+          { "text": "바로 가져갈게요!", "effect": "patience_up", "effect_value": 10 },
+          { "text": "조금만 기다려주세요.", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "전장에선 3초 안에 물을 마셔야 했어.",
+        "tag": "story",
+        "responses": [
+          { "text": "여긴 전장이 아니니까 천천히요.", "effect": "patience_up", "effect_value": 8 },
+          { "text": "거의 다 됐어요!", "effect": "patience_up", "effect_value": 6 }
+        ]
+      },
+      {
+        "npc_line": "...기다리는 건 싫어. 근데 여긴 참아줄게.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(감사하다)", "effect": "patience_up", "effect_value": 12 },
+          { "text": "(서두른다)", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "...칼자루를 쥐고 기다리던 시절보단 낫지.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 듣는다)", "effect": "patience_up", "effect_value": 10 },
+          { "text": "(무거운 말이다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "기다리는 동안 이 의자 다리를 세 번 찼어. ...습관이야.",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...의자가 불쌍해요.", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(무서운 습관이다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "한 잔이 이렇게 오래 걸리는 건... 아, 됐어. 기다릴게.",
+        "tag": "complaint",
+        "responses": [
+          { "text": "(서두른다)", "effect": "patience_up", "effect_value": 8 },
+          { "text": "(미안한 마음이다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "동료들이 쉬는 시간에 술을 마셨지. 나는 물만 마셨어. 살아남은 이유야.",
+        "tag": "story",
+        "responses": [
+          { "text": "(듣고 있다)", "effect": "patience_up", "effect_value": 10 },
+          { "text": "(현명하셨다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "...여기 소리가 적어서 좋군. 전장은 항상 시끄러웠으니까.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 듣는다)", "effect": "patience_up", "effect_value": 10 },
+          { "text": "(쉬고 계세요)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "idle": [
+      {
+        "npc_line": "...나쁘지 않았어.",
+        "tag": "praise",
+        "responses": [
+          { "text": "더 드실 건요?", "effect": "none", "effect_value": 0 },
+          { "text": "감사합니다.", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...검을 내려놓으니까 손이 가볍더라. 처음엔 불안했어.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "지금은요?", "effect": "satisfaction_up", "effect_value": 5, "next_context": "pike_now" }
+        ]
+      },
+      {
+        "npc_line": "전장에서 같이 싸우던 녀석이 있었어. 말이 많은 놈. ...보고 싶군.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(가슴이 아프다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "요즘은 낚시를 해. 물고기는 배신 안 하니까.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃어야 할지 모르겠다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(씁쓸한 유머다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "한 번은 혼자서 열 명을 상대한 적 있어. ...자랑이 아니야.",
+        "tag": "story",
+        "responses": [
+          { "text": "(듣고 있다)", "effect": "patience_up", "effect_value": 8 },
+          { "text": "...살아계셔서 다행이에요.", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "여기 잔이 튼튼하군. 전장에서 쓰던 주석잔은 한 번 떨어뜨리면 찌그러졌지.",
+        "tag": "boring",
+        "responses": [
+          { "text": "(끄덕인다)", "effect": "none", "effect_value": 0 },
+          { "text": "(비교 대상이 독특하시다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...이 바는 괜찮아. 이유는 모르겠지만.",
+        "tag": "praise",
+        "responses": [
+          { "text": "(뿌듯하다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "용병은 약속을 지키는 직업이야. ...돈 받고 하는 약속이지만.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(씁쓸하다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(웃음을 참는다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "전장에서 가장 무서운 건 적이 아니야. 조용한 밤이야.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(무거운 말이다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "...이 물은 깨끗하군. 전장의 물은 항상 탁했어.",
+        "tag": "story",
+        "responses": [
+          { "text": "(여기서 편히 드세요)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(끄덕인다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "은퇴하고 제일 먼저 한 건 검을 녹인 거야. ...후회는 없어.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(강한 결심이다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "가끔 꿈에서 아직도 싸워. ...깨면 다행이라고 생각해.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(마음이 아프다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "여기서 좋은 꿈 꾸세요.", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "...이 바에서는 경계를 안 해도 되는군. 오랜만이야.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(따뜻한 기분이 든다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "(편히 계세요)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "상처 자국을 세면 서른일곱 개야. ...하나하나 이유가 있지.",
+        "tag": "story",
+        "responses": [
+          { "text": "(듣고 있다)", "effect": "patience_up", "effect_value": 8 },
+          { "text": "(말이 안 나온다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "eating": [
+      {
+        "npc_line": "...깔끔하군.",
+        "tag": "menu_review",
+        "responses": [
+          { "text": "다행이에요.", "effect": "satisfaction_up", "effect_value": 3 },
+          { "text": "(끄덕인다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...군더더기 없어서 좋아. 술처럼 머리가 흐려지지 않으니까.",
+        "tag": "praise",
+        "responses": [
+          { "text": "(뿌듯하다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "이 차가움이 좋아. 정신이 또렷해져.",
+        "tag": "menu_review",
+        "responses": [
+          { "text": "(마음에 드셨나보다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(끄덕인다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "전장에선 물 한 모금이 생사를 갈랐지. ...여기선 그냥 맛있는 거야.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(무거운 말이다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "...잘 만들었어. 군대 취사병보다 낫군.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(그건 칭찬인가)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(웃음을 참는다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "...이걸 마시면 조금 인간 같아지는 기분이야.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(가슴이 뭉클하다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      }
+    ],
+
+    "farewell": [
+      {
+        "npc_line": "...또 온다.",
+        "tag": "closing",
+        "responses": [
+          { "text": "기다리고 있을게요.", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(고개를 끄덕인다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...괜찮은 바야. 다음엔 더 빨리 줘.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(노력할게요)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "오랜만에 편히 쉬었어. ...고맙다.",
+        "tag": "closing",
+        "responses": [
+          { "text": "(따뜻한 인사다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "...누가 건드리면 말해. 처리해줄게.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(든든하다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "(진심이신 것 같다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      }
+    ],
+
+    "merc_talk": [
+      {
+        "npc_line": "...그건 옛날 얘기야. 지금은 마시러 왔을 뿐이야.",
+        "tag": "story",
+        "responses": [
+          { "text": "알겠습니다.", "effect": "patience_up", "effect_value": 5 },
+          { "text": "그래도 대단한 분이시네요.", "effect": "satisfaction_up", "effect_value": 3, "next_context": "past_talk" }
+        ]
+      }
+    ],
+    "past_talk": [
+      {
+        "npc_line": "...대단할 것 없어. 살아남았을 뿐이야.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 끄덕인다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "여기선 편히 쉬세요.", "effect": "patience_up", "effect_value": 8 }
+        ]
+      }
+    ],
+    "pike_now": [
+      {
+        "npc_line": "...지금은 괜찮아. 이런 곳에서 물 마시는 게 좋으니까.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(따뜻한 기분이 든다)", "effect": "satisfaction_up", "effect_value": 12 },
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      }
+    ]
+  }
+}

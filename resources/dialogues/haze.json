@@ -1,0 +1,344 @@
+{
+  "id": "dlg_haze",
+  "entries": {
+    "greeting": [
+      {
+        "npc_line": "안녕! 여기 처음인데, 뭐가 맛있어?",
+        "tag": "opening",
+        "responses": [
+          { "text": "얼음물이 기본이에요!", "effect": "patience_up", "effect_value": 5 },
+          { "text": "약초사라고 들었는데요?", "effect": "satisfaction_up", "effect_value": 5, "next_context": "herb_talk" }
+        ]
+      },
+      {
+        "npc_line": "우와, 이 바 분위기 좋다! 허브 화분 놓으면 더 좋을 텐데!",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "좋은 아이디어네요!", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "뭘 드릴까요?", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "허브 향 솔솔~ 아, 이건 내 가방에서 나는 냄새야. 히히.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "무슨 허브예요?", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "오늘 숲에서 새 약초를 발견했어! 이름은... 아직 안 지었어!",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...이름을 안 지었다고요?", "effect": "patience_up", "effect_value": 3 },
+          { "text": "(신나 보이신다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "여기 공기가 좋다! 환기를 잘 시키는구나! ...아, 직업병이야.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음을 참는다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "감사합니다?", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "문 앞에 자라는 잡초 봤어? 사실 약효가 있는 풀이야!",
+        "tag": "story",
+        "responses": [
+          { "text": "(몰랐다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(관찰력이 대단하시다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "waiting": [
+      {
+        "npc_line": "기다리는 동안 이 테이블 냄새 좀 맡아봐도 돼? ...나무 향이 좋다!",
+        "tag": "absurd",
+        "responses": [
+          { "text": "편하게 하세요!", "effect": "patience_up", "effect_value": 10 },
+          { "text": "곧 가져다드릴게요!", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "아 참, 아까 숲에서 본 버섯이 있는데! 듣고 싶어?",
+        "tag": "story",
+        "responses": [
+          { "text": "네, 들려주세요!", "effect": "patience_up", "effect_value": 15 },
+          { "text": "잠깐만요, 음료부터 가져올게요.", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "기다리는 시간에 약초 분류를 좀 할게! ...어, 이거 어디서 났더라?",
+        "tag": "humor",
+        "responses": [
+          { "text": "(분류가 안 되고 있다)", "effect": "patience_up", "effect_value": 8 },
+          { "text": "(웃음)", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "약초를 말리려면 인내심이 필요해. 기다리는 건 익숙하지!",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(감사하다)", "effect": "patience_up", "effect_value": 12 },
+          { "text": "(여유로운 분이다)", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "혹시 이 바에 약초 말릴 공간이 있을까? ...아, 주문 먼저지!",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...약초를 말리시게요?", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(정신없으시다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "이 바 근처에 뭘풀이 자라더라! 기침에 좋은 건데, 나중에 가져다줄까?",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "정말요? 감사해요!", "effect": "patience_up", "effect_value": 10 },
+          { "text": "(친절한 분이다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "한 번은 약초 채집하다가 곰을 만난 적 있어! ...근데 곰이 더 놀랐더라고.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음을 터뜨린다)", "effect": "patience_up", "effect_value": 12 },
+          { "text": "...위험하잖아요!", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "비 오는 날이 약초 채집하기 제일 좋아. 향이 진해지거든!",
+        "tag": "story",
+        "responses": [
+          { "text": "(몰랐다)", "effect": "patience_up", "effect_value": 8 },
+          { "text": "(전문가의 지식이다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "idle": [
+      {
+        "npc_line": "한 잔 더 마시면서 이야기 더 해도 돼? 할 말이 너무 많아!",
+        "tag": "opening",
+        "responses": [
+          { "text": "물론이죠!", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "뭘 더 드릴까요?", "effect": "none", "effect_value": 0 }
+        ]
+      },
+      {
+        "npc_line": "이 바 창틀에 로즈마리를 심으면 벌레도 안 오고 향기도 나고! 완벽이야!",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(메모해둔다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(열정적이시다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "약초학 책을 쓰고 싶은데... 매번 새 약초를 발견해서 끝이 안 나!",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(좋은 고민이다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "예전에 독초를 약초로 착각한 적 있어. ...3일 동안 누워있었지.",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...괜찮으셨어요?!", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(위험한 직업이다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "스승님이 말씀하셨어. '약초는 대지의 언어'라고. 아직도 배우는 중이야.",
+        "tag": "story",
+        "responses": [
+          { "text": "(멋진 스승님이시다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(듣고 있다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "혹시 뒷마당이 있어? 약초밭을 만들어줄 수 있는데!",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...정말요?", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(진심인 것 같다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "이 물에 레몬밤을 넣으면 수면에 좋아! ...아, 메뉴에 없으면 안 되나?",
+        "tag": "humor",
+        "responses": [
+          { "text": "(레시피를 고려해본다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "가끔 숲에서 길을 잃어. 근데 약초를 따다 보면 어느새 나와 있어!",
+        "tag": "humor",
+        "responses": [
+          { "text": "...그건 좀 위험하지 않나요?", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(운이 좋으신 분이다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "세상에서 가장 좋은 향은 비 온 뒤 흙냄새야. 페트리코르라고 해.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(동의한다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(이름이 있었구나)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "약초사는 외로운 직업이야. ...근데 나는 식물이랑 대화하니까 괜찮아!",
+        "tag": "sad",
+        "responses": [
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "여기도 자주 와요.", "effect": "satisfaction_up", "effect_value": 10 }
+        ]
+      },
+      {
+        "npc_line": "이 바 테이블은 버드나무야! 버드나무 껍질은 해열 효과가 있어!",
+        "tag": "story",
+        "responses": [
+          { "text": "(몰랐다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(뭐든 약초와 연결하신다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "오늘 채집한 약초 보여줄까? 가방에 50종류나 있어!",
+        "tag": "absurd",
+        "responses": [
+          { "text": "50종이나요?!", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(가방이 무겁겠다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "민들레차 아세요? 해독에 좋거든! 메뉴에 넣으면 대박일 텐데!",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(고려해본다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(레시피를 물어봐야겠다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "한 번은 약초밭에서 잠들었는데 온몸에 꽃가루가... 히히.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(천진난만하시다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "eating": [
+      {
+        "npc_line": "음~ 이 물 깨끗하다! 어디서 가져온 거야?",
+        "tag": "menu_review",
+        "responses": [
+          { "text": "비밀이에요.", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "이 물에 박하를 넣으면 위장에도 좋고 맛도 좋을 텐데!",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(메모해둔다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(항상 약초 생각이시구나)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "깔끔하다! 잡맛이 없어! 좋은 수원이구나!",
+        "tag": "praise",
+        "responses": [
+          { "text": "(뿌듯하다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "감사합니다!", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "이거 마시니까 힘이 나! ...아, 그건 약초 효과가 아니라 기분 문제인가?",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(기분도 중요하죠)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "얼음이 녹는 소리가 좋다... 빗방울 떨어지는 소리 같아.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(섬세한 감각이시다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(끄덕인다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "이 잔을 다 마시면... 숲으로 돌아가야지. 해가 지기 전에 채집해야 해!",
+        "tag": "story",
+        "responses": [
+          { "text": "(열정적이시다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(조심히 다녀오세요)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "farewell": [
+      {
+        "npc_line": "아 벌써 가야 해! 다음엔 약초 선물 가져올게! 안녕!",
+        "tag": "closing",
+        "responses": [
+          { "text": "기대할게요! 또 오세요!", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(손을 흔든다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "오늘 여기서 마신 물 덕분에 기운이 났어! 내일도 채집 열심히 할게!",
+        "tag": "praise",
+        "responses": [
+          { "text": "(뿌듯하다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "가기 전에! 이 말린 허브 하나 줄게! 베개 밑에 넣으면 잠이 잘 와!",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "감사합니다!", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(따뜻한 분이다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "다음에 올 때 이 바에 어울리는 허브를 가져올게! 기대해!",
+        "tag": "closing",
+        "responses": [
+          { "text": "(기대된다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(꼭 와주세요)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "herb_talk": [
+      {
+        "npc_line": "맞아! 숲이랑 들판을 돌아다니면서 약초를 모으고 있어. 오늘은 30종이나 찾았어!",
+        "tag": "story",
+        "responses": [
+          { "text": "30종이나요?!", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "어떤 약초를 찾으시나요?", "effect": "patience_up", "effect_value": 8, "next_context": "herb_detail" }
+        ]
+      }
+    ],
+    "herb_detail": [
+      {
+        "npc_line": "지금은 이슬풀을 찾고 있어. 새벽에만 피는데, 물을 정화하는 효능이 있거든!",
+        "tag": "story",
+        "responses": [
+          { "text": "신기하네요!", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "그래서 모닝 미스트를 좋아하시는 거군요.", "effect": "patience_up", "effect_value": 10 }
+        ]
+      }
+    ]
+  }
+}

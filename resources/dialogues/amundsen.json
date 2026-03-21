@@ -1,0 +1,406 @@
+{
+  "id": "dlg_amundsen",
+  "entries": {
+    "greeting": [
+      {
+        "npc_line": "...여기가 그 바인가. 나쁘지 않군.",
+        "tag": "opening",
+        "responses": [
+          { "text": "어서 오세요.", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(고개를 끄덕인다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "추운 날이야. 따뜻한 곳을 찾고 있었지.",
+        "tag": "opening",
+        "responses": [
+          { "text": "(자리를 안내한다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(따뜻한 수건을 건넨다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "문 여는 방향이 남쪽이군. ...직업병이야.",
+        "tag": "humor",
+        "responses": [
+          { "text": "...방향을 보시는 건가요?", "effect": "patience_up", "effect_value": 3 },
+          { "text": "(웃음을 참는다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "여기 온도가 딱 좋아. 영상 22도. 남극 기지 내부랑 같아.",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...체감으로 아시는 건가요?", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(온도계를 확인한다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...바닥이 안 미끄럽군. 좋아.",
+        "tag": "boring",
+        "responses": [
+          { "text": "(끄덕인다)", "effect": "none", "effect_value": 0 },
+          { "text": "...감사합니다?", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "오랜만에 사람 냄새가 나는 곳에 왔어. ...비유적인 의미로.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "편하게 계세요.", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      }
+    ],
+
+    "waiting": [
+      {
+        "npc_line": "기다리는 건 익숙하지. 블리자드가 지나가길 기다린 적도 있으니까.",
+        "tag": "story",
+        "responses": [
+          { "text": "(귀를 기울인다)", "effect": "patience_up", "effect_value": 10 },
+          { "text": "블리자드요...?", "effect": "patience_up", "effect_value": 8, "next_context": "amundsen_blizzard" }
+        ]
+      },
+      {
+        "npc_line": "...서두를 필요 없어. 천천히.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(고개를 숙인다)", "effect": "patience_up", "effect_value": 12 },
+          { "text": "(감사한 마음으로 서두른다)", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "남극에서는 물 끓이는 데 20분이 걸려. 여긴 천국이야.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "patience_up", "effect_value": 10 },
+          { "text": "20분이요?", "effect": "patience_up", "effect_value": 8, "next_context": "amundsen_boiling" }
+        ]
+      },
+      {
+        "npc_line": "예전에 식수가 떨어져서 눈을 녹여 마신 적이 있어. 3주간.",
+        "tag": "story",
+        "responses": [
+          { "text": "...3주요?", "effect": "patience_up", "effect_value": 10 },
+          { "text": "(놀란 표정)", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "...이 시계 소리가 좋군. 남극에는 시계가 의미 없거든. 해가 안 지니까.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 듣는다)", "effect": "patience_up", "effect_value": 10 },
+          { "text": "...외로우셨겠어요.", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "한 번은 텐트 지퍼가 얼어서 3시간을 밖에서 보냈어. 영하 50도에.",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...살아계신 게 신기해요.", "effect": "patience_up", "effect_value": 10 },
+          { "text": "(입이 벌어진다)", "effect": "patience_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "...가끔 펭귄이 텐트에 찾아왔어. 그게 유일한 손님이었지.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "...여기도 찾아오시잖아요.", "effect": "satisfaction_up", "effect_value": 10 }
+        ]
+      },
+      {
+        "npc_line": "펭귄한테 물 한 잔 줬더니 다음 날 생선을 물고 왔더라고.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음을 터뜨린다)", "effect": "patience_up", "effect_value": 12 },
+          { "text": "...정말요?", "effect": "patience_up", "effect_value": 8 }
+        ]
+      }
+    ],
+
+    "idle": [
+      {
+        "npc_line": "이 바의 분위기가 마음에 드는군. 조용해서 좋아.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(고개를 끄덕인다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(잔을 닦으며 미소짓는다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "...한 잔 더 할까.",
+        "tag": "opening",
+        "responses": [
+          { "text": "(메뉴를 내민다)", "effect": "patience_up", "effect_value": 8 },
+          { "text": "(끄덕인다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "남극점에 처음 섰을 때... 아무 감정도 없었어. 그냥 바람만 불더라.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "...지금은요?", "effect": "satisfaction_up", "effect_value": 5, "next_context": "amundsen_now" }
+        ]
+      },
+      {
+        "npc_line": "빙하가 갈라지는 소리를 들어본 적 있어? 천둥 같으면서도... 슬퍼.",
+        "tag": "sad",
+        "responses": [
+          { "text": "...슬프다니요?", "effect": "satisfaction_up", "effect_value": 5, "next_context": "amundsen_glacier_sound" },
+          { "text": "(고개를 젓는다)", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "동료가 물었어. '왜 또 가냐'고. 대답을 못 했지.",
+        "tag": "story",
+        "responses": [
+          { "text": "(듣고 있다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "...지금은 답을 아시나요?", "effect": "satisfaction_up", "effect_value": 8, "next_context": "amundsen_why" }
+        ]
+      },
+      {
+        "npc_line": "한 번은 나침반이 고장나서 별로 방향을 잡았어. 3일간.",
+        "tag": "story",
+        "responses": [
+          { "text": "(놀라며 듣는다)", "effect": "patience_up", "effect_value": 8 },
+          { "text": "...무사히 돌아오신 거죠?", "effect": "patience_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "요즘 젊은 탐험가들은 GPS를 가져가더라. ...편리한 세상이야.",
+        "tag": "boring",
+        "responses": [
+          { "text": "(끄덕인다)", "effect": "none", "effect_value": 0 },
+          { "text": "시대가 변했죠.", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...혹시 이 바에 개썰매 주차장이 있나?",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...네?", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(진지한 건지 판단이 안 선다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      },
+      {
+        "npc_line": "남극에서 가장 그리운 건 따뜻한 물이었어. 두 번째는 대화.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "두 가지 다 여기 있어요.", "effect": "satisfaction_up", "effect_value": 10 }
+        ]
+      },
+      {
+        "npc_line": "크레바스에 빠졌을 때 인생이 스쳐갔는데... 대부분이 눈 풍경이더라고.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃어야 할지 모르겠다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "...무사하셨다니 다행이에요.", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "여기 벽에 지도를 걸면 좋겠군. 남극 지도.",
+        "tag": "boring",
+        "responses": [
+          { "text": "(고려해본다)", "effect": "patience_up", "effect_value": 3 },
+          { "text": "(끄덕인다)", "effect": "none", "effect_value": 0 }
+        ]
+      },
+      {
+        "npc_line": "...오로라를 본 적 있나? 하늘이 춤을 추는 거야. 진짜로.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(상상해본다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "...보고 싶네요.", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "동상에 걸린 발가락이 아직도 날씨를 예측해. 나름 편리하지.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음을 참는다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "...그건 좀 슬프지 않나요?", "effect": "patience_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "eating": [
+      {
+        "npc_line": "...좋군. 이 차가움은 빙하를 떠올리게 해.",
+        "tag": "menu_review",
+        "responses": [
+          { "text": "(뿌듯하다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(고개를 끄덕인다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...이 물의 순도가 괜찮군. 빙하수에 비할 바는 아니지만.",
+        "tag": "menu_review",
+        "responses": [
+          { "text": "(감사히 받아들인다)", "effect": "satisfaction_up", "effect_value": 3 },
+          { "text": "빙하수는 어떤가요?", "effect": "patience_up", "effect_value": 5, "next_context": "amundsen_glacier_water" }
+        ]
+      },
+      {
+        "npc_line": "남극에서 마신 눈녹은물보다 훨씬 낫군.",
+        "tag": "praise",
+        "responses": [
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "감사합니다.", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "얼음의 각도가 좋아. ...각도에 대해선 좀 까다로워.",
+        "tag": "absurd",
+        "responses": [
+          { "text": "...각도요?", "effect": "patience_up", "effect_value": 5 },
+          { "text": "(진지하게 듣는다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "...조용히 마실 수 있어서 좋아. 펭귄은 시끄럽거든.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(다행이다)", "effect": "patience_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "이걸 마시면 남극이 조금 덜 그리워져.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "...자주 오세요.", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "farewell": [
+      {
+        "npc_line": "좋은 시간이었어. ...또 오겠지.",
+        "tag": "closing",
+        "responses": [
+          { "text": "(손을 흔든다)", "effect": "satisfaction_up", "effect_value": 3 },
+          { "text": "(고개를 끄덕인다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "...이 바의 좌표를 기록해둬야겠군.",
+        "tag": "humor",
+        "responses": [
+          { "text": "(웃음)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "(지도를 꺼내실 기세다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      },
+      {
+        "npc_line": "밖이 춥겠지만... 익숙해.",
+        "tag": "boring",
+        "responses": [
+          { "text": "조심히 가세요.", "effect": "satisfaction_up", "effect_value": 3 },
+          { "text": "(따뜻하게 입으셨길 바란다)", "effect": "satisfaction_up", "effect_value": 3 }
+        ]
+      },
+      {
+        "npc_line": "다음에 올 때는 빙하 사진을 가져올게. ...관심 있으면.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(기대된다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "꼭 보여주세요.", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ],
+
+    "amundsen_blizzard": [
+      {
+        "npc_line": "72시간. 텐트 안에서. 바람 소리만 들으면서.",
+        "tag": "story",
+        "responses": [
+          { "text": "(숨을 삼킨다)", "effect": "satisfaction_up", "effect_value": 5 },
+          { "text": "...어떻게 버티셨어요?", "effect": "patience_up", "effect_value": 8, "next_context": "amundsen_blizzard2" }
+        ]
+      }
+    ],
+    "amundsen_blizzard2": [
+      {
+        "npc_line": "식량은 3일치. 연료는 이틀치. ...노래를 불렀어. 아무도 안 들으니까.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(가슴이 먹먹하다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "...무슨 노래였어요?", "effect": "patience_up", "effect_value": 10, "next_context": "amundsen_song" }
+        ]
+      }
+    ],
+    "amundsen_song": [
+      {
+        "npc_line": "어머니가 불러주셨던 자장가. 가사는 기억 안 나. 멜로디만.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 15 },
+          { "text": "(눈시울이 뜨거워진다)", "effect": "satisfaction_up", "effect_value": 12 }
+        ]
+      }
+    ],
+    "amundsen_boiling": [
+      {
+        "npc_line": "기압이 낮으니까. 해발 2800미터에서는 물이 90도에서 끓어.",
+        "tag": "story",
+        "responses": [
+          { "text": "(몰랐다)", "effect": "patience_up", "effect_value": 5 },
+          { "text": "그래서 맛도 다른가요?", "effect": "patience_up", "effect_value": 8, "next_context": "amundsen_taste" }
+        ]
+      }
+    ],
+    "amundsen_taste": [
+      {
+        "npc_line": "...솔직히 그때는 맛 같은 건 신경 안 썼어. 살아있다는 게 중요했으니까.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(무거운 말이다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "(조용히 듣는다)", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ],
+    "amundsen_now": [
+      {
+        "npc_line": "지금은... 이런 곳에서 물 한 잔 마시는 게 좋아. 그것만으로 충분해.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(따뜻한 기분이 든다)", "effect": "satisfaction_up", "effect_value": 12 },
+          { "text": "(미소짓는다)", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      }
+    ],
+    "amundsen_glacier_sound": [
+      {
+        "npc_line": "수만 년 된 얼음이 부서지는 거니까. 시간이 무너지는 소리 같아.",
+        "tag": "sad",
+        "responses": [
+          { "text": "(말문이 막힌다)", "effect": "satisfaction_up", "effect_value": 10 },
+          { "text": "...아름답게 들려요.", "effect": "satisfaction_up", "effect_value": 8 }
+        ]
+      }
+    ],
+    "amundsen_why": [
+      {
+        "npc_line": "...글쎄. 돌아올 곳이 있으니까 갈 수 있었던 건지도 몰라.",
+        "tag": "refreshing",
+        "responses": [
+          { "text": "(가슴이 뭉클하다)", "effect": "satisfaction_up", "effect_value": 15 },
+          { "text": "여기도 그런 곳이 되면 좋겠어요.", "effect": "satisfaction_up", "effect_value": 12 }
+        ]
+      }
+    ],
+    "amundsen_glacier_water": [
+      {
+        "npc_line": "1만 년 전 눈이 얼어서 된 거야. 마시면... 시간을 마시는 기분이지.",
+        "tag": "story",
+        "responses": [
+          { "text": "(감탄한다)", "effect": "satisfaction_up", "effect_value": 8 },
+          { "text": "...시간을 마시는 기분...", "effect": "satisfaction_up", "effect_value": 5 }
+        ]
+      }
+    ]
+  }
+}
