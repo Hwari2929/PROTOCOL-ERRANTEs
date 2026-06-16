@@ -30,6 +30,16 @@ func _build_ui() -> void:
 	_vbox = VBoxContainer.new()
 	_vbox.name = "TeamSelectVBox"
 	_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	_vbox.add_theme_constant_override("separation", 8)
+	# Centre the panel on screen.
+	_vbox.anchor_left = 0.5
+	_vbox.anchor_top = 0.5
+	_vbox.anchor_right = 0.5
+	_vbox.anchor_bottom = 0.5
+	_vbox.offset_left = -130.0
+	_vbox.offset_right = 130.0
+	_vbox.offset_top = -170.0
+	_vbox.offset_bottom = 170.0
 	add_child(_vbox)
 	
 	# Title

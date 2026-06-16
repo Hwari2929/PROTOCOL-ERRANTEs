@@ -125,7 +125,7 @@ func _make_unit(team: int, cfg: Dictionary, sprite_id: String = "") -> Node2D:
 func units_of(team: int) -> Array:
 	var out: Array = []
 	for u in units.get_children():
-		if is_instance_valid(u) and int(u.get("team")) == team and int(u.get("hp")) > 0:
+		if is_instance_valid(u) and u.is_in_group("unit") and int(u.get("team")) == team and int(u.get("hp")) > 0:
 			out.append(u)
 	return out
 
