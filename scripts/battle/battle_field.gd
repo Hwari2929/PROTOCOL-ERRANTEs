@@ -10,6 +10,10 @@ const UNIT: PackedScene = preload("res://scenes/battle/unit.tscn")
 const TEAM_PLAYER: int = 0
 const TEAM_ENEMY: int = 1
 
+## Phase constants
+const PHASE_PREP: int = 0
+const PHASE_COMBAT: int = 1
+
 ## MAJOR class stat configs (simplest tactical type for the slice).
 const ROSTER: Dictionary = {
 	"protagonist": {"max_hp": 150, "attack": 14, "attack_interval": 0.9, "attack_range": 120.0, "move_speed": 70.0, "armor": 5},
@@ -27,15 +31,21 @@ const PLAYER_TEAM_IDS: Array = ["protagonist", "ranger", "vanguard"]
 @onready var units: Node2D = $Units
 
 var _resolved: bool = false
+var phase: int = PHASE_PREP
+
+signal phase_changed(new_phase: int)
 
 
 func _ready() -> void:
 	_spawn_players()
 	spawn_wave(4)
+	begin_prep()
 
 
 func _physics_process(_delta: float) -> void:
 	if _resolved:
+		return
+	if phase != PHASE_COMBAT:
 		return
 	if is_over():
 		_resolved = true
@@ -52,6 +62,7 @@ func spawn_wave(count: int) -> void:
 		var offset: float = (float(i) - float(count - 1) / 2.0) * 84.0
 		u.position = Vector2(900.0, 360.0 + offset)
 	_resolved = false
+	begin_prep()
 
 
 func _spawn_players() -> void:
@@ -99,3 +110,28 @@ func result() -> int:
 	if enemies.is_empty():
 		return 1
 	return 0
+
+
+## Get the current phase.
+func current_phase() -> int:
+	return phase
+
+
+## Enter preparation phase: deactivate units, reset latch, emit signal.
+func begin_prep() -> void:
+	phase = PHASE_PREP
+	_resolved = false
+	for u in units.get_children():
+		if is_instance_valid(u) and u.has_method("set_active"):
+			u.set_active(false)
+	phase_changed.emit(PHASE_PREP)
+
+
+## Enter combat phase: activate units, reset latch, emit signal.
+func start_combat() -> void:
+	phase = PHASE_COMBAT
+	_resolved = false
+	for u in units.get_children():
+		if is_instance_valid(u) and u.has_method("set_active"):
+			u.set_active(true)
+	phase_changed.emit(PHASE_COMBAT)
