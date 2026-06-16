@@ -2,3 +2,67 @@ extends Node
 ## 의뢰(run) 진행 — 전투 노드 체인 + 노드 간 증강 + 런 종료 — SCAFFOLD STUB. PE5 implements.
 ## A quest = a chain of 3 combat nodes; advance on victory, augment between nodes,
 ## win after the last node, lose if the player team is wiped.
+
+@onready var _battle_field: Node = get_parent().get_node_or_null("BattleField")
+@onready var _resonance: Node = get_parent().get_node_or_null("Resonance")
+@onready var _augment_system: Node = get_parent().get_node_or_null("AugmentSystem")
+
+var _node_count: int = 3
+var _current_node: int = 1
+var _run_result: int = 0
+var _is_run_over: bool = false
+
+func node_count() -> int:
+	return _node_count
+
+func current_node() -> int:
+	return _current_node
+
+func is_run_over() -> bool:
+	return _is_run_over
+
+func run_result() -> int:
+	return _run_result
+
+func _ready() -> void:
+	EventBus.battle_session_started.emit()
+	EventBus.round_started.emit(1)
+	EventBus.round_ended.connect(_on_round_ended)
+
+func _on_round_ended(round_number: int, victory: bool) -> void:
+	if victory:
+		advance_node()
+	else:
+		_is_run_over = true
+		_run_result = -1
+		EventBus.battle_session_ended.emit(false)
+
+func advance_node() -> void:
+	if _is_run_over:
+		return
+
+	var result: int = 0
+	if _battle_field != null:
+		result = _battle_field.result()
+
+	if result == 1:
+		if _resonance != null:
+			_resonance.add_resonance(10)
+
+		if _resonance != null and _resonance.can_grade_up():
+			if _augment_system != null:
+				_augment_system.show_menu(3)
+
+		if _current_node < _node_count:
+			_current_node += 1
+			if _battle_field != null:
+				_battle_field.spawn_wave(_current_node)
+			EventBus.round_started.emit(_current_node)
+		else:
+			_is_run_over = true
+			_run_result = 1
+			EventBus.battle_session_ended.emit(true)
+	elif result == -1:
+		_is_run_over = true
+		_run_result = -1
+		EventBus.battle_session_ended.emit(false)
