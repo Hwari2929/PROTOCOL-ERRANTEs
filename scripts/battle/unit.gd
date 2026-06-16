@@ -3,6 +3,15 @@ extends Node2D
 signal hp_changed(current: int, max: int)
 signal died()
 
+## Per-class active-skill cooldown (seconds). Classes not listed have no skill.
+const SKILL_CD: Dictionary = {
+	"protagonist": 5.0,  # nova: AoE damage to nearby enemies
+	"ranger": 4.0,       # volley: big hit on current target
+	"vanguard": 6.0,     # fortify: +armor (self)
+	"commander": 5.0,    # rally: +attack to all allies
+	"medic": 3.5,        # mend: heal lowest-HP ally
+}
+
 var team: int = 0
 var max_hp: int = 100
 var hp: int = 100
@@ -14,6 +23,9 @@ var armor: int = 0
 var sprite_id: String = ""
 
 var active: bool = false
+
+var skill_cd: float = 0.0
+var skill_timer: float = 0.0
 
 var _attack_timer: float = 0.0
 var _is_dragging: bool = false
@@ -31,6 +43,8 @@ func is_active() -> bool:
 ## Load the class/team sprite (res://assets/sprites/<sprite_id>.png) if present;
 ## otherwise the _draw() placeholder circle is used.
 func refresh_sprite() -> void:
+	skill_cd = float(SKILL_CD.get(sprite_id, 0.0))
+	skill_timer = skill_cd
 	if _sprite == null or sprite_id == "":
 		return
 	var path: String = "res://assets/sprites/%s.png" % sprite_id
@@ -56,6 +70,13 @@ func _physics_process(delta: float) -> void:
 		return
 	if hp <= 0:
 		return
+
+	# Active skill on its own cooldown (independent of basic attacks).
+	if skill_cd > 0.0:
+		skill_timer -= delta
+		if skill_timer <= 0.0:
+			skill_timer = skill_cd
+			_use_skill()
 
 	var target: Node2D = acquire_target()
 	if target == null:
@@ -109,6 +130,63 @@ func die() -> void:
 	t.tween_property(self, "modulate:a", 0.0, 0.3)
 	t.tween_property(self, "scale", Vector2(0.3, 0.3), 0.3)
 	t.finished.connect(queue_free)
+
+# ── Active skills (dispatched by class = sprite_id) ──
+func _use_skill() -> void:
+	match sprite_id:
+		"protagonist":
+			_skill_nova(int(round(float(attack) * 1.5)), 240.0)
+		"ranger":
+			_skill_volley(attack * 3)
+		"vanguard":
+			armor += 4
+		"commander":
+			_skill_rally(3)
+		"medic":
+			_skill_mend(int(round(float(max_hp) * 0.18)) + 10)
+	_skill_pulse()
+
+func _skill_nova(dmg: int, radius: float) -> void:
+	for n in _units_on(false):
+		if global_position.distance_to(n.global_position) <= radius:
+			n.take_damage(dmg)
+
+func _skill_volley(dmg: int) -> void:
+	var t: Node2D = acquire_target()
+	if t != null:
+		t.take_damage(dmg)
+
+func _skill_rally(amount: int) -> void:
+	for n in _units_on(true):
+		n.attack += amount
+
+func _skill_mend(amount: int) -> void:
+	var lowest: Node2D = null
+	var lowest_ratio: float = 1.0
+	for n in _units_on(true):
+		var r: float = float(n.hp) / float(n.max_hp)
+		if n.hp < n.max_hp and r < lowest_ratio:
+			lowest_ratio = r
+			lowest = n
+	if lowest != null:
+		lowest.hp = mini(lowest.max_hp, lowest.hp + amount)
+		lowest.queue_redraw()
+
+## Living units; allies==true -> same team, allies==false -> enemy team.
+func _units_on(allies: bool) -> Array:
+	var out: Array = []
+	for n in get_tree().get_nodes_in_group("unit"):
+		if n is Node2D and n.hp > 0 and ((n.team == team) == allies):
+			out.append(n)
+	return out
+
+## Brief cyan flash to signal a skill firing.
+func _skill_pulse() -> void:
+	if _sprite == null:
+		return
+	_sprite.modulate = Color(0.6, 1.2, 1.6, 1.0)
+	var t: Tween = create_tween()
+	t.tween_property(_sprite, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.18)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if active or team != 0:
