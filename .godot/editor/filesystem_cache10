@@ -1,12 +1,12 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1781606053
+::res://::1781606142
 CLAUDE.md::TextFile::-1::1781602160::0::1::::<><><>0<>0<><>::
 GDD.md::TextFile::-1::1781602162::0::1::::<><><>0<>0<><>::
 ::res://docs/::1781602277
 dev_guidelines.md::TextFile::-1::1781602277::0::1::::<><><>0<>0<><>::
 project_brief.md::TextFile::-1::1781602256::0::1::::<><><>0<>0<><>::
-::res://scenes/::1781602177
-main.tscn::PackedScene::-1::1781602176::0::1::::<><><>0<>0<><>::res://scenes/battle/battle_field.tscn<>res://scripts/battle/resonance.gd<>res://scripts/battle/augment.gd<>res://scripts/battle/battle_session.gd<>res://scripts/ui/battle_hud.gd
+::res://scenes/::1781606368
+main.tscn::PackedScene::-1::1781606368::0::1::::<><><>0<>0<><>::res://scenes/battle/battle_field.tscn<>res://scripts/battle/resonance.gd<>res://scripts/battle/augment.gd<>res://scripts/battle/battle_session.gd<>res://scripts/ui/battle_hud.gd<>res://scripts/ui/prep_panel.gd
 ::res://scenes/battle/::1781602178
 battle_field.tscn::PackedScene::-1::1781602177::0::1::::<><><>0<>0<><>::res://scripts/battle/battle_field.gd
 unit.tscn::PackedScene::-1::1781602178::0::1::::<><><>0<>0<><>::res://scripts/battle/unit.gd
@@ -37,7 +37,8 @@ MenuItemData.gd::GDScript::3225457011071093383::1781601544::0::1::::MenuItemData
 RecipeChoice.gd::GDScript::8709350695291997263::1781601544::0::1::::RecipeChoice<>Resource<><>0<>0<><>::
 RecipeData.gd::GDScript::4321838767387883875::1781601544::0::1::::RecipeData<>Resource<><>0<>0<><>::
 RecipeStep.gd::GDScript::3099342203694566979::1781601544::0::1::::RecipeStep<>Resource<><>0<>0<><>::
-::res://scripts/ui/::1781606131
+::res://scripts/ui/::1781606376
 battle_hud.gd::GDScript::4947419750092029509::1781606131::0::1::::<>Control<><>0<>0<><>::
 CraftingPanel.gd::GDScript::3720279992759613807::1781601544::0::1::::CraftingPanel<>Control<><>0<>0<><>::
 DialogueBubble.gd::GDScript::8251055883356414568::1781601544::0::1::::DialogueBubble<>Control<><>0<>0<><>::
+prep_panel.gd::GDScript::1550347862367856455::1781606376::0::1::::<>Control<><>0<>0<><>::
