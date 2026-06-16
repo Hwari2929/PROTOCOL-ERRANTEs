@@ -76,9 +76,29 @@ func spawn_wave(node_index: int) -> void:
 
 
 func _spawn_players() -> void:
-	var n: int = PLAYER_TEAM_IDS.size()
+	_spawn_player_ids(PLAYER_TEAM_IDS)
+
+
+## Rebuild the player team from a list of roster ids (used by team selection).
+## Invalid/empty selections fall back to the default trio.
+func set_player_team(ids: Array) -> void:
+	for u in units.get_children():
+		if is_instance_valid(u) and int(u.get("team")) == TEAM_PLAYER:
+			u.queue_free()
+	var valid: Array = []
+	for id in ids:
+		if ROSTER.has(id) and not valid.has(id):
+			valid.append(id)
+	if valid.is_empty():
+		valid = PLAYER_TEAM_IDS
+	_spawn_player_ids(valid)
+	begin_prep()
+
+
+func _spawn_player_ids(ids: Array) -> void:
+	var n: int = ids.size()
 	for i in n:
-		var id: String = PLAYER_TEAM_IDS[i]
+		var id: String = ids[i]
 		var cfg: Dictionary = ROSTER[id]
 		var u: Node2D = _make_unit(TEAM_PLAYER, cfg, id)
 		var offset: float = (float(i) - float(n - 1) / 2.0) * 90.0
