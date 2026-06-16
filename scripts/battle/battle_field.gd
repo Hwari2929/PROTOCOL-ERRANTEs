@@ -24,6 +24,8 @@ const ROSTER: Dictionary = {
 }
 
 const ENEMY_STATS: Dictionary = {"max_hp": 70, "attack": 9, "attack_interval": 1.0, "attack_range": 90.0, "move_speed": 55.0, "armor": 2}
+## Faster, frailer 군체 variant (introduced from node 2).
+const SWARMLING_STATS: Dictionary = {"max_hp": 45, "attack": 7, "attack_interval": 0.8, "attack_range": 80.0, "move_speed": 95.0, "armor": 0}
 
 ## Player team for the slice: 주인공 + 레인저 + 뱅가드 (exactly 3).
 const PLAYER_TEAM_IDS: Array = ["protagonist", "ranger", "vanguard"]
@@ -38,7 +40,7 @@ signal phase_changed(new_phase: int)
 
 func _ready() -> void:
 	_spawn_players()
-	spawn_wave(4)
+	spawn_wave(1)
 	begin_prep()
 
 
@@ -53,12 +55,20 @@ func _physics_process(_delta: float) -> void:
 		EventBus.round_ended.emit(1, victory)
 
 
-## (Re)populate the enemy team for the next combat node.
-func spawn_wave(count: int) -> void:
-	for e in units_of(TEAM_ENEMY):
-		e.queue_free()
+## (Re)populate the enemy team for a given 1-based NODE INDEX.
+## Count and stats scale with the node; a faster swarmling variant joins from node 2.
+func spawn_wave(node_index: int) -> void:
+	for e in units.get_children():
+		if is_instance_valid(e) and int(e.get("team")) == TEAM_ENEMY:
+			e.queue_free()
+	var count: int = 3 + node_index
+	var stat_scale: float = 1.0 + 0.25 * float(node_index - 1)
 	for i in count:
-		var u: Node2D = _make_unit(TEAM_ENEMY, ENEMY_STATS, "swarm")
+		var is_fast: bool = node_index >= 2 and i % 3 == 2
+		var cfg: Dictionary = (SWARMLING_STATS if is_fast else ENEMY_STATS).duplicate()
+		cfg["max_hp"] = int(round(float(cfg["max_hp"]) * stat_scale))
+		cfg["attack"] = int(round(float(cfg["attack"]) * stat_scale))
+		var u: Node2D = _make_unit(TEAM_ENEMY, cfg, "swarm")
 		var offset: float = (float(i) - float(count - 1) / 2.0) * 84.0
 		u.position = Vector2(900.0, 360.0 + offset)
 	_resolved = false

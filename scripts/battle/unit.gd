@@ -87,13 +87,28 @@ func acquire_target() -> Node2D:
 func take_damage(amount: int) -> void:
 	hp -= amount
 	hp_changed.emit(hp, max_hp)
+	queue_redraw()
+	_flash()
 	if hp <= 0:
 		die()
+
+func _flash() -> void:
+	if _sprite == null:
+		return
+	_sprite.modulate = Color(1.6, 0.6, 0.6, 1.0)
+	var t: Tween = create_tween()
+	t.tween_property(_sprite, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.12)
 
 func die() -> void:
 	died.emit()
 	remove_from_group("unit")
-	queue_free()
+	active = false
+	# Fade + shrink out, then free (combat state is already correct: out of group, hp<=0).
+	var t: Tween = create_tween()
+	t.set_parallel(true)
+	t.tween_property(self, "modulate:a", 0.0, 0.3)
+	t.tween_property(self, "scale", Vector2(0.3, 0.3), 0.3)
+	t.finished.connect(queue_free)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if active or team != 0:
@@ -115,7 +130,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		global_position = new_pos
 
 func _draw() -> void:
-	if _has_sprite:
-		return
-	var color: Color = Color.BLUE if team == 0 else Color.RED
-	draw_circle(Vector2.ZERO, 20.0, color)
+	if not _has_sprite:
+		var color: Color = Color.BLUE if team == 0 else Color.RED
+		draw_circle(Vector2.ZERO, 20.0, color)
+	# HP bar above the unit, shown only while damaged and alive.
+	if hp > 0 and hp < max_hp:
+		var w: float = 40.0
+		var bh: float = 5.0
+		var top: Vector2 = Vector2(-w / 2.0, -40.0)
+		var ratio: float = clampf(float(hp) / float(max_hp), 0.0, 1.0)
+		draw_rect(Rect2(top, Vector2(w, bh)), Color(0.0, 0.0, 0.0, 0.6))
+		var fill: Color = Color(0.2, 0.9, 0.3).lerp(Color(0.9, 0.2, 0.2), 1.0 - ratio)
+		draw_rect(Rect2(top, Vector2(w * ratio, bh)), fill)
