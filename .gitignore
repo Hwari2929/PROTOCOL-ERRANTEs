@@ -5,3 +5,5 @@ _contract*.tscn
 _contract*.json
 _capture*
 .harness_shot.png
+
+assets/_raw/

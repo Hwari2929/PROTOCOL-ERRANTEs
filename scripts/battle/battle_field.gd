@@ -58,7 +58,7 @@ func spawn_wave(count: int) -> void:
 	for e in units_of(TEAM_ENEMY):
 		e.queue_free()
 	for i in count:
-		var u: Node2D = _make_unit(TEAM_ENEMY, ENEMY_STATS)
+		var u: Node2D = _make_unit(TEAM_ENEMY, ENEMY_STATS, "swarm")
 		var offset: float = (float(i) - float(count - 1) / 2.0) * 84.0
 		u.position = Vector2(900.0, 360.0 + offset)
 	_resolved = false
@@ -70,14 +70,14 @@ func _spawn_players() -> void:
 	for i in n:
 		var id: String = PLAYER_TEAM_IDS[i]
 		var cfg: Dictionary = ROSTER[id]
-		var u: Node2D = _make_unit(TEAM_PLAYER, cfg)
+		var u: Node2D = _make_unit(TEAM_PLAYER, cfg, id)
 		var offset: float = (float(i) - float(n - 1) / 2.0) * 90.0
 		u.position = Vector2(380.0, 360.0 + offset)
 
 
 ## Spawn one unit, tag its team/group, and apply stats dynamically.
 ## unit.gd has no class_name, so its script vars are assigned via set().
-func _make_unit(team: int, cfg: Dictionary) -> Node2D:
+func _make_unit(team: int, cfg: Dictionary, sprite_id: String = "") -> Node2D:
 	var u: Node2D = UNIT.instantiate()
 	units.add_child(u)
 	if u.has_method("setup"):
@@ -85,6 +85,9 @@ func _make_unit(team: int, cfg: Dictionary) -> Node2D:
 	for key in cfg:
 		u.set(key, cfg[key])
 	u.set("hp", int(cfg.get("max_hp", 100)))
+	u.set("sprite_id", sprite_id)
+	if u.has_method("refresh_sprite"):
+		u.refresh_sprite()
 	return u
 
 

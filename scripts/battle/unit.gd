@@ -11,12 +11,15 @@ var attack_interval: float = 1.0
 var attack_range: float = 100.0
 var move_speed: float = 50.0
 var armor: int = 0
+var sprite_id: String = ""
 
 var active: bool = false
 
 var _attack_timer: float = 0.0
 var _is_dragging: bool = false
 var _drag_offset: Vector2 = Vector2.ZERO
+var _has_sprite: bool = false
+@onready var _sprite: Sprite2D = $Sprite2D
 
 func setup(team: int) -> void:
 	self.team = team
@@ -24,6 +27,26 @@ func setup(team: int) -> void:
 
 func is_active() -> bool:
 	return active
+
+## Load the class/team sprite (res://assets/sprites/<sprite_id>.png) if present;
+## otherwise the _draw() placeholder circle is used.
+func refresh_sprite() -> void:
+	if _sprite == null or sprite_id == "":
+		return
+	var path: String = "res://assets/sprites/%s.png" % sprite_id
+	if not ResourceLoader.exists(path):
+		return
+	var tex: Texture2D = load(path)
+	if tex == null:
+		return
+	_sprite.texture = tex
+	_sprite.centered = true
+	var h: float = float(tex.get_height())
+	if h > 0.0:
+		var s: float = 52.0 / h
+		_sprite.scale = Vector2(s, s)
+	_has_sprite = true
+	queue_redraw()
 
 func set_active(value: bool) -> void:
 	active = value
@@ -92,5 +115,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		global_position = new_pos
 
 func _draw() -> void:
+	if _has_sprite:
+		return
 	var color: Color = Color.BLUE if team == 0 else Color.RED
 	draw_circle(Vector2.ZERO, 20.0, color)
