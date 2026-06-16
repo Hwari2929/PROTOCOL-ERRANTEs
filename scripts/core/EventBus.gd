@@ -1,6 +1,5 @@
-class_name EventBus
 extends Node
-## 글로벌 시그널 버스 — 노드 간 직접 참조 없이 이벤트 전달
+## 글로벌 시그널 버스 (Autoload "EventBus" — class_name 미사용: 동명 autoload 충돌 방지) — 노드 간 직접 참조 없이 이벤트 전달
 
 # === 게임 상태 ===
 signal game_state_changed(old_state: StringName, new_state: StringName)

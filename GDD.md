@@ -577,7 +577,7 @@ func load_game() -> bool:
 - private 함수: _prefix (_calculate_internal)
 
 ### Claude Code 협업 규칙
-- 씬 파일(.tscn/.tres)은 에디터(Xogot)에서 직접 편집
-- GDScript 파일은 Claude Code에서 작성/수정 가능
+- 씬 파일(.tscn/.tres)은 자율 하네스가 생성/수정 가능 (2026-06-16 갱신). 생성분은 Xogot에서 검수
+- GDScript 파일은 Claude Code/하네스에서 작성/수정 가능
 - PR 단위는 기능 단위로 작게 유지
 - 커밋 메시지는 Conventional Commits (feat:, fix:, refactor:)

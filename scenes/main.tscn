@@ -1,0 +1,32 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/battle/battle_field.tscn" id="1_field"]
+[ext_resource type="Script" path="res://scripts/battle/resonance.gd" id="2_reso"]
+[ext_resource type="Script" path="res://scripts/battle/augment.gd" id="3_aug"]
+[ext_resource type="Script" path="res://scripts/battle/battle_session.gd" id="4_sess"]
+[ext_resource type="Script" path="res://scripts/ui/battle_hud.gd" id="5_hud"]
+
+[node name="Main" type="Node2D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(640, 360)
+
+[node name="BattleField" parent="." instance=ExtResource("1_field")]
+
+[node name="Resonance" type="Node" parent="."]
+script = ExtResource("2_reso")
+
+[node name="AugmentSystem" type="Node" parent="."]
+script = ExtResource("3_aug")
+
+[node name="BattleSession" type="Node" parent="."]
+script = ExtResource("4_sess")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="BattleHUD" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("5_hud")

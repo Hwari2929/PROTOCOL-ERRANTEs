@@ -1,6 +1,5 @@
-class_name ResourceManager
 extends Node
-## 자원(골드/토큰) 관리 싱글톤
+## 자원(골드/토큰) 관리 싱글톤 (Autoload "ResourceManager" — class_name 미사용: 동명 autoload 충돌 방지)
 ##
 ## 골드: 바 경영 자원 → 장비 가챠, 유물, 바 업그레이드
 ## 토큰: 전투 자원 → 캐릭터 가챠

@@ -1,6 +1,5 @@
-class_name GameManager
 extends Node
-## 전역 게임 상태 머신
+## 전역 게임 상태 머신 (Autoload "GameManager" — class_name 미사용: 동명 autoload 충돌 방지)
 ##
 ## 상태 흐름:
 ##   TITLE → MENU → BAR_OPEN ⇄ BAR_CLOSING → BATTLE → BATTLE_END → BAR_OPENING → BAR_OPEN
