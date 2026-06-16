@@ -1,82 +1,73 @@
 extends Control
-## Battle HUD — Displays run state on screen.
-## Subscribes to EventBus battle signals and reflects run state on screen.
+## Battle HUD — node progress, resonance grade & credits, WIN/LOSE banner.
+## Reads live state from sibling BattleSession / Resonance and reacts to EventBus.
+## In-engine text is English (default font has no Hangul glyphs).
 
-var _progress_label: Label
-var _grade_label: Label
-var _banner_label: Label
+var _progress: Label
+var _grade: Label
+var _banner: Label
+
 
 func _ready() -> void:
-    # Create child Labels
-    _progress_label = Label.new()
-    _progress_label.name = "ProgressLabel"
-    _progress_label.add_theme_font_size_override("font_size", 24)
-    add_child(_progress_label)
+	var vbox: VBoxContainer = VBoxContainer.new()
+	vbox.position = Vector2(16.0, 12.0)
+	vbox.add_theme_constant_override("separation", 6)
+	add_child(vbox)
+	_progress = _make_label(vbox, 24)
+	_grade = _make_label(vbox, 24)
 
-    _grade_label = Label.new()
-    _grade_label.name = "GradeLabel"
-    _grade_label.add_theme_font_size_override("font_size", 24)
-    add_child(_grade_label)
+	_banner = Label.new()
+	_banner.add_theme_font_size_override("font_size", 48)
+	_banner.position = Vector2(540.0, 300.0)
+	_banner.visible = false
+	add_child(_banner)
 
-    _banner_label = Label.new()
-    _banner_label.name = "BannerLabel"
-    _banner_label.add_theme_font_size_override("font_size", 32)
-    _banner_label.visible = false
-    add_child(_banner_label)
+	EventBus.round_started.connect(_on_round_started)
+	EventBus.battle_session_ended.connect(_on_session_ended)
+	var reso: Node = get_parent().get_node_or_null("Resonance")
+	if reso != null and reso.has_signal("grade_changed"):
+		reso.grade_changed.connect(_on_grade_changed)
 
-    # Connect to EventBus autoload signals
-    if EventBus:
-        EventBus.round_started.connect(_on_event_bus_round_started)
-        EventBus.battle_session_ended.connect(_on_event_bus_battle_session_ended)
+	refresh()
 
-    # Connect to sibling Resonance grade_changed signal
-    var resonance_node: Node = get_parent().get_node_or_null("Resonance")
-    if resonance_node:
-        resonance_node.grade_changed.connect(_on_resonance_grade_changed)
 
-    # Initial state
-    refresh()
+func _make_label(parent: Node, size: int) -> Label:
+	var l: Label = Label.new()
+	l.add_theme_font_size_override("font_size", size)
+	parent.add_child(l)
+	return l
 
-func _on_event_bus_round_started(round_number: int) -> void:
-    refresh()
 
-func _on_event_bus_battle_session_ended(victory: bool) -> void:
-    _banner_label.text = "WIN" if victory else "LOSE"
-    _banner_label.visible = true
+func _on_round_started(_round_number: int) -> void:
+	refresh()
 
-func _on_resonance_grade_changed(grade: String) -> void:
-    refresh()
+
+func _on_grade_changed(_new_grade: int) -> void:
+	refresh()
+
+
+func _on_session_ended(victory: bool) -> void:
+	_banner.text = "VICTORY" if victory else "DEFEAT"
+	_banner.modulate = Color(0.6, 1.0, 0.6) if victory else Color(1.0, 0.5, 0.5)
+	_banner.visible = true
+
 
 func refresh() -> void:
-    # Read current state from siblings via guarded get_parent lookups
-    var battle_field: Node = get_parent().get_node_or_null("BattleField")
-    var resonance_node: Node = get_parent().get_node_or_null("Resonance")
-    var battle_session: Node = get_parent().get_node_or_null("BattleSession")
+	var node_i: int = 1
+	var node_n: int = 3
+	var sess: Node = get_parent().get_node_or_null("BattleSession")
+	if sess != null:
+		if sess.has_method("current_node"):
+			node_i = sess.current_node()
+		if sess.has_method("node_count"):
+			node_n = sess.node_count()
+	_progress.text = "Node %d / %d" % [node_i, node_n]
 
-    # Update node progress
-    var total_nodes: int = 3
-    var current_node: int = 1
-    if GameManager:
-        if GameManager.has_method("get_current_node"):
-            var result = GameManager.get_current_node()
-            if result is int:
-                current_node = result
-    _progress_label.text = "Node %d/%d" % [current_node, total_nodes]
-
-    # Update resonance grade & credits
-    var grade: String = "S"
-    var credits: int = 0
-    if resonance_node:
-        if resonance_node.has_method("get_grade"):
-            grade = resonance_node.get_grade()
-    if ResourceManager:
-        if ResourceManager.has_method("get_credits"):
-            credits = ResourceManager.get_credits()
-    _grade_label.text = "Grade: %s | Credits: %d" % [grade, credits]
-
-    # Hide banner if session is not ended (prevent stale banner)
-    # Only show banner if explicitly triggered by signal, but ensure it's hidden if session is active/ended without signal
-    if battle_session:
-        if battle_session.has_method("is_session_ended"):
-            if not battle_session.is_session_ended():
-                _banner_label.visible = false
+	var grade: int = 1
+	var credits: int = 0
+	var reso: Node = get_parent().get_node_or_null("Resonance")
+	if reso != null:
+		if reso.has_method("current_grade"):
+			grade = reso.current_grade()
+		credits = int(reso.get("credits"))
+	_grade.text = "Resonance Grade %d   |   Credits %d" % [grade, credits]

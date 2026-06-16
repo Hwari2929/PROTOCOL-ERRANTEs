@@ -1,5 +1,5 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1781605987
+::res://::1781606053
 CLAUDE.md::TextFile::-1::1781602160::0::1::::<><><>0<>0<><>::
 GDD.md::TextFile::-1::1781602162::0::1::::<><><>0<>0<><>::
 ::res://docs/::1781602277
@@ -37,7 +37,7 @@ MenuItemData.gd::GDScript::3225457011071093383::1781601544::0::1::::MenuItemData
 RecipeChoice.gd::GDScript::8709350695291997263::1781601544::0::1::::RecipeChoice<>Resource<><>0<>0<><>::
 RecipeData.gd::GDScript::4321838767387883875::1781601544::0::1::::RecipeData<>Resource<><>0<>0<><>::
 RecipeStep.gd::GDScript::3099342203694566979::1781601544::0::1::::RecipeStep<>Resource<><>0<>0<><>::
-::res://scripts/ui/::1781602210
-battle_hud.gd::GDScript::4947419750092029509::1781605744::0::1::::<>Control<><>0<>0<><>::
+::res://scripts/ui/::1781606131
+battle_hud.gd::GDScript::4947419750092029509::1781606131::0::1::::<>Control<><>0<>0<><>::
 CraftingPanel.gd::GDScript::3720279992759613807::1781601544::0::1::::CraftingPanel<>Control<><>0<>0<><>::
 DialogueBubble.gd::GDScript::8251055883356414568::1781601544::0::1::::DialogueBubble<>Control<><>0<>0<><>::
