@@ -1,118 +1,203 @@
 extends Node
 class_name ClassData
-## Class / subclass / inhesion registry (data-driven).
+## Class / subclass / inhesion registry — the 16-class system (4 positions × 4 tactical
+## types) + the protagonist. Faithful to the design doc's structure; effects are
+## stat-modifier bundles for now (deeper mechanics — status effects, psionic 이성,
+## special mini-systems, minor cards — layer on in later phases).
 ##
-## Structure (faithful to the ERRANTES design): each class has a BASE inhesion
-## (applied at spawn, always on) and a set of SUBCLASSES. Each subclass has three
-## inhesion tiers — 고유1 / 고유2 / 고유3 — unlocked progressively as the unit's
-## resonance grade rises (grade 2 -> tier 1, 3 -> tier 2, 4 -> tier 3). 고유4 is not
-## implemented yet.
+## Each class: label, position(명사수/돌격가/통솔자/전문가), tactical(메이저/스페셜/마이너/사이오닉),
+## stats(spawn base), base(고유 특성 always-on bundle), subclasses{ id: {label, tiers[3]} }.
 ##
-## Effects are simplified into stat-modifier bundles for now (the doc's charge/skill
-## mechanics can replace these later). A bundle is a Dictionary with any of:
-##   attack_mult, attack_add, max_hp_mult, armor_add,
-##   attack_interval_mult (<1 = faster), move_speed_mult, attack_range_add,
-##   skill_cd_mult (<1 = faster skills)
+## Effect bundle keys (see apply_mods): attack_mult, attack_add, max_hp_mult, armor_add,
+## attack_interval_mult(<1 faster), move_speed_mult, attack_range_add,
+## skill_cd_mult(<1 faster), skill_power_mult.
+
+## Position -> placeholder sprite id (real per-class art comes later).
+const POSITION_SPRITE: Dictionary = {
+	"명사수": "ranger", "돌격가": "vanguard", "통솔자": "commander", "전문가": "medic",
+}
+## Position -> signature skill kind (unit._use_skill dispatches on this).
+const POSITION_SKILL: Dictionary = {
+	"명사수": "volley", "돌격가": "fortify", "통솔자": "rally", "전문가": "mend",
+}
 
 const CLASSES: Dictionary = {
+	# ── Protagonist (hero, always available) ──
 	"protagonist": {
-		"label": "주인공",
+		"label": "주인공", "position": "돌격가", "tactical": "메이저", "skill": "nova", "sprite": "protagonist",
+		"stats": {"max_hp": 150, "attack": 14, "attack_interval": 0.9, "attack_range": 120.0, "move_speed": 70.0, "armor": 5},
 		"base": {"attack_mult": 1.10, "max_hp_mult": 1.10},
 		"subclasses": {
-			"duelist": {"label": "결투가", "tiers": [
-				{"attack_mult": 1.20},
-				{"attack_add": 5, "attack_interval_mult": 0.90},
-				{"attack_mult": 1.25, "skill_cd_mult": 0.85},
-			]},
-			"warden": {"label": "수문장", "tiers": [
-				{"max_hp_mult": 1.20, "armor_add": 3},
-				{"armor_add": 5},
-				{"max_hp_mult": 1.20, "skill_cd_mult": 0.85},
-			]},
+			"duelist": {"label": "결투가", "tiers": [{"attack_mult": 1.20}, {"attack_add": 5, "attack_interval_mult": 0.90}, {"attack_mult": 1.25, "skill_power_mult": 1.20}]},
+			"warden": {"label": "수문장", "tiers": [{"max_hp_mult": 1.20, "armor_add": 3}, {"armor_add": 5}, {"max_hp_mult": 1.20, "skill_cd_mult": 0.85}]},
 		},
 	},
+
+	# ── 메이저 ──
 	"ranger": {
-		"label": "레인저",
+		"label": "레인저", "position": "명사수", "tactical": "메이저",
+		"stats": {"max_hp": 90, "attack": 20, "attack_interval": 0.7, "attack_range": 260.0, "move_speed": 60.0, "armor": 1},
 		"base": {"attack_mult": 1.25, "attack_interval_mult": 0.95},
 		"subclasses": {
-			"suppressor": {"label": "제압자", "tiers": [
-				{"attack_mult": 1.20, "skill_cd_mult": 0.90, "skill_power_mult": 1.25},
-				{"attack_add": 6, "skill_power_mult": 1.15},
-				{"attack_mult": 1.20, "attack_range_add": 40.0},
-			]},
-			"tracker": {"label": "추적자", "tiers": [
-				{"attack_interval_mult": 0.85},
-				{"attack_mult": 1.25},
-				{"attack_add": 8, "skill_cd_mult": 0.85},
-			]},
-			"outlaw": {"label": "무법자", "tiers": [
-				{"move_speed_mult": 1.20, "attack_interval_mult": 0.92},
-				{"attack_add": 5, "move_speed_mult": 1.10},
-				{"attack_mult": 1.20, "attack_interval_mult": 0.88},
-			]},
+			"suppressor": {"label": "제압자", "tiers": [{"attack_mult": 1.20, "skill_power_mult": 1.25}, {"attack_add": 6, "skill_power_mult": 1.15}, {"attack_mult": 1.20, "attack_range_add": 40.0}]},
+			"outlaw": {"label": "무법자", "tiers": [{"move_speed_mult": 1.20, "attack_interval_mult": 0.92}, {"attack_add": 5, "move_speed_mult": 1.10}, {"attack_mult": 1.20, "attack_interval_mult": 0.88}]},
+			"tracker": {"label": "추적자", "tiers": [{"attack_interval_mult": 0.85}, {"attack_mult": 1.25}, {"attack_add": 8, "skill_cd_mult": 0.85}]},
 		},
 	},
 	"vanguard": {
-		"label": "뱅가드",
+		"label": "뱅가드", "position": "돌격가", "tactical": "메이저",
+		"stats": {"max_hp": 190, "attack": 11, "attack_interval": 1.0, "attack_range": 70.0, "move_speed": 85.0, "armor": 9},
 		"base": {"max_hp_mult": 1.15, "armor_add": 3},
 		"subclasses": {
-			"guardian": {"label": "수호자", "tiers": [
-				{"armor_add": 5, "max_hp_mult": 1.15},
-				{"armor_add": 6},
-				{"max_hp_mult": 1.20, "skill_cd_mult": 0.85},
-			]},
-			"charger": {"label": "돌격자", "tiers": [
-				{"move_speed_mult": 1.25, "attack_mult": 1.15},
-				{"attack_add": 5},
-				{"attack_mult": 1.25, "skill_cd_mult": 0.85},
-			]},
-			"escort": {"label": "엄호자", "tiers": [
-				{"max_hp_mult": 1.15, "armor_add": 4},
-				{"max_hp_mult": 1.15},
-				{"armor_add": 6, "skill_cd_mult": 0.85},
-			]},
+			"guardian": {"label": "수호자", "tiers": [{"armor_add": 5, "max_hp_mult": 1.15}, {"armor_add": 6}, {"max_hp_mult": 1.20, "skill_cd_mult": 0.85}]},
+			"charger": {"label": "돌격자", "tiers": [{"move_speed_mult": 1.25, "attack_mult": 1.15}, {"attack_add": 5}, {"attack_mult": 1.25, "skill_cd_mult": 0.85}]},
+			"escort": {"label": "엄호자", "tiers": [{"max_hp_mult": 1.15, "armor_add": 4}, {"max_hp_mult": 1.15}, {"armor_add": 6, "skill_cd_mult": 0.85}]},
 		},
 	},
 	"commander": {
-		"label": "커맨더",
+		"label": "커맨더", "position": "통솔자", "tactical": "메이저",
+		"stats": {"max_hp": 110, "attack": 12, "attack_interval": 0.9, "attack_range": 190.0, "move_speed": 65.0, "armor": 3},
 		"base": {"attack_mult": 1.10, "attack_range_add": 20.0},
 		"subclasses": {
-			"overseer": {"label": "감시자", "tiers": [
-				{"attack_range_add": 40.0, "attack_mult": 1.15},
-				{"attack_add": 5},
-				{"attack_mult": 1.20, "skill_cd_mult": 0.85},
-			]},
-			"warlord": {"label": "사령관", "tiers": [
-				{"attack_mult": 1.20},
-				{"attack_interval_mult": 0.88},
-				{"attack_add": 7, "skill_cd_mult": 0.85},
-			]},
-			"beastmaster": {"label": "조련사", "tiers": [
-				{"skill_power_mult": 1.25, "attack_mult": 1.10},
-				{"attack_add": 5, "skill_power_mult": 1.15},
-				{"skill_power_mult": 1.20, "attack_range_add": 30.0},
-			]},
+			"overseer": {"label": "감시자", "tiers": [{"attack_range_add": 40.0, "attack_mult": 1.15}, {"attack_add": 5}, {"attack_mult": 1.20, "skill_cd_mult": 0.85}]},
+			"warlord": {"label": "사령관", "tiers": [{"attack_mult": 1.20}, {"attack_interval_mult": 0.88}, {"attack_add": 7, "skill_cd_mult": 0.85}]},
+			"beastmaster": {"label": "조련사", "tiers": [{"skill_power_mult": 1.25, "attack_mult": 1.10}, {"attack_add": 5, "skill_power_mult": 1.15}, {"skill_power_mult": 1.20, "attack_range_add": 30.0}]},
 		},
 	},
 	"medic": {
-		"label": "메딕",
+		"label": "메딕", "position": "전문가", "tactical": "메이저",
+		"stats": {"max_hp": 100, "attack": 8, "attack_interval": 1.1, "attack_range": 160.0, "move_speed": 65.0, "armor": 2},
 		"base": {"max_hp_mult": 1.10, "skill_cd_mult": 0.90},
 		"subclasses": {
-			"healer": {"label": "치유사", "tiers": [
-				{"skill_cd_mult": 0.85, "max_hp_mult": 1.10},
-				{"max_hp_mult": 1.15},
-				{"skill_cd_mult": 0.85, "armor_add": 3},
-			]},
-			"purifier": {"label": "정화자", "tiers": [
-				{"attack_mult": 1.20, "skill_power_mult": 1.20},
-				{"attack_add": 4, "skill_cd_mult": 0.90, "skill_power_mult": 1.20},
-				{"attack_mult": 1.20, "max_hp_mult": 1.10},
-			]},
-			"counselor": {"label": "조언자", "tiers": [
-				{"skill_power_mult": 1.20, "max_hp_mult": 1.10},
-				{"skill_cd_mult": 0.85},
-				{"skill_power_mult": 1.20, "max_hp_mult": 1.10},
-			]},
+			"healer": {"label": "치유사", "tiers": [{"skill_cd_mult": 0.85, "max_hp_mult": 1.10}, {"max_hp_mult": 1.15}, {"skill_cd_mult": 0.85, "armor_add": 3}]},
+			"purifier": {"label": "정화자", "tiers": [{"attack_mult": 1.20, "skill_power_mult": 1.20}, {"attack_add": 4, "skill_cd_mult": 0.90, "skill_power_mult": 1.20}, {"attack_mult": 1.20, "max_hp_mult": 1.10}]},
+			"counselor": {"label": "조언자", "tiers": [{"skill_power_mult": 1.20, "max_hp_mult": 1.10}, {"skill_cd_mult": 0.85}, {"skill_power_mult": 1.20, "max_hp_mult": 1.10}]},
+		},
+	},
+
+	# ── 스페셜 ──
+	"sentinel": {
+		"label": "센티넬", "position": "명사수", "tactical": "스페셜",
+		"stats": {"max_hp": 150, "attack": 14, "attack_interval": 0.6, "attack_range": 170.0, "move_speed": 50.0, "armor": 4},
+		"base": {"max_hp_mult": 1.20, "attack_interval_mult": 0.90},
+		"subclasses": {
+			"overlord": {"label": "군림자", "tiers": [{"attack_mult": 1.20}, {"attack_add": 6}, {"attack_mult": 1.20, "attack_interval_mult": 0.90}]},
+			"pilot_mech": {"label": "조종자", "tiers": [{"max_hp_mult": 1.25, "armor_add": 5}, {"armor_add": 6}, {"max_hp_mult": 1.20, "attack_add": 6}]},
+			"crusher": {"label": "분쇄자", "tiers": [{"attack_add": 8, "attack_range_add": 30.0}, {"attack_mult": 1.20}, {"max_hp_mult": 1.15, "attack_add": 6}]},
+		},
+	},
+	"breacher": {
+		"label": "브리처", "position": "돌격가", "tactical": "스페셜",
+		"stats": {"max_hp": 160, "attack": 13, "attack_interval": 0.95, "attack_range": 90.0, "move_speed": 90.0, "armor": 5},
+		"base": {"move_speed_mult": 1.10, "skill_power_mult": 1.15},
+		"subclasses": {
+			"breakthrough": {"label": "돌파자", "tiers": [{"move_speed_mult": 1.20, "attack_mult": 1.15}, {"attack_add": 6}, {"attack_mult": 1.20, "skill_cd_mult": 0.85}]},
+			"skirmisher": {"label": "척후대", "tiers": [{"attack_interval_mult": 0.88, "move_speed_mult": 1.10}, {"attack_add": 5}, {"attack_interval_mult": 0.85}]},
+			"irradiator": {"label": "피폭자", "tiers": [{"skill_power_mult": 1.25}, {"attack_mult": 1.15, "skill_power_mult": 1.15}, {"skill_power_mult": 1.20, "attack_add": 5}]},
+		},
+	},
+	"cipher": {
+		"label": "사이퍼", "position": "통솔자", "tactical": "스페셜",
+		"stats": {"max_hp": 105, "attack": 11, "attack_interval": 0.9, "attack_range": 185.0, "move_speed": 62.0, "armor": 3},
+		"base": {"skill_power_mult": 1.15, "attack_range_add": 20.0},
+		"subclasses": {
+			"relay": {"label": "중계자", "tiers": [{"max_hp_mult": 1.15, "skill_power_mult": 1.15}, {"max_hp_mult": 1.10}, {"skill_power_mult": 1.20, "armor_add": 3}]},
+			"analyst": {"label": "분석자", "tiers": [{"attack_mult": 1.20}, {"attack_add": 5}, {"attack_mult": 1.20, "skill_cd_mult": 0.85}]},
+			"planner": {"label": "기획자", "tiers": [{"skill_cd_mult": 0.85}, {"skill_power_mult": 1.20}, {"skill_cd_mult": 0.85, "attack_add": 4}]},
+		},
+	},
+	"engineer": {
+		"label": "엔지니어", "position": "전문가", "tactical": "스페셜",
+		"stats": {"max_hp": 115, "attack": 9, "attack_interval": 1.1, "attack_range": 150.0, "move_speed": 58.0, "armor": 5},
+		"base": {"max_hp_mult": 1.15, "armor_add": 3},
+		"subclasses": {
+			"supervisor": {"label": "감독관", "tiers": [{"attack_add": 6, "attack_range_add": 40.0}, {"attack_mult": 1.15}, {"skill_power_mult": 1.20}]},
+			"fortifier": {"label": "축성가", "tiers": [{"armor_add": 6, "max_hp_mult": 1.15}, {"armor_add": 6}, {"max_hp_mult": 1.20}]},
+			"technician": {"label": "기술사", "tiers": [{"skill_cd_mult": 0.85, "attack_add": 4}, {"attack_interval_mult": 0.88}, {"skill_power_mult": 1.20}]},
+		},
+	},
+
+	# ── 마이너 ──
+	"scout": {
+		"label": "스카웃", "position": "명사수", "tactical": "마이너",
+		"stats": {"max_hp": 95, "attack": 17, "attack_interval": 0.8, "attack_range": 250.0, "move_speed": 68.0, "armor": 2},
+		"base": {"attack_mult": 1.15, "attack_range_add": 30.0},
+		"subclasses": {
+			"ranger_skirm": {"label": "유격수", "tiers": [{"attack_range_add": 50.0}, {"attack_mult": 1.20}, {"attack_add": 6, "move_speed_mult": 1.10}]},
+			"recon": {"label": "수색대", "tiers": [{"attack_mult": 1.20}, {"attack_add": 5}, {"attack_mult": 1.20, "attack_range_add": 30.0}]},
+			"sentry": {"label": "파수꾼", "tiers": [{"attack_interval_mult": 0.85}, {"attack_add": 5}, {"attack_interval_mult": 0.85, "attack_mult": 1.15}]},
+		},
+	},
+	"arbiter": {
+		"label": "아비터", "position": "돌격가", "tactical": "마이너",
+		"stats": {"max_hp": 175, "attack": 13, "attack_interval": 0.95, "attack_range": 80.0, "move_speed": 80.0, "armor": 7},
+		"base": {"attack_mult": 1.10, "max_hp_mult": 1.10},
+		"subclasses": {
+			"punisher": {"label": "징벌자", "tiers": [{"armor_add": 5, "max_hp_mult": 1.15}, {"armor_add": 5}, {"attack_mult": 1.20, "armor_add": 4}]},
+			"judge": {"label": "심판자", "tiers": [{"attack_mult": 1.20}, {"attack_add": 6}, {"attack_mult": 1.25, "skill_power_mult": 1.15}]},
+			"recorder": {"label": "기록자", "tiers": [{"skill_power_mult": 1.20}, {"attack_add": 5, "skill_power_mult": 1.15}, {"skill_power_mult": 1.20}]},
+		},
+	},
+	"pilot": {
+		"label": "파일럿", "position": "통솔자", "tactical": "마이너",
+		"stats": {"max_hp": 105, "attack": 12, "attack_interval": 0.9, "attack_range": 195.0, "move_speed": 66.0, "armor": 3},
+		"base": {"attack_range_add": 30.0, "skill_power_mult": 1.10},
+		"subclasses": {
+			"controller": {"label": "통제관", "tiers": [{"skill_power_mult": 1.25, "attack_range_add": 30.0}, {"skill_power_mult": 1.15}, {"attack_mult": 1.15, "skill_power_mult": 1.15}]},
+			"quartermaster": {"label": "보급관", "tiers": [{"skill_cd_mult": 0.85, "max_hp_mult": 1.10}, {"skill_cd_mult": 0.88}, {"skill_power_mult": 1.20}]},
+			"squad_lead": {"label": "지휘관", "tiers": [{"attack_add": 5, "max_hp_mult": 1.10}, {"attack_mult": 1.15}, {"attack_add": 6, "armor_add": 3}]},
+		},
+	},
+	"ghost": {
+		"label": "고스트", "position": "전문가", "tactical": "마이너",
+		"stats": {"max_hp": 100, "attack": 12, "attack_interval": 1.0, "attack_range": 150.0, "move_speed": 72.0, "armor": 2},
+		"base": {"skill_power_mult": 1.20, "move_speed_mult": 1.10},
+		"subclasses": {
+			"assassin": {"label": "암살자", "tiers": [{"attack_mult": 1.25, "skill_power_mult": 1.15}, {"attack_add": 6}, {"attack_mult": 1.25}]},
+			"infiltrator": {"label": "잠행자", "tiers": [{"skill_power_mult": 1.25}, {"skill_cd_mult": 0.88}, {"skill_power_mult": 1.20, "attack_add": 4}]},
+			"synchronizer": {"label": "동조자", "tiers": [{"max_hp_mult": 1.15, "skill_power_mult": 1.15}, {"skill_cd_mult": 0.88}, {"skill_power_mult": 1.20, "max_hp_mult": 1.10}]},
+		},
+	},
+
+	# ── 사이오닉 ──
+	"lifter": {
+		"label": "리프터", "position": "명사수", "tactical": "사이오닉",
+		"stats": {"max_hp": 100, "attack": 16, "attack_interval": 0.85, "attack_range": 240.0, "move_speed": 60.0, "armor": 2},
+		"base": {"skill_power_mult": 1.15, "attack_range_add": 20.0},
+		"subclasses": {
+			"tractor": {"label": "견인자", "tiers": [{"skill_power_mult": 1.25}, {"attack_add": 5, "skill_power_mult": 1.10}, {"skill_power_mult": 1.20}]},
+			"conveyor": {"label": "전달자", "tiers": [{"move_speed_mult": 1.20, "skill_power_mult": 1.10}, {"attack_mult": 1.15}, {"skill_cd_mult": 0.85}]},
+			"weaver": {"label": "방직자", "tiers": [{"armor_add": 4, "max_hp_mult": 1.15}, {"max_hp_mult": 1.10}, {"armor_add": 5, "skill_power_mult": 1.15}]},
+		},
+	},
+	"templar": {
+		"label": "템플러", "position": "돌격가", "tactical": "사이오닉",
+		"stats": {"max_hp": 170, "attack": 14, "attack_interval": 0.9, "attack_range": 80.0, "move_speed": 82.0, "armor": 6},
+		"base": {"attack_mult": 1.15, "attack_interval_mult": 0.95},
+		"subclasses": {
+			"wanderer": {"label": "방랑자", "tiers": [{"move_speed_mult": 1.20, "attack_mult": 1.15}, {"attack_add": 6}, {"attack_interval_mult": 0.88}]},
+			"reaper": {"label": "수확자", "tiers": [{"attack_mult": 1.20}, {"attack_add": 6}, {"attack_mult": 1.25, "skill_power_mult": 1.15}]},
+			"resistor": {"label": "저항자", "tiers": [{"armor_add": 5, "max_hp_mult": 1.15}, {"armor_add": 5}, {"attack_mult": 1.15, "armor_add": 4}]},
+		},
+	},
+	"oracle": {
+		"label": "오라클", "position": "통솔자", "tactical": "사이오닉",
+		"stats": {"max_hp": 105, "attack": 11, "attack_interval": 0.95, "attack_range": 185.0, "move_speed": 62.0, "armor": 3},
+		"base": {"skill_power_mult": 1.15, "skill_cd_mult": 0.92},
+		"subclasses": {
+			"diviner": {"label": "점술사", "tiers": [{"skill_cd_mult": 0.85}, {"skill_power_mult": 1.20}, {"skill_cd_mult": 0.85, "skill_power_mult": 1.10}]},
+			"illusionist": {"label": "환술사", "tiers": [{"skill_power_mult": 1.25}, {"skill_power_mult": 1.15}, {"attack_mult": 1.15, "skill_power_mult": 1.15}]},
+			"medium": {"label": "영매사", "tiers": [{"attack_mult": 1.15, "skill_power_mult": 1.10}, {"attack_add": 5}, {"skill_power_mult": 1.20}]},
+		},
+	},
+	"mystic": {
+		"label": "미스틱", "position": "전문가", "tactical": "사이오닉",
+		"stats": {"max_hp": 100, "attack": 10, "attack_interval": 1.05, "attack_range": 175.0, "move_speed": 62.0, "armor": 2},
+		"base": {"skill_power_mult": 1.25, "skill_cd_mult": 0.92},
+		"subclasses": {
+			"liberator": {"label": "해방자", "tiers": [{"skill_power_mult": 1.25}, {"skill_cd_mult": 0.88}, {"skill_power_mult": 1.20}]},
+			"pyro": {"label": "방화자", "tiers": [{"attack_mult": 1.15, "skill_power_mult": 1.15}, {"skill_power_mult": 1.15}, {"skill_power_mult": 1.20, "attack_add": 4}]},
+			"decomposer": {"label": "분해자", "tiers": [{"attack_mult": 1.20}, {"skill_power_mult": 1.15}, {"attack_mult": 1.20, "skill_power_mult": 1.10}]},
 		},
 	},
 }
@@ -122,8 +207,55 @@ static func has_class(class_id: String) -> bool:
 	return CLASSES.has(class_id)
 
 
+static func class_ids() -> Array:
+	return CLASSES.keys()
+
+
 static func class_label(class_id: String) -> String:
 	return String(CLASSES.get(class_id, {}).get("label", class_id))
+
+
+static func position_of(class_id: String) -> String:
+	return String(CLASSES.get(class_id, {}).get("position", ""))
+
+
+static func tactical_of(class_id: String) -> String:
+	return String(CLASSES.get(class_id, {}).get("tactical", ""))
+
+
+static func stats_for(class_id: String) -> Dictionary:
+	return CLASSES.get(class_id, {}).get("stats", {})
+
+
+## Visual sprite id for a class (explicit "sprite", else position default).
+static func sprite_for(class_id: String) -> String:
+	var c: Dictionary = CLASSES.get(class_id, {})
+	if c.is_empty():
+		return class_id  # non-class (e.g. enemy "swarm") uses its own id as the sprite
+	if c.has("sprite"):
+		return String(c["sprite"])
+	return String(POSITION_SPRITE.get(String(c.get("position", "")), class_id))
+
+
+## Signature skill kind for a class (explicit "skill", else position default; "" if none).
+static func skill_for(class_id: String) -> String:
+	var c: Dictionary = CLASSES.get(class_id, {})
+	if c.is_empty():
+		return ""
+	if c.has("skill"):
+		return String(c["skill"])
+	return String(POSITION_SKILL.get(String(c.get("position", "")), ""))
+
+
+static func default_subclass(class_id: String) -> String:
+	var subs: Dictionary = CLASSES.get(class_id, {}).get("subclasses", {})
+	for k in subs:
+		return String(k)
+	return ""
+
+
+static func subclass_ids(class_id: String) -> Array:
+	return CLASSES.get(class_id, {}).get("subclasses", {}).keys()
 
 
 static func subclass_label(class_id: String, sub_id: String) -> String:
@@ -131,32 +263,14 @@ static func subclass_label(class_id: String, sub_id: String) -> String:
 	return String(subs.get(sub_id, {}).get("label", sub_id))
 
 
-## First subclass id for a class (default selection).
-static func default_subclass(class_id: String) -> String:
-	var c: Dictionary = CLASSES.get(class_id, {})
-	var subs: Dictionary = c.get("subclasses", {})
-	for k in subs:
-		return String(k)
-	return ""
-
-
-static func subclass_ids(class_id: String) -> Array:
-	var c: Dictionary = CLASSES.get(class_id, {})
-	var subs: Dictionary = c.get("subclasses", {})
-	return subs.keys()
-
-
 static func base_mods(class_id: String) -> Dictionary:
-	var c: Dictionary = CLASSES.get(class_id, {})
-	return c.get("base", {})
+	return CLASSES.get(class_id, {}).get("base", {})
 
 
 ## Tier is 1-based (1/2/3). Returns {} if out of range.
 static func tier_mods(class_id: String, subclass_id: String, tier: int) -> Dictionary:
-	var c: Dictionary = CLASSES.get(class_id, {})
-	var subs: Dictionary = c.get("subclasses", {})
-	var sub: Dictionary = subs.get(subclass_id, {})
-	var tiers: Array = sub.get("tiers", [])
+	var subs: Dictionary = CLASSES.get(class_id, {}).get("subclasses", {})
+	var tiers: Array = subs.get(subclass_id, {}).get("tiers", [])
 	if tier >= 1 and tier <= tiers.size():
 		return tiers[tier - 1]
 	return {}
