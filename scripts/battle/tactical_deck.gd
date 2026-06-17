@@ -17,6 +17,7 @@ var tp: int = 0
 
 var _has_commander: bool = false
 var _built: bool = false
+var _bonus_draw: int = 0
 
 
 func _ready() -> void:
@@ -46,21 +47,28 @@ func _current_team_ids() -> Array:
 
 ## Ensure the deck matches the team (commander cards) and deal a fresh hand of 3.
 func refresh_for_team(ids: Array) -> void:
+	var has_minor: bool = false
+	for id in ids:
+		if ClassData.tactical_of(id) == "마이너":
+			has_minor = true
+			break
+	_bonus_draw = 1 if has_minor else 0
+
 	var has_cmd: bool = ids.has("commander")
 	if not _built or has_cmd != _has_commander:
-		# Full rebuild: replace the whole deck and discard the old hand (no recycling).
 		_has_commander = has_cmd
 		deck = CardData.build(has_cmd)
+		if has_minor:
+			deck.append({"id": "minor_tactic", "label": "고유 전술", "cost": 1, "desc": "카드 1장 드로우", "effect": {"draw": 1}})
 		deck.shuffle()
 		graveyard = []
 		hand = []
 		_built = true
 	else:
-		# Normal node start: unused hand -> graveyard.
 		for c in hand:
 			graveyard.append(c)
 		hand = []
-	_draw(HAND_SIZE)
+	_draw(HAND_SIZE + _bonus_draw)
 	hand_changed.emit(hand)
 
 
