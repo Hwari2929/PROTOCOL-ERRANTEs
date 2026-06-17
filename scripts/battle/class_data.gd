@@ -36,8 +36,8 @@ const CLASSES: Dictionary = {
 		"base": {"attack_mult": 1.25, "attack_interval_mult": 0.95},
 		"subclasses": {
 			"suppressor": {"label": "제압자", "tiers": [
-				{"attack_mult": 1.20, "skill_cd_mult": 0.90},
-				{"attack_add": 6},
+				{"attack_mult": 1.20, "skill_cd_mult": 0.90, "skill_power_mult": 1.25},
+				{"attack_add": 6, "skill_power_mult": 1.15},
 				{"attack_mult": 1.20, "attack_range_add": 40.0},
 			]},
 			"tracker": {"label": "추적자", "tiers": [
@@ -89,8 +89,8 @@ const CLASSES: Dictionary = {
 				{"skill_cd_mult": 0.85, "armor_add": 3},
 			]},
 			"purifier": {"label": "정화자", "tiers": [
-				{"attack_mult": 1.20},
-				{"attack_add": 4, "skill_cd_mult": 0.90},
+				{"attack_mult": 1.20, "skill_power_mult": 1.20},
+				{"attack_add": 4, "skill_cd_mult": 0.90, "skill_power_mult": 1.20},
 				{"attack_mult": 1.20, "max_hp_mult": 1.10},
 			]},
 		},
@@ -156,3 +156,5 @@ static func apply_mods(u: Node, mods: Dictionary) -> void:
 		u.set("attack_range", float(u.get("attack_range")) + float(mods["attack_range_add"]))
 	if mods.has("skill_cd_mult"):
 		u.set("skill_cd", maxf(0.5, float(u.get("skill_cd")) * float(mods["skill_cd_mult"])))
+	if mods.has("skill_power_mult"):
+		u.set("skill_power", float(u.get("skill_power")) * float(mods["skill_power_mult"]))

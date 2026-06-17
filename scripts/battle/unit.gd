@@ -29,6 +29,7 @@ var active: bool = false
 
 var skill_cd: float = 0.0
 var skill_timer: float = 0.0
+var skill_power: float = 1.0       # multiplier on skill magnitude (inhesion/cards scale it)
 
 var _attack_timer: float = 0.0
 var _is_dragging: bool = false
@@ -163,16 +164,16 @@ func die() -> void:
 # ── Active skills (dispatched by class = sprite_id) ──
 func _use_skill() -> void:
 	match sprite_id:
-		"protagonist":
-			_skill_nova(int(round(float(attack) * 1.5)), 240.0)
-		"ranger":
-			_skill_volley(attack * 3)
-		"vanguard":
-			armor += 4
-		"commander":
-			_skill_rally(3)
-		"medic":
-			_skill_mend(int(round(float(max_hp) * 0.18)) + 10)
+		"protagonist":   # Nova — AoE burst to nearby enemies
+			_skill_nova(int(round(float(attack) * 1.6 * skill_power)), 250.0)
+		"ranger":        # Volley — burst on the 3 nearest enemies
+			_skill_volley(int(round(float(attack) * 2.2 * skill_power)), 3)
+		"vanguard":      # Fortify — gain armor + patch self up
+			_skill_fortify()
+		"commander":     # Rally — permanently raise allies' attack
+			_skill_rally(maxi(1, int(round(3.0 * skill_power))))
+		"medic":         # Mend — heal the lowest-HP ally
+			_skill_mend(int(round((float(max_hp) * 0.18 + 12.0) * skill_power)))
 	_skill_pulse()
 
 func _skill_nova(dmg: int, radius: float) -> void:
@@ -180,10 +181,23 @@ func _skill_nova(dmg: int, radius: float) -> void:
 		if global_position.distance_to(n.global_position) <= radius:
 			n.take_damage(dmg)
 
-func _skill_volley(dmg: int) -> void:
-	var t: Node2D = acquire_target()
-	if t != null:
-		t.take_damage(dmg)
+## Hit the `max_targets` nearest enemies.
+func _skill_volley(dmg: int, max_targets: int) -> void:
+	var enemies: Array = _units_on(false)
+	enemies.sort_custom(func(a, b): return global_position.distance_to(a.global_position) < global_position.distance_to(b.global_position))
+	var hit: int = 0
+	for n in enemies:
+		if hit >= max_targets:
+			break
+		n.take_damage(dmg)
+		hit += 1
+
+## Gain armor and patch up (frontline sustain).
+func _skill_fortify() -> void:
+	armor += 4
+	var healed: int = int(round(float(max_hp) * 0.10 * skill_power))
+	hp = mini(max_hp, hp + healed)
+	queue_redraw()
 
 func _skill_rally(amount: int) -> void:
 	for n in _units_on(true):
