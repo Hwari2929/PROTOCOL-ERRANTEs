@@ -31,6 +31,7 @@ signal battle_phase_changed(new_phase: StringName)
 signal round_started(round_number: int)
 signal round_ended(round_number: int, victory: bool)
 signal tokens_changed(new_amount: int)
+signal team_changed(class_ids: Array)
 
 # === 캐릭터 ===
 signal character_obtained(character_id: StringName)

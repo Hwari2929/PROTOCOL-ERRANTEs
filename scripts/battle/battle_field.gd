@@ -112,6 +112,7 @@ func set_player_team(ids: Array, subclasses: Dictionary = {}) -> void:
 	if valid.is_empty():
 		valid = PLAYER_TEAM_IDS
 	_spawn_player_ids(valid, subclasses)
+	EventBus.team_changed.emit(valid)
 	begin_prep()
 
 
