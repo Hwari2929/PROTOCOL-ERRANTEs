@@ -35,7 +35,7 @@ func _ready() -> void:
 
 	EventBus.round_started.connect(_on_round_started)
 	EventBus.battle_session_ended.connect(_on_session_ended)
-	var reso: Node = get_parent().get_node_or_null("Resonance")
+	var reso: Node = get_parent().get_parent().get_node_or_null("Resonance")
 	if reso != null and reso.has_signal("grade_changed"):
 		reso.grade_changed.connect(_on_grade_changed)
 	if reso != null and reso.has_signal("credits_changed"):
@@ -74,7 +74,7 @@ func _on_retry_pressed() -> void:
 func refresh() -> void:
 	var node_i: int = 1
 	var node_n: int = 3
-	var sess: Node = get_parent().get_node_or_null("BattleSession")
+	var sess: Node = get_parent().get_parent().get_node_or_null("BattleSession")
 	if sess != null:
 		if sess.has_method("current_node"):
 			node_i = sess.current_node()
@@ -84,7 +84,7 @@ func refresh() -> void:
 
 	var grade: int = 1
 	var credits: int = 0
-	var reso: Node = get_parent().get_node_or_null("Resonance")
+	var reso: Node = get_parent().get_parent().get_node_or_null("Resonance")
 	if reso != null:
 		if reso.has_method("current_grade"):
 			grade = reso.current_grade()

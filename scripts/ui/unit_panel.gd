@@ -14,10 +14,10 @@ func _ready() -> void:
     _content.anchor_bottom = 0.0
     _content.anchor_left = 1.0
     _content.anchor_right = 1.0
-    _content.offset_top = 120.0
+    _content.offset_top = 110.0
     _content.offset_right = -16.0
-    _content.offset_left = 0.0
-    _content.offset_bottom = 0.0
+    _content.offset_left = -250.0
+    _content.offset_bottom = 470.0
 
     var _title: Label = Label.new()
     _title.text = "공명 강화"
