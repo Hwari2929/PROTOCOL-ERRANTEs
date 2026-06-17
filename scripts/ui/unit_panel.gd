@@ -73,7 +73,12 @@ func _on_resonate_pressed(unit: Node) -> void:
         _resonance.credits_changed.emit(_resonance.credits)
         var gained: int = unit.gain_resonance(8)
         if gained > 0:
-            var _augment_system: Node = get_parent().get_node_or_null("AugmentSystem")
-            if _augment_system:
-                _augment_system.show_menu(3)
+            if unit.current_res_grade() >= 2 and not unit.has_subclass():
+                var _subclass_menu: Node = get_parent().get_node_or_null("SubclassMenu")
+                if _subclass_menu:
+                    _subclass_menu.show_for(unit)
+            else:
+                var _augment_system: Node = get_parent().get_node_or_null("AugmentSystem")
+                if _augment_system:
+                    _augment_system.show_menu(3)
         refresh()

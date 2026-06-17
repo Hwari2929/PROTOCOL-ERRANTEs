@@ -109,6 +109,17 @@ func unlock_inhesion(tier: int) -> void:
 		t += 1
 	inhesion_tier = tier
 
+## Set the subclass and retroactively apply bonuses for all tiers already unlocked.
+func set_subclass(sub_id: String) -> void:
+	subclass_id = sub_id
+	for t in range(1, inhesion_tier + 1):
+		var mods: Dictionary = ClassData.tier_mods(sprite_id, sub_id, t)
+		if not mods.is_empty():
+			ClassData.apply_mods(self, mods)
+
+func has_subclass() -> bool:
+	return subclass_id != ""
+
 func res_threshold_for(g: int) -> int:
 	if g <= 1: return 0
 	elif g == 2: return 8
