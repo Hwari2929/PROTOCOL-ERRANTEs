@@ -6,6 +6,7 @@ extends Control
 var _progress: Label
 var _grade: Label
 var _banner: Label
+var _retry: Button
 
 
 func _ready() -> void:
@@ -21,6 +22,16 @@ func _ready() -> void:
 	_banner.position = Vector2(540.0, 300.0)
 	_banner.visible = false
 	add_child(_banner)
+
+	_retry = Button.new()
+	_retry.text = "RETRY"
+	_retry.add_theme_font_size_override("font_size", 24)
+	_retry.position = Vector2(560.0, 370.0)
+	_retry.custom_minimum_size = Vector2(160.0, 52.0)
+	_retry.visible = false
+	_retry.process_mode = Node.PROCESS_MODE_ALWAYS
+	_retry.pressed.connect(_on_retry_pressed)
+	add_child(_retry)
 
 	EventBus.round_started.connect(_on_round_started)
 	EventBus.battle_session_ended.connect(_on_session_ended)
@@ -50,6 +61,12 @@ func _on_session_ended(victory: bool) -> void:
 	_banner.text = "VICTORY" if victory else "DEFEAT"
 	_banner.modulate = Color(0.6, 1.0, 0.6) if victory else Color(1.0, 0.5, 0.5)
 	_banner.visible = true
+	_retry.visible = true
+
+
+func _on_retry_pressed() -> void:
+	get_tree().paused = false
+	get_tree().reload_current_scene()
 
 
 func refresh() -> void:
