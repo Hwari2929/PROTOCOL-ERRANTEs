@@ -131,6 +131,7 @@ func _physics_process(delta: float) -> void:
 		if _attack_timer <= 0.0:
 			var dmg: int = maxi(1, attack - target.armor)
 			target.take_damage(dmg)
+			_apply_on_hit(target)
 			_attack_timer = attack_interval
 
 func acquire_target() -> Node2D:
@@ -144,6 +145,19 @@ func acquire_target() -> Node2D:
 				best_dist = d
 				best_target = node
 	return best_target
+
+## Apply this unit's subclass on-hit status trait to a struck target.
+func _apply_on_hit(target: Node) -> void:
+	if target == null or not target.has_method("apply_status"):
+		return
+	var subtrait: Dictionary = ClassData.subclass_trait(sprite_id, subclass_id)
+	match String(subtrait.get("on_hit", "")):
+		"bleed":
+			target.apply_status("bleed", 1, 4.0, 5.0, "physical")
+		"burn":
+			target.apply_status("burn", 1, 4.0, 5.0, "physical")
+		"poison":
+			target.apply_status("poison", 1, 4.0, 6.0, "chemical")
 
 func take_damage(amount: int) -> void:
 	if _status != null and _status.has_method("absorb"):
@@ -203,6 +217,9 @@ func _use_skill() -> void:
 			_skill_rally(maxi(1, int(round(3.0 * skill_power))))
 		"mend":         # Mend — heal the lowest-HP ally
 			_skill_mend(int(round((float(max_hp) * 0.18 + 12.0) * skill_power)))
+	var subtrait: Dictionary = ClassData.subclass_trait(sprite_id, subclass_id)
+	if String(subtrait.get("on_skill", "")) == "shield":
+		add_shield(int(round(float(max_hp) * 0.15 * skill_power)))
 	_skill_pulse()
 	var host: Node2D = _fx_host()
 	if host != null and SKILL_NAME.has(kind):
