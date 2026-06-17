@@ -101,9 +101,9 @@ func _spawn_players() -> void:
 
 ## Rebuild the player team from a list of roster ids (used by team selection).
 ## Invalid/empty selections fall back to the default trio.
-func set_player_team(ids: Array) -> void:
+func set_player_team(ids: Array, subclasses: Dictionary = {}) -> void:
 	for u in units.get_children():
-		if is_instance_valid(u) and int(u.get("team")) == TEAM_PLAYER:
+		if is_instance_valid(u) and u.is_in_group("unit") and int(u.get("team")) == TEAM_PLAYER:
 			u.queue_free()
 	var valid: Array = []
 	for id in ids:
@@ -111,16 +111,19 @@ func set_player_team(ids: Array) -> void:
 			valid.append(id)
 	if valid.is_empty():
 		valid = PLAYER_TEAM_IDS
-	_spawn_player_ids(valid)
+	_spawn_player_ids(valid, subclasses)
 	begin_prep()
 
 
-func _spawn_player_ids(ids: Array) -> void:
+func _spawn_player_ids(ids: Array, subclasses: Dictionary = {}) -> void:
 	var n: int = ids.size()
 	for i in n:
 		var id: String = ids[i]
 		var cfg: Dictionary = ROSTER[id]
 		var u: Node2D = _make_unit(TEAM_PLAYER, cfg, id)
+		# Override the default subclass with the player's choice (tiers apply later).
+		if subclasses.has(id) and String(subclasses[id]) != "":
+			u.set("subclass_id", subclasses[id])
 		var offset: float = (float(i) - float(n - 1) / 2.0) * 90.0
 		u.position = Vector2(380.0, 360.0 + offset)
 
