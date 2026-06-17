@@ -26,6 +26,10 @@ const ROSTER: Dictionary = {
 const ENEMY_STATS: Dictionary = {"max_hp": 70, "attack": 9, "attack_interval": 1.0, "attack_range": 90.0, "move_speed": 55.0, "armor": 2}
 ## Faster, frailer 군체 variant (introduced from node 2).
 const SWARMLING_STATS: Dictionary = {"max_hp": 45, "attack": 7, "attack_interval": 0.8, "attack_range": 80.0, "move_speed": 95.0, "armor": 0}
+## Boss (final node): a large, durable 군체 brood-mother.
+const BOSS_STATS: Dictionary = {"max_hp": 680, "attack": 22, "attack_interval": 1.3, "attack_range": 120.0, "move_speed": 46.0, "armor": 9, "body_scale": 2.0}
+## Final node index (a boss wave instead of a normal wave).
+const BOSS_NODE: int = 3
 
 ## Player team for the slice: 주인공 + 레인저 + 뱅가드 (exactly 3).
 const PLAYER_TEAM_IDS: Array = ["protagonist", "ranger", "vanguard"]
@@ -59,8 +63,17 @@ func _physics_process(_delta: float) -> void:
 ## Count and stats scale with the node; a faster swarmling variant joins from node 2.
 func spawn_wave(node_index: int) -> void:
 	for e in units.get_children():
-		if is_instance_valid(e) and int(e.get("team")) == TEAM_ENEMY:
+		if is_instance_valid(e) and e.is_in_group("unit") and int(e.get("team")) == TEAM_ENEMY:
 			e.queue_free()
+	if node_index >= BOSS_NODE:
+		_spawn_boss_wave()
+	else:
+		_spawn_normal_wave(node_index)
+	_resolved = false
+	begin_prep()
+
+
+func _spawn_normal_wave(node_index: int) -> void:
 	var count: int = 3 + node_index
 	var stat_scale: float = 1.0 + 0.25 * float(node_index - 1)
 	for i in count:
@@ -71,8 +84,15 @@ func spawn_wave(node_index: int) -> void:
 		var u: Node2D = _make_unit(TEAM_ENEMY, cfg, "swarm")
 		var offset: float = (float(i) - float(count - 1) / 2.0) * 84.0
 		u.position = Vector2(900.0, 360.0 + offset)
-	_resolved = false
-	begin_prep()
+
+
+## Final node: one big boss flanked by two swarm minions.
+func _spawn_boss_wave() -> void:
+	var boss: Node2D = _make_unit(TEAM_ENEMY, BOSS_STATS.duplicate(), "swarm")
+	boss.position = Vector2(930.0, 360.0)
+	for i in 2:
+		var u: Node2D = _make_unit(TEAM_ENEMY, ENEMY_STATS.duplicate(), "swarm")
+		u.position = Vector2(840.0, 360.0 + (-1.0 if i == 0 else 1.0) * 150.0)
 
 
 func _spawn_players() -> void:

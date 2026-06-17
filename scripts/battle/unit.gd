@@ -21,6 +21,7 @@ var attack_range: float = 100.0
 var move_speed: float = 50.0
 var armor: int = 0
 var sprite_id: String = ""
+var body_scale: float = 1.0
 
 var active: bool = false
 
@@ -57,7 +58,7 @@ func refresh_sprite() -> void:
 	_sprite.centered = true
 	var h: float = float(tex.get_height())
 	if h > 0.0:
-		var s: float = 52.0 / h
+		var s: float = 52.0 / h * body_scale
 		_sprite.scale = Vector2(s, s)
 	_has_sprite = true
 	queue_redraw()
