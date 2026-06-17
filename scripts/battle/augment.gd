@@ -5,12 +5,16 @@ extends Node
 ## no class_name).
 
 const AUGMENTS: Array = [
-	{"id": "impact",   "label": "충격 증폭",     "desc": "피해 +30%"},
-	{"id": "keen_aim", "label": "날카로운 조준", "desc": "공격력 +20%"},
-	{"id": "sturdy",   "label": "강건함",         "desc": "최대 체력 +15%, 방어도 +2"},
-	{"id": "bulwark",  "label": "불굴의 의지",    "desc": "방어도 +5"},
-	{"id": "agile",    "label": "기민한 사수",    "desc": "이동 속도 +25%"},
-	{"id": "mastery",  "label": "반복 숙달",      "desc": "공격 속도 +18%"},
+	{"id": "impact",       "label": "충격 증폭",     "desc": "피해 +30%",          "effect": {"attack_mult": 1.30}},
+	{"id": "keen_aim",     "label": "날카로운 조준", "desc": "공격력 +8",          "effect": {"attack_add": 8}},
+	{"id": "sturdy",       "label": "강건함",         "desc": "최대 체력 +15%, 방어도 +2", "effect": {"max_hp_mult": 1.15, "armor_add": 2}},
+	{"id": "bulwark",      "label": "불굴의 의지",    "desc": "방어도 +5",          "effect": {"armor_add": 5}},
+	{"id": "agile",        "label": "기민한 사수",    "desc": "이동 속도 +25%",     "effect": {"move_speed_mult": 1.25}},
+	{"id": "mastery",      "label": "반복 숙달",      "desc": "공격 속도 +18%",     "effect": {"attack_interval_mult": 0.82}},
+	{"id": "overcharge",   "label": "과충전",         "desc": "스킬 위력 +30%",     "effect": {"skill_power_mult": 1.30}},
+	{"id": "rapid_skills", "label": "신속 시전",      "desc": "스킬 쿨 -20%",       "effect": {"skill_cd_mult": 0.80}},
+	{"id": "marksman",     "label": "명사수",         "desc": "사거리 +60, 공격 +10%", "effect": {"attack_range_add": 60.0, "attack_mult": 1.10}},
+	{"id": "juggernaut",   "label": "파쇄기",         "desc": "최대 체력 +25%, 방어도 +4", "effect": {"max_hp_mult": 1.25, "armor_add": 4}},
 ]
 
 var _layer: CanvasLayer = null
@@ -33,24 +37,16 @@ func roll_choices(n: int) -> Array:
 
 
 func apply_augment(id: String) -> void:
+	var effect: Dictionary = {}
+	for a in AUGMENTS:
+		if String(a["id"]) == id:
+			effect = a["effect"]
+			break
+	if effect.is_empty():
+		return
 	for u in get_tree().get_nodes_in_group("unit"):
-		if int(u.get("team")) != 0:
-			continue
-		match id:
-			"impact":
-				u.set("attack", int(round(float(u.get("attack")) * 1.3)))
-			"keen_aim":
-				u.set("attack", int(round(float(u.get("attack")) * 1.2)))
-			"sturdy":
-				u.set("max_hp", int(round(float(u.get("max_hp")) * 1.15)))
-				u.set("hp", int(round(float(u.get("hp")) * 1.15)))
-				u.set("armor", int(u.get("armor")) + 2)
-			"bulwark":
-				u.set("armor", int(u.get("armor")) + 5)
-			"agile":
-				u.set("move_speed", float(u.get("move_speed")) * 1.25)
-			"mastery":
-				u.set("attack_interval", maxf(0.2, float(u.get("attack_interval")) * 0.82))
+		if int(u.get("team")) == 0:
+			ClassData.apply_mods(u, effect)
 
 
 ## Build one button per rolled choice and pause until the player picks.
