@@ -38,6 +38,8 @@ func _ready() -> void:
 	var reso: Node = get_parent().get_node_or_null("Resonance")
 	if reso != null and reso.has_signal("grade_changed"):
 		reso.grade_changed.connect(_on_grade_changed)
+	if reso != null and reso.has_signal("credits_changed"):
+		reso.credits_changed.connect(_on_grade_changed)
 
 	refresh()
 

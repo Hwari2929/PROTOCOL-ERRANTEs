@@ -46,12 +46,9 @@ func advance_node() -> void:
 		result = _battle_field.result()
 
 	if result == 1:
+		# Combat reward: energy credits (spent later via RESONATE in prep).
 		if _resonance != null:
-			_resonance.add_resonance(10)
-
-		if _resonance != null and _resonance.can_grade_up():
-			if _augment_system != null:
-				_augment_system.show_menu(3)
+			_resonance.gain_credits(12)
 
 		if _current_node < _node_count:
 			_current_node += 1

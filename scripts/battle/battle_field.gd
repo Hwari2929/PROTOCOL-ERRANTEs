@@ -138,7 +138,22 @@ func _make_unit(team: int, cfg: Dictionary, sprite_id: String = "") -> Node2D:
 	u.set("sprite_id", sprite_id)
 	if u.has_method("refresh_sprite"):
 		u.refresh_sprite()
+	# Class identity: default subclass + base inhesion (player classes only).
+	if ClassData.has_class(sprite_id):
+		if String(u.get("subclass_id")) == "":
+			u.set("subclass_id", ClassData.default_subclass(sprite_id))
+		if u.has_method("apply_base_inhesion"):
+			u.apply_base_inhesion()
 	return u
+
+
+## Unlock subclass inhesion on all player units up to the tier for `grade`
+## (grade 2 -> 고유1, 3 -> 고유2, 4 -> 고유3).
+func apply_inhesion_for_grade(grade: int) -> void:
+	var tier: int = clampi(grade - 1, 0, 3)
+	for u in units_of(TEAM_PLAYER):
+		if u.has_method("unlock_inhesion"):
+			u.unlock_inhesion(tier)
 
 
 ## Living units of a team.

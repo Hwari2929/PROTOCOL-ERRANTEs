@@ -20,8 +20,10 @@ var attack_interval: float = 1.0
 var attack_range: float = 100.0
 var move_speed: float = 50.0
 var armor: int = 0
-var sprite_id: String = ""
+var sprite_id: String = ""        # also serves as the class id
 var body_scale: float = 1.0
+var subclass_id: String = ""
+var inhesion_tier: int = 0        # 0 = base only; 1/2/3 = 고유1/2/3 unlocked
 
 var active: bool = false
 
@@ -65,6 +67,24 @@ func refresh_sprite() -> void:
 
 func set_active(value: bool) -> void:
 	active = value
+
+## Apply the class BASE inhesion (always on). Call once at spawn after stats are set.
+func apply_base_inhesion() -> void:
+	if ClassData.has_class(sprite_id):
+		ClassData.apply_mods(self, ClassData.base_mods(sprite_id))
+
+## Unlock the subclass inhesion up to `tier` (1=고유1 .. 3=고유3), applying any
+## tiers not yet applied. Idempotent for already-unlocked tiers.
+func unlock_inhesion(tier: int) -> void:
+	if tier <= inhesion_tier or not ClassData.has_class(sprite_id):
+		return
+	var t: int = inhesion_tier + 1
+	while t <= tier:
+		var mods: Dictionary = ClassData.tier_mods(sprite_id, subclass_id, t)
+		if not mods.is_empty():
+			ClassData.apply_mods(self, mods)
+		t += 1
+	inhesion_tier = tier
 
 func _physics_process(delta: float) -> void:
 	if not active:
