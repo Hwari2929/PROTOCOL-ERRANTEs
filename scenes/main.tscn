@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/battle/battle_field.tscn" id="1_field"]
 [ext_resource type="Script" path="res://scripts/battle/resonance.gd" id="2_reso"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://scripts/battle/tactical_deck.gd" id="8_deck"]
 [ext_resource type="Script" path="res://scripts/ui/card_bar.gd" id="9_card"]
 [ext_resource type="Script" path="res://scripts/ui/title_overlay.gd" id="10_title"]
+[ext_resource type="Script" path="res://scripts/ui/unit_panel.gd" id="11_unit"]
 
 [node name="Main" type="Node2D"]
 
@@ -59,6 +60,13 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("7_tsel")
+
+[node name="UnitPanel" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("11_unit")
 
 [node name="TitleOverlay" type="Control" parent="UI"]
 layout_mode = 3
