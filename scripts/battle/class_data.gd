@@ -234,6 +234,8 @@ static func sprite_for(class_id: String) -> String:
 		return class_id  # non-class (e.g. enemy "swarm") uses its own id as the sprite
 	if c.has("sprite"):
 		return String(c["sprite"])
+	if ResourceLoader.exists("res://assets/sprites/%s.png" % class_id):
+		return class_id  # class has its own sprite asset
 	return String(POSITION_SPRITE.get(String(c.get("position", "")), class_id))
 
 
