@@ -41,7 +41,7 @@ const CLASSES: Dictionary = {
 		"subclasses": {
 			"suppressor": {"label": "제압자", "tiers": [{"attack_mult": 1.20, "skill_power_mult": 1.25}, {"attack_add": 6, "skill_power_mult": 1.15}, {"attack_mult": 1.20, "attack_range_add": 40.0}]},
 			"outlaw": {"label": "무법자", "tiers": [{"move_speed_mult": 1.20, "attack_interval_mult": 0.92}, {"attack_add": 5, "move_speed_mult": 1.10}, {"attack_mult": 1.20, "attack_interval_mult": 0.88}]},
-			"tracker": {"label": "추적자", "tiers": [{"attack_interval_mult": 0.85}, {"attack_mult": 1.25}, {"attack_add": 8, "skill_cd_mult": 0.85}]},
+			"tracker": {"label": "추적자", "trait": {"on_hit": "bleed"}, "tiers": [{"attack_interval_mult": 0.85}, {"attack_mult": 1.25}, {"attack_add": 8, "skill_cd_mult": 0.85}]},
 		},
 	},
 	"vanguard": {
@@ -50,7 +50,7 @@ const CLASSES: Dictionary = {
 		"base": {"max_hp_mult": 1.15, "armor_add": 3},
 		"subclasses": {
 			"guardian": {"label": "수호자", "tiers": [{"armor_add": 5, "max_hp_mult": 1.15}, {"armor_add": 6}, {"max_hp_mult": 1.20, "skill_cd_mult": 0.85}]},
-			"charger": {"label": "돌격자", "tiers": [{"move_speed_mult": 1.25, "attack_mult": 1.15}, {"attack_add": 5}, {"attack_mult": 1.25, "skill_cd_mult": 0.85}]},
+			"charger": {"label": "돌격자", "trait": {"on_skill": "shield"}, "tiers": [{"move_speed_mult": 1.25, "attack_mult": 1.15}, {"attack_add": 5}, {"attack_mult": 1.25, "skill_cd_mult": 0.85}]},
 			"escort": {"label": "엄호자", "tiers": [{"max_hp_mult": 1.15, "armor_add": 4}, {"max_hp_mult": 1.15}, {"armor_add": 6, "skill_cd_mult": 0.85}]},
 		},
 	},
@@ -83,7 +83,7 @@ const CLASSES: Dictionary = {
 		"subclasses": {
 			"overlord": {"label": "군림자", "tiers": [{"attack_mult": 1.20}, {"attack_add": 6}, {"attack_mult": 1.20, "attack_interval_mult": 0.90}]},
 			"pilot_mech": {"label": "조종자", "tiers": [{"max_hp_mult": 1.25, "armor_add": 5}, {"armor_add": 6}, {"max_hp_mult": 1.20, "attack_add": 6}]},
-			"crusher": {"label": "분쇄자", "tiers": [{"attack_add": 8, "attack_range_add": 30.0}, {"attack_mult": 1.20}, {"max_hp_mult": 1.15, "attack_add": 6}]},
+			"crusher": {"label": "분쇄자", "trait": {"on_skill": "shield"}, "tiers": [{"attack_add": 8, "attack_range_add": 30.0}, {"attack_mult": 1.20}, {"max_hp_mult": 1.15, "attack_add": 6}]},
 		},
 	},
 	"breacher": {
@@ -93,7 +93,7 @@ const CLASSES: Dictionary = {
 		"subclasses": {
 			"breakthrough": {"label": "돌파자", "tiers": [{"move_speed_mult": 1.20, "attack_mult": 1.15}, {"attack_add": 6}, {"attack_mult": 1.20, "skill_cd_mult": 0.85}]},
 			"skirmisher": {"label": "척후대", "tiers": [{"attack_interval_mult": 0.88, "move_speed_mult": 1.10}, {"attack_add": 5}, {"attack_interval_mult": 0.85}]},
-			"irradiator": {"label": "피폭자", "tiers": [{"skill_power_mult": 1.25}, {"attack_mult": 1.15, "skill_power_mult": 1.15}, {"skill_power_mult": 1.20, "attack_add": 5}]},
+			"irradiator": {"label": "피폭자", "trait": {"on_hit": "poison"}, "tiers": [{"skill_power_mult": 1.25}, {"attack_mult": 1.15, "skill_power_mult": 1.15}, {"skill_power_mult": 1.20, "attack_add": 5}]},
 		},
 	},
 	"cipher": {
@@ -176,7 +176,7 @@ const CLASSES: Dictionary = {
 		"base": {"attack_mult": 1.15, "attack_interval_mult": 0.95},
 		"subclasses": {
 			"wanderer": {"label": "방랑자", "tiers": [{"move_speed_mult": 1.20, "attack_mult": 1.15}, {"attack_add": 6}, {"attack_interval_mult": 0.88}]},
-			"reaper": {"label": "수확자", "tiers": [{"attack_mult": 1.20}, {"attack_add": 6}, {"attack_mult": 1.25, "skill_power_mult": 1.15}]},
+			"reaper": {"label": "수확자", "trait": {"on_hit": "bleed"}, "tiers": [{"attack_mult": 1.20}, {"attack_add": 6}, {"attack_mult": 1.25, "skill_power_mult": 1.15}]},
 			"resistor": {"label": "저항자", "tiers": [{"armor_add": 5, "max_hp_mult": 1.15}, {"armor_add": 5}, {"attack_mult": 1.15, "armor_add": 4}]},
 		},
 	},
@@ -196,7 +196,7 @@ const CLASSES: Dictionary = {
 		"base": {"skill_power_mult": 1.25, "skill_cd_mult": 0.92},
 		"subclasses": {
 			"liberator": {"label": "해방자", "tiers": [{"skill_power_mult": 1.25}, {"skill_cd_mult": 0.88}, {"skill_power_mult": 1.20}]},
-			"pyro": {"label": "방화자", "tiers": [{"attack_mult": 1.15, "skill_power_mult": 1.15}, {"skill_power_mult": 1.15}, {"skill_power_mult": 1.20, "attack_add": 4}]},
+			"pyro": {"label": "방화자", "trait": {"on_hit": "burn"}, "tiers": [{"attack_mult": 1.15, "skill_power_mult": 1.15}, {"skill_power_mult": 1.15}, {"skill_power_mult": 1.20, "attack_add": 4}]},
 			"decomposer": {"label": "분해자", "tiers": [{"attack_mult": 1.20}, {"skill_power_mult": 1.15}, {"attack_mult": 1.20, "skill_power_mult": 1.10}]},
 		},
 	},
@@ -263,6 +263,10 @@ static func subclass_ids(class_id: String) -> Array:
 static func subclass_label(class_id: String, sub_id: String) -> String:
 	var subs: Dictionary = CLASSES.get(class_id, {}).get("subclasses", {})
 	return String(subs.get(sub_id, {}).get("label", sub_id))
+
+
+static func subclass_trait(class_id: String, sub_id: String) -> Dictionary:
+	return CLASSES.get(class_id, {}).get("subclasses", {}).get(sub_id, {}).get("trait", {})
 
 
 static func base_mods(class_id: String) -> Dictionary:
