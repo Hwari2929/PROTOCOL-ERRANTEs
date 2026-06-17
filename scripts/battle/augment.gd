@@ -57,25 +57,44 @@ func show_menu(n: int) -> void:
 	if _layer != null and is_instance_valid(_layer):
 		_layer.queue_free()
 	_layer = CanvasLayer.new()
+	_layer.layer = 50  # above all other UI
 	_layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_layer)
 
+	var bg: ColorRect = ColorRect.new()
+	bg.color = Color(0.0, 0.0, 0.0, 0.7)
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_STOP  # block clicks behind
+	bg.process_mode = Node.PROCESS_MODE_ALWAYS
+	_layer.add_child(bg)
+
 	var vbox: VBoxContainer = VBoxContainer.new()
-	vbox.position = Vector2(440.0, 240.0)
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	vbox.add_theme_constant_override("separation", 12)
-	_layer.add_child(vbox)
+	vbox.anchor_left = 0.5
+	vbox.anchor_top = 0.5
+	vbox.anchor_right = 0.5
+	vbox.anchor_bottom = 0.5
+	vbox.offset_left = -230.0
+	vbox.offset_right = 230.0
+	vbox.offset_top = -150.0
+	vbox.offset_bottom = 150.0
+	vbox.process_mode = Node.PROCESS_MODE_ALWAYS
+	bg.add_child(vbox)
 
 	var title: Label = Label.new()
 	title.text = "증강 선택 (1택)"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 28)
 	vbox.add_child(title)
 
 	for c in choices:
 		var btn: Button = Button.new()
-		btn.text = "%s — %s" % [c["label"], c["desc"]]
-		btn.custom_minimum_size = Vector2(360.0, 56.0)
+		btn.text = "%s — %s" % [String(c["label"]), String(c["desc"])]
+		btn.custom_minimum_size = Vector2(440.0, 56.0)
 		btn.add_theme_font_size_override("font_size", 20)
-		var cid: String = c["id"]
+		btn.process_mode = Node.PROCESS_MODE_ALWAYS
+		var cid: String = String(c["id"])
 		btn.pressed.connect(func() -> void: _on_pick(cid))
 		vbox.add_child(btn)
 
