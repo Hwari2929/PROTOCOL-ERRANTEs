@@ -43,6 +43,7 @@ var _is_dragging: bool = false
 var _drag_offset: Vector2 = Vector2.ZERO
 var _has_sprite: bool = false
 @onready var _sprite: Sprite2D = $Sprite2D
+@onready var _status: Node = get_node_or_null("Status")
 
 func setup(team: int) -> void:
 	self.team = team
@@ -106,6 +107,10 @@ func _physics_process(delta: float) -> void:
 	if hp <= 0:
 		return
 
+	# Status tick
+	if _status != null:
+		_status.tick(delta)
+
 	# Active skill on its own cooldown (independent of basic attacks).
 	if skill_cd > 0.0:
 		skill_timer -= delta
@@ -141,6 +146,8 @@ func acquire_target() -> Node2D:
 	return best_target
 
 func take_damage(amount: int) -> void:
+	if _status != null and _status.has_method("absorb"):
+		amount = _status.absorb(amount)
 	hp -= amount
 	hp_changed.emit(hp, max_hp)
 	queue_redraw()
@@ -155,6 +162,14 @@ func take_damage(amount: int) -> void:
 		DamageNumber.spawn(host, global_position, amount, col)
 	if hp <= 0:
 		die()
+
+func apply_status(id: String, stacks: int, duration: float, per_sec: float, dtype: String) -> void:
+	if _status != null and _status.has_method("apply_status"):
+		_status.apply_status(id, stacks, duration, per_sec, dtype)
+
+func add_shield(amount: int) -> void:
+	if _status != null and _status.has_method("add_shield"):
+		_status.add_shield(amount)
 
 func _flash() -> void:
 	if _sprite == null:
