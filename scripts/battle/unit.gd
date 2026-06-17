@@ -2,6 +2,7 @@ extends Node2D
 
 signal hp_changed(current: int, max: int)
 signal died()
+signal res_grade_changed(new_grade: int)
 
 ## Per-class active-skill cooldown (seconds). Classes not listed have no skill.
 const SKILL_CD: Dictionary = {
@@ -31,6 +32,9 @@ var body_scale: float = 1.0
 var subclass_id: String = ""
 var inhesion_tier: int = 0        # 0 = base only; 1/2/3 = 고유1/2/3 unlocked
 var weapon_id: String = ""        # equipped weapon (ItemData)
+
+var res_grade: int = 1
+var res_points: int = 0
 
 var active: bool = false
 
@@ -104,6 +108,30 @@ func unlock_inhesion(tier: int) -> void:
 			ClassData.apply_mods(self, mods)
 		t += 1
 	inhesion_tier = tier
+
+func res_threshold_for(g: int) -> int:
+	if g <= 1: return 0
+	elif g == 2: return 8
+	elif g == 3: return 12
+	elif g == 4: return 24
+	elif g == 5: return 40
+	return 9999
+
+func gain_resonance(amount: int) -> int:
+	var grades_gained: int = 0
+	res_points += amount
+	while res_grade < 5 and res_points >= res_threshold_for(res_grade + 1):
+		res_grade += 1
+		grades_gained += 1
+		unlock_inhesion(res_grade - 1)
+		res_grade_changed.emit(res_grade)
+	return grades_gained
+
+func current_res_grade() -> int:
+	return res_grade
+
+func current_res_points() -> int:
+	return res_points
 
 func _physics_process(delta: float) -> void:
 	if not active:
@@ -346,9 +374,7 @@ func _draw() -> void:
 	# HP bar above the unit, shown only while damaged and alive.
 	if hp > 0 and hp < max_hp:
 		var w: float = 40.0
-		var bh: float = 5.0
-		var top: Vector2 = Vector2(-w / 2.0, -40.0)
-		var ratio: float = clampf(float(hp) / float(max_hp), 0.0, 1.0)
-		draw_rect(Rect2(top, Vector2(w, bh)), Color(0.0, 0.0, 0.0, 0.6))
-		var fill: Color = Color(0.2, 0.9, 0.3).lerp(Color(0.9, 0.2, 0.2), 1.0 - ratio)
-		draw_rect(Rect2(top, Vector2(w * ratio, bh)), fill)
+		var h: float = 4.0
+		var ratio: float = float(hp) / float(max_hp)
+		draw_rect(Rect2(-w / 2.0, -30.0, w * ratio, h), Color(0.2, 0.8, 0.2, 0.8))
+		draw_rect(Rect2(-w / 2.0, -30.0, w, h), Color(0.0, 0.0, 0.0, 0.5))
