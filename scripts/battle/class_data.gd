@@ -39,9 +39,9 @@ const CLASSES: Dictionary = {
 		"stats": {"max_hp": 90, "attack": 20, "attack_interval": 0.7, "attack_range": 260.0, "move_speed": 60.0, "armor": 1},
 		"base": {"attack_mult": 1.25, "attack_interval_mult": 0.95},
 		"subclasses": {
-			"suppressor": {"label": "제압자", "tiers": [{"attack_mult": 1.20, "skill_power_mult": 1.25}, {"attack_add": 6, "skill_power_mult": 1.15}, {"attack_mult": 1.20, "attack_range_add": 40.0}]},
-			"outlaw": {"label": "무법자", "tiers": [{"move_speed_mult": 1.20, "attack_interval_mult": 0.92}, {"attack_add": 5, "move_speed_mult": 1.10}, {"attack_mult": 1.20, "attack_interval_mult": 0.88}]},
-			"tracker": {"label": "추적자", "trait": {"on_hit": "bleed"}, "tiers": [{"attack_interval_mult": 0.85}, {"attack_mult": 1.25}, {"attack_add": 8, "skill_cd_mult": 0.85}]},
+			"suppressor": {"label": "제압자", "ability": {"id": "grenade", "type": "special", "charge_req": 3}, "tiers": [{"attack_mult": 1.20, "skill_power_mult": 1.25}, {"attack_add": 6, "skill_power_mult": 1.15}, {"attack_mult": 1.20, "attack_range_add": 40.0}]},
+			"outlaw": {"label": "무법자", "ability": {"id": "flash_ammo", "type": "general", "cd": 10.0}, "tiers": [{"move_speed_mult": 1.20, "attack_interval_mult": 0.92}, {"attack_add": 5, "move_speed_mult": 1.10}, {"attack_mult": 1.20, "attack_interval_mult": 0.88}]},
+			"tracker": {"label": "추적자", "trait": {"on_hit": "bleed"}, "ability": {"id": "pierce_ammo", "type": "general", "cd": 8.0}, "tiers": [{"attack_interval_mult": 0.85}, {"attack_mult": 1.25}, {"attack_add": 8, "skill_cd_mult": 0.85}]},
 		},
 	},
 	"vanguard": {
@@ -267,6 +267,10 @@ static func subclass_label(class_id: String, sub_id: String) -> String:
 
 static func subclass_trait(class_id: String, sub_id: String) -> Dictionary:
 	return CLASSES.get(class_id, {}).get("subclasses", {}).get(sub_id, {}).get("trait", {})
+
+
+static func subclass_ability(class_id: String, sub_id: String) -> Dictionary:
+	return CLASSES.get(class_id, {}).get("subclasses", {}).get(sub_id, {}).get("ability", {})
 
 
 static func base_mods(class_id: String) -> Dictionary:
