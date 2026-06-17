@@ -1,7 +1,8 @@
 extends Node
-## 의뢰(run) 진행 — 전투 노드 체인 + 노드 간 증강 + 런 종료 — SCAFFOLD STUB. PE5 implements.
-## A quest = a chain of 3 combat nodes; advance on victory, augment between nodes,
-## win after the last node, lose if the player team is wiped.
+## 의뢰(run) 진행 — 전투 노드 체인 + 런 종료.
+## A quest = a chain of 3 combat nodes; on victory grant energy credits and advance
+## (next wave + round_started), win after the last node, lose if the team is wiped.
+## (Resonance/augment/inhesion now happen via the RESONATE action in prep_panel.)
 
 @onready var _battle_field: Node = get_parent().get_node_or_null("BattleField")
 @onready var _resonance: Node = get_parent().get_node_or_null("Resonance")
