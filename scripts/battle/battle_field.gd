@@ -26,6 +26,8 @@ const ROSTER: Dictionary = {
 const ENEMY_STATS: Dictionary = {"max_hp": 70, "attack": 9, "attack_interval": 1.0, "attack_range": 90.0, "move_speed": 55.0, "armor": 2}
 ## Faster, frailer 군체 variant (introduced from node 2).
 const SWARMLING_STATS: Dictionary = {"max_hp": 45, "attack": 7, "attack_interval": 0.8, "attack_range": 80.0, "move_speed": 95.0, "armor": 0}
+## Ranged spitter: hangs back and attacks from afar (introduced from node 2).
+const RANGED_STATS: Dictionary = {"max_hp": 50, "attack": 11, "attack_interval": 1.4, "attack_range": 300.0, "move_speed": 35.0, "armor": 1}
 ## Boss (final node): a large, durable 군체 brood-mother — a real threat.
 const BOSS_STATS: Dictionary = {"max_hp": 1500, "attack": 30, "attack_interval": 1.1, "attack_range": 130.0, "move_speed": 48.0, "armor": 12, "body_scale": 2.0}
 ## Final node index (a boss wave instead of a normal wave).
@@ -77,8 +79,13 @@ func _spawn_normal_wave(node_index: int) -> void:
 	var count: int = 3 + node_index
 	var stat_scale: float = 1.0 + 0.25 * float(node_index - 1)
 	for i in count:
-		var is_fast: bool = node_index >= 2 and i % 3 == 2
-		var cfg: Dictionary = (SWARMLING_STATS if is_fast else ENEMY_STATS).duplicate()
+		var cfg: Dictionary
+		if node_index >= 2 and i % 3 == 1:
+			cfg = RANGED_STATS.duplicate()      # spitter
+		elif node_index >= 2 and i % 3 == 2:
+			cfg = SWARMLING_STATS.duplicate()   # fast
+		else:
+			cfg = ENEMY_STATS.duplicate()       # normal
 		cfg["max_hp"] = int(round(float(cfg["max_hp"]) * stat_scale))
 		cfg["attack"] = int(round(float(cfg["attack"]) * stat_scale))
 		var u: Node2D = _make_unit(TEAM_ENEMY, cfg, "swarm")
