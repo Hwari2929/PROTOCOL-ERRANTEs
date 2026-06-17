@@ -44,6 +44,10 @@ var _drag_offset: Vector2 = Vector2.ZERO
 var _has_sprite: bool = false
 @onready var _sprite: Sprite2D = $Sprite2D
 @onready var _status: Node = get_node_or_null("Status")
+var reason: float = 50.0
+var _special_ramp: float = 0.0
+var _ramp_accum: float = 0.0
+var _decay_accum: float = 0.0
 
 func setup(team: int) -> void:
 	self.team = team
@@ -110,6 +114,7 @@ func _physics_process(delta: float) -> void:
 	# Status tick
 	if _status != null:
 		_status.tick(delta)
+	_passive_tick(delta)
 
 	# Active skill on its own cooldown (independent of basic attacks).
 	if skill_cd > 0.0:
@@ -130,6 +135,11 @@ func _physics_process(delta: float) -> void:
 		_attack_timer -= delta
 		if _attack_timer <= 0.0:
 			var dmg: int = maxi(1, attack - target.armor)
+			var tac: String = ClassData.tactical_of(sprite_id)
+			if tac == "사이오닉":
+				dmg = int(round(float(dmg) * reason_output_mult()))
+			elif tac == "스페셜":
+				dmg = int(round(float(dmg) * (1.0 + _special_ramp)))
 			target.take_damage(dmg)
 			_apply_on_hit(target)
 			_attack_timer = attack_interval
@@ -159,7 +169,28 @@ func _apply_on_hit(target: Node) -> void:
 		"poison":
 			target.apply_status("poison", 1, 4.0, 6.0, "chemical")
 
+func reason_output_mult() -> float:
+	return 1.0 + clampf((50.0 - reason) / 50.0, 0.0, 1.0) * 0.5
+
+func reason_taken_mult() -> float:
+	return 1.0 + clampf((50.0 - reason) / 50.0, 0.0, 1.0) * 0.5
+
+func _passive_tick(delta: float) -> void:
+	var tac: String = ClassData.tactical_of(sprite_id)
+	if tac == "스페셜":
+		_ramp_accum += delta
+		while _ramp_accum >= 2.0:
+			_ramp_accum -= 2.0
+			_special_ramp = minf(0.30, _special_ramp + 0.03)
+	elif tac == "사이오닉" and reason < 0.0:
+		_decay_accum += delta
+		while _decay_accum >= 1.0:
+			_decay_accum -= 1.0
+			take_damage(maxi(1, int(round(float(max_hp) * 0.01))))
+
 func take_damage(amount: int) -> void:
+	if ClassData.tactical_of(sprite_id) == "사이오닉":
+		amount = int(round(float(amount) * reason_taken_mult()))
 	if _status != null and _status.has_method("absorb"):
 		amount = _status.absorb(amount)
 	hp -= amount
@@ -220,6 +251,8 @@ func _use_skill() -> void:
 	var subtrait: Dictionary = ClassData.subclass_trait(sprite_id, subclass_id)
 	if String(subtrait.get("on_skill", "")) == "shield":
 		add_shield(int(round(float(max_hp) * 0.15 * skill_power)))
+	if ClassData.tactical_of(sprite_id) == "사이오닉":
+		reason = maxf(-100.0, reason - 12.0)
 	_skill_pulse()
 	var host: Node2D = _fx_host()
 	if host != null and SKILL_NAME.has(kind):
