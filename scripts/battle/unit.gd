@@ -52,6 +52,9 @@ var reason: float = 50.0
 var _special_ramp: float = 0.0
 var _ramp_accum: float = 0.0
 var _decay_accum: float = 0.0
+var crit_chance: float = 0.05
+var crit_mult: float = 2.0
+@onready var _ability: Node = get_node_or_null("Ability")
 
 func setup(team: int) -> void:
 	self.team = team
@@ -116,9 +119,18 @@ func set_subclass(sub_id: String) -> void:
 		var mods: Dictionary = ClassData.tier_mods(sprite_id, sub_id, t)
 		if not mods.is_empty():
 			ClassData.apply_mods(self, mods)
+	configure_ability()
 
 func has_subclass() -> bool:
 	return subclass_id != ""
+
+func configure_ability() -> void:
+	if _ability != null and _ability.has_method("configure"):
+		_ability.configure()
+
+func on_combat_start() -> void:
+	if _ability != null and _ability.has_method("on_combat_start"):
+		_ability.on_combat_start()
 
 func res_threshold_for(g: int) -> int:
 	if g <= 1: return 0
@@ -154,6 +166,8 @@ func _physics_process(delta: float) -> void:
 	if _status != null:
 		_status.tick(delta)
 	_passive_tick(delta)
+	if _ability != null:
+		_ability.tick(delta)
 
 	# Active skill on its own cooldown (independent of basic attacks).
 	if skill_cd > 0.0:
@@ -179,6 +193,11 @@ func _physics_process(delta: float) -> void:
 				dmg = int(round(float(dmg) * reason_output_mult()))
 			elif tac == "스페셜":
 				dmg = int(round(float(dmg) * (1.0 + _special_ramp)))
+			var is_crit: bool = randf() < crit_chance
+			if is_crit:
+				dmg = int(round(float(dmg) * crit_mult))
+				if _ability != null:
+					_ability.gain_charge(1)
 			target.take_damage(dmg)
 			_apply_on_hit(target)
 			_attack_timer = attack_interval

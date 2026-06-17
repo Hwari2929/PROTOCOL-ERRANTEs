@@ -3,13 +3,16 @@ extends Node
 ## Foundation for faithful class signatures: 일반 기술(cooldown) / 특수 기술(충전 요구량),
 ## 충전 획득 트리거(전투 진입·결정타), and per-subclass ability dispatch. UnitRef = get_parent().
 
-var unit_owner: Node = get_parent()
+var unit_owner: Node = null
 var ability_id: String = ""
 var skill_type: String = ""
 var charge: int = 0
 var charge_req: int = 0
 var cooldown: float = 0.0
 var _cd_timer: float = 0.0
+
+func _ready() -> void:
+	unit_owner = get_parent()
 
 func configure() -> void:
 	var meta: Dictionary = ClassData.subclass_ability(unit_owner.sprite_id, unit_owner.subclass_id)
