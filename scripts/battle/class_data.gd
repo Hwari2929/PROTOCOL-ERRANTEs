@@ -45,6 +45,11 @@ const CLASSES: Dictionary = {
 				{"attack_mult": 1.25},
 				{"attack_add": 8, "skill_cd_mult": 0.85},
 			]},
+			"outlaw": {"label": "무법자", "tiers": [
+				{"move_speed_mult": 1.20, "attack_interval_mult": 0.92},
+				{"attack_add": 5, "move_speed_mult": 1.10},
+				{"attack_mult": 1.20, "attack_interval_mult": 0.88},
+			]},
 		},
 	},
 	"vanguard": {
@@ -60,6 +65,11 @@ const CLASSES: Dictionary = {
 				{"move_speed_mult": 1.25, "attack_mult": 1.15},
 				{"attack_add": 5},
 				{"attack_mult": 1.25, "skill_cd_mult": 0.85},
+			]},
+			"escort": {"label": "엄호자", "tiers": [
+				{"max_hp_mult": 1.15, "armor_add": 4},
+				{"max_hp_mult": 1.15},
+				{"armor_add": 6, "skill_cd_mult": 0.85},
 			]},
 		},
 	},
@@ -77,6 +87,11 @@ const CLASSES: Dictionary = {
 				{"attack_interval_mult": 0.88},
 				{"attack_add": 7, "skill_cd_mult": 0.85},
 			]},
+			"beastmaster": {"label": "조련사", "tiers": [
+				{"skill_power_mult": 1.25, "attack_mult": 1.10},
+				{"attack_add": 5, "skill_power_mult": 1.15},
+				{"skill_power_mult": 1.20, "attack_range_add": 30.0},
+			]},
 		},
 	},
 	"medic": {
@@ -92,6 +107,11 @@ const CLASSES: Dictionary = {
 				{"attack_mult": 1.20, "skill_power_mult": 1.20},
 				{"attack_add": 4, "skill_cd_mult": 0.90, "skill_power_mult": 1.20},
 				{"attack_mult": 1.20, "max_hp_mult": 1.10},
+			]},
+			"counselor": {"label": "조언자", "tiers": [
+				{"skill_power_mult": 1.20, "max_hp_mult": 1.10},
+				{"skill_cd_mult": 0.85},
+				{"skill_power_mult": 1.20, "max_hp_mult": 1.10},
 			]},
 		},
 	},
