@@ -1,11 +1,9 @@
 extends Control
-## Team selection: pick 3 of 5 classes and choose each one's subclass, then CONFIRM.
-## In-engine labels use English ids (default font has no Hangul); Korean labels live in
-## ClassData for when the font cycle lands.
+## Team selection: pick 3 of ALL classes (16 + protagonist) and choose each one's
+## subclass and weapon, then CONFIRM. Rows scroll. Korean labels from ClassData/ItemData.
 
 const MAX_SELECTION: int = 3
 const DEFAULT_TEAM: Array[String] = ["protagonist", "ranger", "vanguard"]
-const CLASS_LIST: Array[String] = ["protagonist", "ranger", "vanguard", "commander", "medic"]
 
 var _selected_ids: Array[String] = []
 var _subclass_choice: Dictionary = {}    # class_id -> subclass_id
@@ -14,7 +12,6 @@ var _class_buttons: Dictionary = {}      # class_id -> Button (toggle)
 var _sub_buttons: Dictionary = {}        # class_id -> Button (cycle)
 var _weapon_buttons: Dictionary = {}     # class_id -> Button (cycle)
 var _confirm_button: Button
-var _vbox: VBoxContainer
 
 
 func _ready() -> void:
@@ -29,47 +26,56 @@ func _ready() -> void:
 func _build_ui() -> void:
 	var bg: ColorRect = ColorRect.new()
 	bg.color = Color(0.0, 0.0, 0.0, 0.6)
-	bg.anchor_right = 1.0
-	bg.anchor_bottom = 1.0
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 
-	_vbox = VBoxContainer.new()
-	_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	_vbox.add_theme_constant_override("separation", 8)
-	_vbox.anchor_left = 0.5
-	_vbox.anchor_top = 0.5
-	_vbox.anchor_right = 0.5
-	_vbox.anchor_bottom = 0.5
-	_vbox.offset_left = -270.0
-	_vbox.offset_right = 270.0
-	_vbox.offset_top = -200.0
-	_vbox.offset_bottom = 200.0
-	add_child(_vbox)
+	var outer: VBoxContainer = VBoxContainer.new()
+	outer.alignment = BoxContainer.ALIGNMENT_CENTER
+	outer.add_theme_constant_override("separation", 8)
+	outer.anchor_left = 0.5
+	outer.anchor_top = 0.5
+	outer.anchor_right = 0.5
+	outer.anchor_bottom = 0.5
+	outer.offset_left = -300.0
+	outer.offset_right = 300.0
+	outer.offset_top = -240.0
+	outer.offset_bottom = 240.0
+	add_child(outer)
 
 	var title: Label = Label.new()
 	title.text = "팀 편성 (3명)"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 22)
-	_vbox.add_child(title)
+	title.add_theme_font_size_override("font_size", 24)
+	outer.add_child(title)
 
-	for class_id in CLASS_LIST:
+	var scroll: ScrollContainer = ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(580.0, 400.0)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	outer.add_child(scroll)
+
+	var rows: VBoxContainer = VBoxContainer.new()
+	rows.add_theme_constant_override("separation", 6)
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(rows)
+
+	for class_id in ClassData.class_ids():
 		_subclass_choice[class_id] = ClassData.default_subclass(class_id)
 		_weapon_choice[class_id] = ItemData.default_for(class_id)
 		var row: HBoxContainer = HBoxContainer.new()
 		row.add_theme_constant_override("separation", 6)
-		_vbox.add_child(row)
+		rows.add_child(row)
 
 		var cbtn: Button = Button.new()
 		cbtn.text = ClassData.class_label(class_id)
 		cbtn.toggle_mode = true
-		cbtn.custom_minimum_size = Vector2(130.0, 36.0)
+		cbtn.custom_minimum_size = Vector2(140.0, 34.0)
 		cbtn.add_theme_font_size_override("font_size", 15)
 		cbtn.toggled.connect(_on_class_toggled.bind(class_id))
 		row.add_child(cbtn)
 		_class_buttons[class_id] = cbtn
 
 		var sbtn: Button = Button.new()
-		sbtn.custom_minimum_size = Vector2(120.0, 36.0)
+		sbtn.custom_minimum_size = Vector2(120.0, 34.0)
 		sbtn.add_theme_font_size_override("font_size", 13)
 		sbtn.pressed.connect(_on_subclass_cycle.bind(class_id))
 		row.add_child(sbtn)
@@ -77,7 +83,7 @@ func _build_ui() -> void:
 		_update_sub_button(class_id)
 
 		var wbtn: Button = Button.new()
-		wbtn.custom_minimum_size = Vector2(130.0, 36.0)
+		wbtn.custom_minimum_size = Vector2(140.0, 34.0)
 		wbtn.add_theme_font_size_override("font_size", 13)
 		wbtn.pressed.connect(_on_weapon_cycle.bind(class_id))
 		row.add_child(wbtn)
@@ -90,7 +96,7 @@ func _build_ui() -> void:
 	_confirm_button.custom_minimum_size = Vector2(0.0, 40.0)
 	_confirm_button.add_theme_font_size_override("font_size", 18)
 	_confirm_button.pressed.connect(_on_confirm_pressed)
-	_vbox.add_child(_confirm_button)
+	outer.add_child(_confirm_button)
 
 
 func _on_class_toggled(pressed: bool, class_id: String) -> void:
@@ -122,8 +128,7 @@ func _update_sub_button(class_id: String) -> void:
 	var sbtn: Button = _sub_buttons.get(class_id)
 	if sbtn == null:
 		return
-	var sub_id: String = String(_subclass_choice.get(class_id, ""))
-	sbtn.text = ClassData.subclass_label(class_id, sub_id)
+	sbtn.text = ClassData.subclass_label(class_id, String(_subclass_choice.get(class_id, "")))
 
 
 func _on_weapon_cycle(class_id: String) -> void:
@@ -144,13 +149,6 @@ func _update_weapon_button(class_id: String) -> void:
 	wbtn.text = "무기: " + ItemData.weapon_label(String(_weapon_choice.get(class_id, "")))
 
 
-func selected_weapons() -> Dictionary:
-	var out: Dictionary = {}
-	for id in _selected_ids:
-		out[id] = _weapon_choice.get(id, ItemData.default_for(id))
-	return out
-
-
 func refresh() -> void:
 	if _confirm_button != null:
 		_confirm_button.disabled = (_selected_ids.size() != MAX_SELECTION)
@@ -164,6 +162,13 @@ func selected_subclasses() -> Dictionary:
 	var out: Dictionary = {}
 	for id in _selected_ids:
 		out[id] = _subclass_choice.get(id, ClassData.default_subclass(id))
+	return out
+
+
+func selected_weapons() -> Dictionary:
+	var out: Dictionary = {}
+	for id in _selected_ids:
+		out[id] = _weapon_choice.get(id, ItemData.default_for(id))
 	return out
 
 
