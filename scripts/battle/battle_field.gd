@@ -148,7 +148,7 @@ func _make_unit(team: int, cfg: Dictionary, sprite_id: String = "", subclass_id:
 		u.refresh_sprite()
 	# Class identity: subclass + weapon + base inhesion (player classes only).
 	if ClassData.has_class(sprite_id):
-		u.set("subclass_id", subclass_id if subclass_id != "" else ClassData.default_subclass(sprite_id))
+		u.set("subclass_id", subclass_id)
 		u.set("weapon_id", weapon_id if weapon_id != "" else ItemData.default_for(sprite_id))
 		if u.has_method("apply_base_inhesion"):
 			u.apply_base_inhesion()
