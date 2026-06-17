@@ -9,8 +9,10 @@ const CLASS_LIST: Array[String] = ["protagonist", "ranger", "vanguard", "command
 
 var _selected_ids: Array[String] = []
 var _subclass_choice: Dictionary = {}    # class_id -> subclass_id
+var _weapon_choice: Dictionary = {}      # class_id -> weapon_id
 var _class_buttons: Dictionary = {}      # class_id -> Button (toggle)
 var _sub_buttons: Dictionary = {}        # class_id -> Button (cycle)
+var _weapon_buttons: Dictionary = {}     # class_id -> Button (cycle)
 var _confirm_button: Button
 var _vbox: VBoxContainer
 
@@ -38,8 +40,8 @@ func _build_ui() -> void:
 	_vbox.anchor_top = 0.5
 	_vbox.anchor_right = 0.5
 	_vbox.anchor_bottom = 0.5
-	_vbox.offset_left = -170.0
-	_vbox.offset_right = 170.0
+	_vbox.offset_left = -270.0
+	_vbox.offset_right = 270.0
 	_vbox.offset_top = -200.0
 	_vbox.offset_bottom = 200.0
 	add_child(_vbox)
@@ -52,6 +54,7 @@ func _build_ui() -> void:
 
 	for class_id in CLASS_LIST:
 		_subclass_choice[class_id] = ClassData.default_subclass(class_id)
+		_weapon_choice[class_id] = ItemData.default_for(class_id)
 		var row: HBoxContainer = HBoxContainer.new()
 		row.add_theme_constant_override("separation", 6)
 		_vbox.add_child(row)
@@ -59,19 +62,27 @@ func _build_ui() -> void:
 		var cbtn: Button = Button.new()
 		cbtn.text = class_id.capitalize()
 		cbtn.toggle_mode = true
-		cbtn.custom_minimum_size = Vector2(150.0, 36.0)
-		cbtn.add_theme_font_size_override("font_size", 16)
+		cbtn.custom_minimum_size = Vector2(130.0, 36.0)
+		cbtn.add_theme_font_size_override("font_size", 15)
 		cbtn.toggled.connect(_on_class_toggled.bind(class_id))
 		row.add_child(cbtn)
 		_class_buttons[class_id] = cbtn
 
 		var sbtn: Button = Button.new()
-		sbtn.custom_minimum_size = Vector2(140.0, 36.0)
-		sbtn.add_theme_font_size_override("font_size", 14)
+		sbtn.custom_minimum_size = Vector2(120.0, 36.0)
+		sbtn.add_theme_font_size_override("font_size", 13)
 		sbtn.pressed.connect(_on_subclass_cycle.bind(class_id))
 		row.add_child(sbtn)
 		_sub_buttons[class_id] = sbtn
 		_update_sub_button(class_id)
+
+		var wbtn: Button = Button.new()
+		wbtn.custom_minimum_size = Vector2(130.0, 36.0)
+		wbtn.add_theme_font_size_override("font_size", 13)
+		wbtn.pressed.connect(_on_weapon_cycle.bind(class_id))
+		row.add_child(wbtn)
+		_weapon_buttons[class_id] = wbtn
+		_update_weapon_button(class_id)
 
 	_confirm_button = Button.new()
 	_confirm_button.text = "CONFIRM"
@@ -115,6 +126,31 @@ func _update_sub_button(class_id: String) -> void:
 	sbtn.text = "> " + sub_id.capitalize()
 
 
+func _on_weapon_cycle(class_id: String) -> void:
+	var ws: Array = ItemData.weapon_ids()
+	if ws.size() <= 1:
+		return
+	var cur: String = String(_weapon_choice.get(class_id, ""))
+	var idx: int = ws.find(cur)
+	idx = (idx + 1) % ws.size()
+	_weapon_choice[class_id] = ws[idx]
+	_update_weapon_button(class_id)
+
+
+func _update_weapon_button(class_id: String) -> void:
+	var wbtn: Button = _weapon_buttons.get(class_id)
+	if wbtn == null:
+		return
+	wbtn.text = "W: " + String(_weapon_choice.get(class_id, "")).capitalize()
+
+
+func selected_weapons() -> Dictionary:
+	var out: Dictionary = {}
+	for id in _selected_ids:
+		out[id] = _weapon_choice.get(id, ItemData.default_for(id))
+	return out
+
+
 func refresh() -> void:
 	if _confirm_button != null:
 		_confirm_button.disabled = (_selected_ids.size() != MAX_SELECTION)
@@ -136,5 +172,5 @@ func _on_confirm_pressed() -> void:
 		return
 	var bf: Node = get_parent().get_parent().get_node_or_null("BattleField")
 	if bf != null and bf.has_method("set_player_team"):
-		bf.set_player_team(_selected_ids, selected_subclasses())
+		bf.set_player_team(_selected_ids, selected_subclasses(), selected_weapons())
 	visible = false

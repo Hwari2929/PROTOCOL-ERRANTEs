@@ -114,7 +114,7 @@ func _spawn_players() -> void:
 
 ## Rebuild the player team from a list of roster ids (used by team selection).
 ## Invalid/empty selections fall back to the default trio.
-func set_player_team(ids: Array, subclasses: Dictionary = {}) -> void:
+func set_player_team(ids: Array, subclasses: Dictionary = {}, weapons: Dictionary = {}) -> void:
 	for u in units.get_children():
 		if is_instance_valid(u) and u.is_in_group("unit") and int(u.get("team")) == TEAM_PLAYER:
 			u.queue_free()
@@ -124,27 +124,26 @@ func set_player_team(ids: Array, subclasses: Dictionary = {}) -> void:
 			valid.append(id)
 	if valid.is_empty():
 		valid = PLAYER_TEAM_IDS
-	_spawn_player_ids(valid, subclasses)
+	_spawn_player_ids(valid, subclasses, weapons)
 	EventBus.team_changed.emit(valid)
 	begin_prep()
 
 
-func _spawn_player_ids(ids: Array, subclasses: Dictionary = {}) -> void:
+func _spawn_player_ids(ids: Array, subclasses: Dictionary = {}, weapons: Dictionary = {}) -> void:
 	var n: int = ids.size()
 	for i in n:
 		var id: String = ids[i]
 		var cfg: Dictionary = ROSTER[id]
-		var u: Node2D = _make_unit(TEAM_PLAYER, cfg, id)
-		# Override the default subclass with the player's choice (tiers apply later).
-		if subclasses.has(id) and String(subclasses[id]) != "":
-			u.set("subclass_id", subclasses[id])
+		var sub: String = String(subclasses.get(id, ""))
+		var weap: String = String(weapons.get(id, ""))
+		var u: Node2D = _make_unit(TEAM_PLAYER, cfg, id, sub, weap)
 		var offset: float = (float(i) - float(n - 1) / 2.0) * 90.0
 		u.position = Vector2(380.0, 360.0 + offset)
 
 
 ## Spawn one unit, tag its team/group, and apply stats dynamically.
 ## unit.gd has no class_name, so its script vars are assigned via set().
-func _make_unit(team: int, cfg: Dictionary, sprite_id: String = "") -> Node2D:
+func _make_unit(team: int, cfg: Dictionary, sprite_id: String = "", subclass_id: String = "", weapon_id: String = "") -> Node2D:
 	var u: Node2D = UNIT.instantiate()
 	units.add_child(u)
 	if u.has_method("setup"):
@@ -155,12 +154,10 @@ func _make_unit(team: int, cfg: Dictionary, sprite_id: String = "") -> Node2D:
 	u.set("sprite_id", sprite_id)
 	if u.has_method("refresh_sprite"):
 		u.refresh_sprite()
-	# Class identity: default subclass + base inhesion (player classes only).
+	# Class identity: subclass + weapon + base inhesion (player classes only).
 	if ClassData.has_class(sprite_id):
-		if String(u.get("subclass_id")) == "":
-			u.set("subclass_id", ClassData.default_subclass(sprite_id))
-		if String(u.get("weapon_id")) == "":
-			u.set("weapon_id", ItemData.default_for(sprite_id))
+		u.set("subclass_id", subclass_id if subclass_id != "" else ClassData.default_subclass(sprite_id))
+		u.set("weapon_id", weapon_id if weapon_id != "" else ItemData.default_for(sprite_id))
 		if u.has_method("apply_base_inhesion"):
 			u.apply_base_inhesion()
 		if u.has_method("equip_weapon"):
