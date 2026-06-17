@@ -159,8 +159,12 @@ func _make_unit(team: int, cfg: Dictionary, sprite_id: String = "") -> Node2D:
 	if ClassData.has_class(sprite_id):
 		if String(u.get("subclass_id")) == "":
 			u.set("subclass_id", ClassData.default_subclass(sprite_id))
+		if String(u.get("weapon_id")) == "":
+			u.set("weapon_id", ItemData.default_for(sprite_id))
 		if u.has_method("apply_base_inhesion"):
 			u.apply_base_inhesion()
+		if u.has_method("equip_weapon"):
+			u.equip_weapon()
 	return u
 
 

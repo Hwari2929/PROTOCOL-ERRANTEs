@@ -30,6 +30,7 @@ var sprite_id: String = ""        # also serves as the class id
 var body_scale: float = 1.0
 var subclass_id: String = ""
 var inhesion_tier: int = 0        # 0 = base only; 1/2/3 = 고유1/2/3 unlocked
+var weapon_id: String = ""        # equipped weapon (ItemData)
 
 var active: bool = false
 
@@ -79,6 +80,11 @@ func set_active(value: bool) -> void:
 func apply_base_inhesion() -> void:
 	if ClassData.has_class(sprite_id):
 		ClassData.apply_mods(self, ClassData.base_mods(sprite_id))
+
+## Apply the equipped weapon's stat bundle. Call once at spawn after base stats.
+func equip_weapon() -> void:
+	if ItemData.has_weapon(weapon_id):
+		ClassData.apply_mods(self, ItemData.effect(weapon_id))
 
 ## Unlock the subclass inhesion up to `tier` (1=고유1 .. 3=고유3), applying any
 ## tiers not yet applied. Idempotent for already-unlocked tiers.
