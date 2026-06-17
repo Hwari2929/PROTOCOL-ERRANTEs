@@ -32,13 +32,16 @@ func _ready() -> void:
 	_title_label = Label.new()
 	_title_label.text = "PROTOCOL ERRANTES"
 	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_title_label.add_theme_font_size_override("font_size", 56)
+	var emphasis: FontFile = load("res://assets/fonts/Paperlogy-8ExtraBold.ttf")
+	if emphasis != null:
+		_title_label.add_theme_font_override("font", emphasis)
+	_title_label.add_theme_font_size_override("font_size", 60)
 	_title_label.add_theme_color_override("font_color", Color.WHITE)
 	_vbox.add_child(_title_label)
 
 	# Subtitle Label
 	_subtitle_label = Label.new()
-	_subtitle_label.text = "Tactical Auto-Battler"
+	_subtitle_label.text = "전술 오토배틀러"
 	_subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_subtitle_label.add_theme_font_size_override("font_size", 24)
 	_subtitle_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
@@ -55,7 +58,7 @@ func _ready() -> void:
 
 	# Start Button
 	_start_button = Button.new()
-	_start_button.text = "START"
+	_start_button.text = "시작"
 	_start_button.add_theme_font_size_override("font_size", 24)
 	_start_button.add_theme_color_override("font_color", Color.WHITE)
 	_start_button.pressed.connect(dismiss)

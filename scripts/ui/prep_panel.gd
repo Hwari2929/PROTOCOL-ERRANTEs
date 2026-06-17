@@ -10,7 +10,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE  # let drag input reach units
 
 	_btn = Button.new()
-	_btn.text = "START COMBAT"
+	_btn.text = "전투 시작"
 	_btn.add_theme_font_size_override("font_size", 22)
 	# Small button, bottom-centre (does NOT cover the deploy zone).
 	_btn.anchor_left = 0.5
@@ -24,7 +24,7 @@ func _ready() -> void:
 	add_child(_btn)
 
 	_label = Label.new()
-	_label.text = "Drag your units, then START"
+	_label.text = "유닛을 배치한 뒤 전투를 시작하세요"
 	_label.add_theme_font_size_override("font_size", 18)
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_label.anchor_left = 0.5
@@ -101,7 +101,7 @@ func _update_resonate() -> void:
 	var c: int = 0
 	if reso != null:
 		c = int(reso.get("credits"))
-	_resonate.text = "RESONATE (%dc)" % c
+	_resonate.text = "공명 (%dc)" % c
 	_resonate.disabled = c <= 0
 
 

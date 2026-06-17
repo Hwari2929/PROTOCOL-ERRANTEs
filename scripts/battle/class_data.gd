@@ -122,6 +122,15 @@ static func has_class(class_id: String) -> bool:
 	return CLASSES.has(class_id)
 
 
+static func class_label(class_id: String) -> String:
+	return String(CLASSES.get(class_id, {}).get("label", class_id))
+
+
+static func subclass_label(class_id: String, sub_id: String) -> String:
+	var subs: Dictionary = CLASSES.get(class_id, {}).get("subclasses", {})
+	return String(subs.get(sub_id, {}).get("label", sub_id))
+
+
 ## First subclass id for a class (default selection).
 static func default_subclass(class_id: String) -> String:
 	var c: Dictionary = CLASSES.get(class_id, {})

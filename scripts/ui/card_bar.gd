@@ -53,7 +53,7 @@ func _on_tp_changed(_tp: int) -> void:
 func _refresh() -> void:
 	if _deck == null:
 		return
-	_tp_label.text = "Tactical Points: %d" % int(_deck.get_tp())
+	_tp_label.text = "전술 포인트: %d" % int(_deck.get_tp())
 	for c in _hbox.get_children():
 		c.queue_free()
 	var hand: Array = _deck.get_hand()
@@ -64,7 +64,7 @@ func _refresh() -> void:
 		b.custom_minimum_size = Vector2(150.0, 96.0)
 		b.add_theme_font_size_override("font_size", 13)
 		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		b.text = "%s\n(%d TP)\n%s" % [String(card.get("id", "")).capitalize(), cost, String(card.get("desc", ""))]
+		b.text = "%s\n(%d TP)\n%s" % [String(card.get("label", card.get("id", ""))), cost, String(card.get("desc", ""))]
 		b.disabled = int(_deck.get_tp()) < cost
 		var idx: int = i
 		b.pressed.connect(func() -> void: _deck.play_card(idx))

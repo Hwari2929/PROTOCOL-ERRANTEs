@@ -47,7 +47,7 @@ func _build_ui() -> void:
 	add_child(_vbox)
 
 	var title: Label = Label.new()
-	title.text = "SELECT YOUR TEAM (3)"
+	title.text = "팀 편성 (3명)"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 22)
 	_vbox.add_child(title)
@@ -60,7 +60,7 @@ func _build_ui() -> void:
 		_vbox.add_child(row)
 
 		var cbtn: Button = Button.new()
-		cbtn.text = class_id.capitalize()
+		cbtn.text = ClassData.class_label(class_id)
 		cbtn.toggle_mode = true
 		cbtn.custom_minimum_size = Vector2(130.0, 36.0)
 		cbtn.add_theme_font_size_override("font_size", 15)
@@ -85,7 +85,7 @@ func _build_ui() -> void:
 		_update_weapon_button(class_id)
 
 	_confirm_button = Button.new()
-	_confirm_button.text = "CONFIRM"
+	_confirm_button.text = "확정"
 	_confirm_button.disabled = true
 	_confirm_button.custom_minimum_size = Vector2(0.0, 40.0)
 	_confirm_button.add_theme_font_size_override("font_size", 18)
@@ -123,7 +123,7 @@ func _update_sub_button(class_id: String) -> void:
 	if sbtn == null:
 		return
 	var sub_id: String = String(_subclass_choice.get(class_id, ""))
-	sbtn.text = "> " + sub_id.capitalize()
+	sbtn.text = ClassData.subclass_label(class_id, sub_id)
 
 
 func _on_weapon_cycle(class_id: String) -> void:
@@ -141,7 +141,7 @@ func _update_weapon_button(class_id: String) -> void:
 	var wbtn: Button = _weapon_buttons.get(class_id)
 	if wbtn == null:
 		return
-	wbtn.text = "W: " + String(_weapon_choice.get(class_id, "")).capitalize()
+	wbtn.text = "무기: " + ItemData.weapon_label(String(_weapon_choice.get(class_id, "")))
 
 
 func selected_weapons() -> Dictionary:

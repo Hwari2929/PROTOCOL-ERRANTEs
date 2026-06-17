@@ -24,7 +24,7 @@ func _ready() -> void:
 	add_child(_banner)
 
 	_retry = Button.new()
-	_retry.text = "RETRY"
+	_retry.text = "다시 시작"
 	_retry.add_theme_font_size_override("font_size", 24)
 	_retry.position = Vector2(560.0, 370.0)
 	_retry.custom_minimum_size = Vector2(160.0, 52.0)
@@ -60,7 +60,7 @@ func _on_grade_changed(_new_grade: int) -> void:
 
 
 func _on_session_ended(victory: bool) -> void:
-	_banner.text = "VICTORY" if victory else "DEFEAT"
+	_banner.text = "승리" if victory else "패배"
 	_banner.modulate = Color(0.6, 1.0, 0.6) if victory else Color(1.0, 0.5, 0.5)
 	_banner.visible = true
 	_retry.visible = true
@@ -80,7 +80,7 @@ func refresh() -> void:
 			node_i = sess.current_node()
 		if sess.has_method("node_count"):
 			node_n = sess.node_count()
-	_progress.text = "Node %d / %d" % [node_i, node_n]
+	_progress.text = "노드 %d / %d" % [node_i, node_n]
 
 	var grade: int = 1
 	var credits: int = 0
@@ -89,4 +89,4 @@ func refresh() -> void:
 		if reso.has_method("current_grade"):
 			grade = reso.current_grade()
 		credits = int(reso.get("credits"))
-	_grade.text = "Resonance Grade %d   |   Credits %d" % [grade, credits]
+	_grade.text = "공명 등급 %d   ·   크레딧 %d" % [grade, credits]

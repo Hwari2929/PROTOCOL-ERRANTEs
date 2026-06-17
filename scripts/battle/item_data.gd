@@ -38,3 +38,7 @@ static func effect(id: String) -> Dictionary:
 
 static func default_for(class_id: String) -> String:
 	return String(DEFAULT.get(class_id, "sidearm"))
+
+
+static func weapon_label(id: String) -> String:
+	return String(WEAPONS.get(id, {}).get("label", id))
