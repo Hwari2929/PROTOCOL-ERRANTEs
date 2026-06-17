@@ -1,15 +1,14 @@
 extends Control
 ## Team selection: pick 3 of ALL classes (16 + protagonist) and choose each one's
-## subclass and weapon, then CONFIRM. Rows scroll. Korean labels from ClassData/ItemData.
+## weapon, then CONFIRM. Subclass is chosen IN-RUN at resonance grade 2 (not here).
+## Rows scroll. Korean labels from ClassData/ItemData.
 
 const MAX_SELECTION: int = 3
 const DEFAULT_TEAM: Array[String] = ["protagonist", "ranger", "vanguard"]
 
 var _selected_ids: Array[String] = []
-var _subclass_choice: Dictionary = {}    # class_id -> subclass_id
 var _weapon_choice: Dictionary = {}      # class_id -> weapon_id
 var _class_buttons: Dictionary = {}      # class_id -> Button (toggle)
-var _sub_buttons: Dictionary = {}        # class_id -> Button (cycle)
 var _weapon_buttons: Dictionary = {}     # class_id -> Button (cycle)
 var _confirm_button: Button
 
@@ -36,8 +35,8 @@ func _build_ui() -> void:
 	outer.anchor_top = 0.5
 	outer.anchor_right = 0.5
 	outer.anchor_bottom = 0.5
-	outer.offset_left = -300.0
-	outer.offset_right = 300.0
+	outer.offset_left = -220.0
+	outer.offset_right = 220.0
 	outer.offset_top = -240.0
 	outer.offset_bottom = 240.0
 	add_child(outer)
@@ -49,7 +48,7 @@ func _build_ui() -> void:
 	outer.add_child(title)
 
 	var scroll: ScrollContainer = ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(580.0, 400.0)
+	scroll.custom_minimum_size = Vector2(430.0, 400.0)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	outer.add_child(scroll)
 
@@ -59,7 +58,6 @@ func _build_ui() -> void:
 	scroll.add_child(rows)
 
 	for class_id in ClassData.class_ids():
-		_subclass_choice[class_id] = ClassData.default_subclass(class_id)
 		_weapon_choice[class_id] = ItemData.default_for(class_id)
 		var row: HBoxContainer = HBoxContainer.new()
 		row.add_theme_constant_override("separation", 6)
@@ -68,22 +66,14 @@ func _build_ui() -> void:
 		var cbtn: Button = Button.new()
 		cbtn.text = ClassData.class_label(class_id)
 		cbtn.toggle_mode = true
-		cbtn.custom_minimum_size = Vector2(140.0, 34.0)
+		cbtn.custom_minimum_size = Vector2(150.0, 34.0)
 		cbtn.add_theme_font_size_override("font_size", 15)
 		cbtn.toggled.connect(_on_class_toggled.bind(class_id))
 		row.add_child(cbtn)
 		_class_buttons[class_id] = cbtn
 
-		var sbtn: Button = Button.new()
-		sbtn.custom_minimum_size = Vector2(120.0, 34.0)
-		sbtn.add_theme_font_size_override("font_size", 13)
-		sbtn.pressed.connect(_on_subclass_cycle.bind(class_id))
-		row.add_child(sbtn)
-		_sub_buttons[class_id] = sbtn
-		_update_sub_button(class_id)
-
 		var wbtn: Button = Button.new()
-		wbtn.custom_minimum_size = Vector2(140.0, 34.0)
+		wbtn.custom_minimum_size = Vector2(160.0, 34.0)
 		wbtn.add_theme_font_size_override("font_size", 13)
 		wbtn.pressed.connect(_on_weapon_cycle.bind(class_id))
 		row.add_child(wbtn)
@@ -113,24 +103,6 @@ func _on_class_toggled(pressed: bool, class_id: String) -> void:
 	refresh()
 
 
-func _on_subclass_cycle(class_id: String) -> void:
-	var subs: Array = ClassData.subclass_ids(class_id)
-	if subs.size() <= 1:
-		return
-	var cur: String = String(_subclass_choice.get(class_id, ""))
-	var idx: int = subs.find(cur)
-	idx = (idx + 1) % subs.size()
-	_subclass_choice[class_id] = subs[idx]
-	_update_sub_button(class_id)
-
-
-func _update_sub_button(class_id: String) -> void:
-	var sbtn: Button = _sub_buttons.get(class_id)
-	if sbtn == null:
-		return
-	sbtn.text = ClassData.subclass_label(class_id, String(_subclass_choice.get(class_id, "")))
-
-
 func _on_weapon_cycle(class_id: String) -> void:
 	var ws: Array = ItemData.weapon_ids()
 	if ws.size() <= 1:
@@ -158,11 +130,9 @@ func selected_ids() -> Array:
 	return _selected_ids.duplicate()
 
 
+## Subclass is chosen in-run at grade 2; none picked at team select.
 func selected_subclasses() -> Dictionary:
-	var out: Dictionary = {}
-	for id in _selected_ids:
-		out[id] = _subclass_choice.get(id, ClassData.default_subclass(id))
-	return out
+	return {}
 
 
 func selected_weapons() -> Dictionary:
@@ -177,5 +147,5 @@ func _on_confirm_pressed() -> void:
 		return
 	var bf: Node = get_parent().get_parent().get_node_or_null("BattleField")
 	if bf != null and bf.has_method("set_player_team"):
-		bf.set_player_team(_selected_ids, selected_subclasses(), selected_weapons())
+		bf.set_player_team(_selected_ids, {}, selected_weapons())
 	visible = false
