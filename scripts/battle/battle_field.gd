@@ -26,8 +26,8 @@ const ROSTER: Dictionary = {
 const ENEMY_STATS: Dictionary = {"max_hp": 70, "attack": 9, "attack_interval": 1.0, "attack_range": 90.0, "move_speed": 55.0, "armor": 2}
 ## Faster, frailer 군체 variant (introduced from node 2).
 const SWARMLING_STATS: Dictionary = {"max_hp": 45, "attack": 7, "attack_interval": 0.8, "attack_range": 80.0, "move_speed": 95.0, "armor": 0}
-## Boss (final node): a large, durable 군체 brood-mother.
-const BOSS_STATS: Dictionary = {"max_hp": 680, "attack": 22, "attack_interval": 1.3, "attack_range": 120.0, "move_speed": 46.0, "armor": 9, "body_scale": 2.0}
+## Boss (final node): a large, durable 군체 brood-mother — a real threat.
+const BOSS_STATS: Dictionary = {"max_hp": 1500, "attack": 30, "attack_interval": 1.1, "attack_range": 130.0, "move_speed": 48.0, "armor": 12, "body_scale": 2.0}
 ## Final node index (a boss wave instead of a normal wave).
 const BOSS_NODE: int = 3
 
