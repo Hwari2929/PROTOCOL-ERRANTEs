@@ -12,6 +12,12 @@ const SKILL_CD: Dictionary = {
 	"medic": 3.5,        # mend: heal lowest-HP ally
 }
 
+## Floating text shown when a class casts its skill.
+const SKILL_NAME: Dictionary = {
+	"protagonist": "NOVA", "ranger": "VOLLEY", "vanguard": "FORTIFY",
+	"commander": "RALLY", "medic": "MEND",
+}
+
 var team: int = 0
 var max_hp: int = 100
 var hp: int = 100
@@ -175,6 +181,16 @@ func _use_skill() -> void:
 		"medic":         # Mend — heal the lowest-HP ally
 			_skill_mend(int(round((float(max_hp) * 0.18 + 12.0) * skill_power)))
 	_skill_pulse()
+	var host: Node2D = _fx_host()
+	if host != null and SKILL_NAME.has(sprite_id):
+		DamageNumber.spawn_text(host, global_position + Vector2(0.0, -16.0), String(SKILL_NAME[sprite_id]), Color(0.6, 1.0, 1.0))
+
+## Returns the BattleField (or nearest Node2D ancestor) to host floating FX.
+func _fx_host() -> Node2D:
+	var host: Node = get_parent()
+	if host != null and host.get_parent() is Node2D:
+		host = host.get_parent()
+	return host as Node2D
 
 func _skill_nova(dmg: int, radius: float) -> void:
 	for n in _units_on(false):
