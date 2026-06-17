@@ -5,6 +5,7 @@ var _center_container: CenterContainer
 var _vbox: VBoxContainer
 var _title_label: Label
 var _subtitle_label: Label
+var _record_label: Label
 var _start_button: Button
 
 func _ready() -> void:
@@ -42,6 +43,15 @@ func _ready() -> void:
 	_subtitle_label.add_theme_font_size_override("font_size", 24)
 	_subtitle_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
 	_vbox.add_child(_subtitle_label)
+
+	# Persistent record line
+	_record_label = Label.new()
+	var rec: Dictionary = SaveStore.load_record()
+	_record_label.text = "Best: %d nodes   ·   Wins %d / %d runs" % [int(rec["best_nodes"]), int(rec["wins"]), int(rec["runs"])]
+	_record_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_record_label.add_theme_font_size_override("font_size", 16)
+	_record_label.add_theme_color_override("font_color", Color(0.6, 0.7, 0.85))
+	_vbox.add_child(_record_label)
 
 	# Start Button
 	_start_button = Button.new()

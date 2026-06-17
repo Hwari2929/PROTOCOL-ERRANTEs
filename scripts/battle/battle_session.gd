@@ -36,6 +36,7 @@ func _on_round_ended(round_number: int, victory: bool) -> void:
 	else:
 		_is_run_over = true
 		_run_result = -1
+		SaveStore.record_run(_current_node - 1, false)
 		EventBus.battle_session_ended.emit(false)
 
 func advance_node() -> void:
@@ -59,8 +60,10 @@ func advance_node() -> void:
 		else:
 			_is_run_over = true
 			_run_result = 1
+			SaveStore.record_run(_node_count, true)
 			EventBus.battle_session_ended.emit(true)
 	elif result == -1:
 		_is_run_over = true
 		_run_result = -1
+		SaveStore.record_run(_current_node - 1, false)
 		EventBus.battle_session_ended.emit(false)
