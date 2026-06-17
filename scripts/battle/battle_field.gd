@@ -15,14 +15,6 @@ const PHASE_PREP: int = 0
 const PHASE_COMBAT: int = 1
 
 ## MAJOR class stat configs (simplest tactical type for the slice).
-const ROSTER: Dictionary = {
-	"protagonist": {"max_hp": 150, "attack": 14, "attack_interval": 0.9, "attack_range": 120.0, "move_speed": 70.0, "armor": 5},
-	"ranger":      {"max_hp": 90,  "attack": 20, "attack_interval": 0.7, "attack_range": 260.0, "move_speed": 60.0, "armor": 1},
-	"vanguard":    {"max_hp": 190, "attack": 11, "attack_interval": 1.0, "attack_range": 70.0,  "move_speed": 85.0, "armor": 9},
-	"commander":   {"max_hp": 110, "attack": 12, "attack_interval": 0.9, "attack_range": 190.0, "move_speed": 65.0, "armor": 3},
-	"medic":       {"max_hp": 100, "attack": 8,  "attack_interval": 1.1, "attack_range": 160.0, "move_speed": 65.0, "armor": 2},
-}
-
 const ENEMY_STATS: Dictionary = {"max_hp": 70, "attack": 9, "attack_interval": 1.0, "attack_range": 90.0, "move_speed": 55.0, "armor": 2}
 ## Faster, frailer 군체 variant (introduced from node 2).
 const SWARMLING_STATS: Dictionary = {"max_hp": 45, "attack": 7, "attack_interval": 0.8, "attack_range": 80.0, "move_speed": 95.0, "armor": 0}
@@ -120,7 +112,7 @@ func set_player_team(ids: Array, subclasses: Dictionary = {}, weapons: Dictionar
 			u.queue_free()
 	var valid: Array = []
 	for id in ids:
-		if ROSTER.has(id) and not valid.has(id):
+		if ClassData.has_class(id) and not valid.has(id):
 			valid.append(id)
 	if valid.is_empty():
 		valid = PLAYER_TEAM_IDS
@@ -133,7 +125,7 @@ func _spawn_player_ids(ids: Array, subclasses: Dictionary = {}, weapons: Diction
 	var n: int = ids.size()
 	for i in n:
 		var id: String = ids[i]
-		var cfg: Dictionary = ROSTER[id]
+		var cfg: Dictionary = ClassData.stats_for(id).duplicate()
 		var sub: String = String(subclasses.get(id, ""))
 		var weap: String = String(weapons.get(id, ""))
 		var u: Node2D = _make_unit(TEAM_PLAYER, cfg, id, sub, weap)

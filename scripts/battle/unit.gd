@@ -5,17 +5,17 @@ signal died()
 
 ## Per-class active-skill cooldown (seconds). Classes not listed have no skill.
 const SKILL_CD: Dictionary = {
-	"protagonist": 5.0,  # nova: AoE damage to nearby enemies
-	"ranger": 4.0,       # volley: big hit on current target
-	"vanguard": 6.0,     # fortify: +armor (self)
-	"commander": 5.0,    # rally: +attack to all allies
-	"medic": 3.5,        # mend: heal lowest-HP ally
+	"nova": 5.0,
+	"volley": 4.0,
+	"fortify": 6.0,
+	"rally": 5.0,
+	"mend": 3.5,
 }
 
 ## Floating text shown when a class casts its skill.
 const SKILL_NAME: Dictionary = {
-	"protagonist": "NOVA", "ranger": "VOLLEY", "vanguard": "FORTIFY",
-	"commander": "RALLY", "medic": "MEND",
+	"nova": "NOVA", "volley": "VOLLEY", "fortify": "FORTIFY",
+	"rally": "RALLY", "mend": "MEND",
 }
 
 var team: int = 0
@@ -54,11 +54,12 @@ func is_active() -> bool:
 ## Load the class/team sprite (res://assets/sprites/<sprite_id>.png) if present;
 ## otherwise the _draw() placeholder circle is used.
 func refresh_sprite() -> void:
-	skill_cd = float(SKILL_CD.get(sprite_id, 0.0))
+	var kind: String = ClassData.skill_for(sprite_id)
+	skill_cd = float(SKILL_CD.get(kind, 0.0))
 	skill_timer = skill_cd
 	if _sprite == null or sprite_id == "":
 		return
-	var path: String = "res://assets/sprites/%s.png" % sprite_id
+	var path: String = "res://assets/sprites/%s.png" % ClassData.sprite_for(sprite_id)
 	if not ResourceLoader.exists(path):
 		return
 	var tex: Texture2D = load(path)
@@ -175,21 +176,22 @@ func die() -> void:
 
 # ── Active skills (dispatched by class = sprite_id) ──
 func _use_skill() -> void:
-	match sprite_id:
-		"protagonist":   # Nova — AoE burst to nearby enemies
+	var kind: String = ClassData.skill_for(sprite_id)
+	match kind:
+		"nova":   # Nova — AoE burst to nearby enemies
 			_skill_nova(int(round(float(attack) * 1.6 * skill_power)), 250.0)
-		"ranger":        # Volley — burst on the 3 nearest enemies
+		"volley":        # Volley — burst on the 3 nearest enemies
 			_skill_volley(int(round(float(attack) * 2.2 * skill_power)), 3)
-		"vanguard":      # Fortify — gain armor + patch self up
+		"fortify":      # Fortify — gain armor + patch self up
 			_skill_fortify()
-		"commander":     # Rally — permanently raise allies' attack
+		"rally":     # Rally — permanently raise allies' attack
 			_skill_rally(maxi(1, int(round(3.0 * skill_power))))
-		"medic":         # Mend — heal the lowest-HP ally
+		"mend":         # Mend — heal the lowest-HP ally
 			_skill_mend(int(round((float(max_hp) * 0.18 + 12.0) * skill_power)))
 	_skill_pulse()
 	var host: Node2D = _fx_host()
-	if host != null and SKILL_NAME.has(sprite_id):
-		DamageNumber.spawn_text(host, global_position + Vector2(0.0, -16.0), String(SKILL_NAME[sprite_id]), Color(0.6, 1.0, 1.0))
+	if host != null and SKILL_NAME.has(kind):
+		DamageNumber.spawn_text(host, global_position + Vector2(0.0, -16.0), String(SKILL_NAME.get(kind, "SKILL")), Color(0.6, 1.0, 1.0))
 
 ## Returns the BattleField (or nearest Node2D ancestor) to host floating FX.
 func _fx_host() -> Node2D:
