@@ -7,6 +7,7 @@ extends Node
 
 signal hand_changed(hand: Array)
 signal tp_changed(tp: int)
+signal assets_changed(assets: int)
 
 const HAND_SIZE: int = 3
 
@@ -14,6 +15,12 @@ var deck: Array = []
 var hand: Array = []
 var graveyard: Array = []
 var tp: int = 0
+
+# 사이퍼 자산(assets) economy: each node grants +1 per 사이퍼 on the team.
+# 고유 '가려진 흉계': every asset SPENT raises 전술 위력(tactical power) by 2%p this quest.
+var assets: int = 0
+var tactical_power_mult: float = 1.0
+var _pinned: Array = []   # card ids kept in hand across nodes (고정 / pin)
 
 var _has_commander: bool = false
 var _built: bool = false
@@ -29,7 +36,20 @@ func _ready() -> void:
 func _on_round_started(_round_number: int) -> void:
 	tp += 1
 	tp_changed.emit(tp)
+	# 사이퍼 자산 income: +1 per 사이퍼 on the team, each node.
+	var ciphers: int = _cipher_count()
+	if ciphers > 0:
+		assets += ciphers
+		assets_changed.emit(assets)
 	refresh_for_team(_current_team_ids())
+
+
+func _cipher_count() -> int:
+	var n: int = 0
+	for id in _current_team_ids():
+		if id == "cipher":
+			n += 1
+	return n
 
 
 func _on_team_changed(ids: Array) -> void:
@@ -65,9 +85,15 @@ func refresh_for_team(ids: Array) -> void:
 		hand = []
 		_built = true
 	else:
+		# 고정(pin)된 카드는 다음 노드 패에 잔류하고 고정이 해제된다; 나머지는 묘지로.
+		var kept: Array = []
 		for c in hand:
-			graveyard.append(c)
-		hand = []
+			if c.get("pinned", false):
+				c["pinned"] = false
+				kept.append(c)
+			else:
+				graveyard.append(c)
+		hand = kept
 	_draw(HAND_SIZE + _bonus_draw)
 	hand_changed.emit(hand)
 
@@ -104,6 +130,43 @@ func play_card(index: int) -> bool:
 		_draw(int(effect["draw"]))
 	hand_changed.emit(hand)
 	return true
+
+
+## 사이퍼 자산 spend: returns false if insufficient. Each point spent raises
+## 전술 위력 by 2%p (고유 가려진 흉계).
+func spend_assets(n: int) -> bool:
+	if n <= 0 or assets < n:
+		return false
+	assets -= n
+	tactical_power_mult += 0.02 * float(n)
+	assets_changed.emit(assets)
+	return true
+
+
+func gain_assets(n: int) -> void:
+	if n <= 0:
+		return
+	assets += n
+	assets_changed.emit(assets)
+
+
+## 고정(pin): spend 1 asset to keep a hand card across the next node.
+func pin_card(index: int) -> bool:
+	if index < 0 or index >= hand.size():
+		return false
+	if not spend_assets(1):
+		return false
+	hand[index]["pinned"] = true
+	hand_changed.emit(hand)
+	return true
+
+
+func current_assets() -> int:
+	return assets
+
+
+func tactical_power() -> float:
+	return tactical_power_mult
 
 
 func get_tp() -> int:

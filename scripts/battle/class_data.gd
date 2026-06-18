@@ -103,8 +103,8 @@ const CLASSES: Dictionary = {
 		"stats": {"max_hp": 105, "attack": 11, "attack_interval": 0.9, "attack_range": 185.0, "move_speed": 62.0, "armor": 3},
 		"base": {"skill_power_mult": 1.15, "attack_range_add": 20.0},
 		"subclasses": {
-			"relay": {"label": "중계자", "tiers": [{"max_hp_mult": 1.15, "skill_power_mult": 1.15}, {"max_hp_mult": 1.10}, {"skill_power_mult": 1.20, "armor_add": 3}]},
-			"analyst": {"label": "분석자", "tiers": [{"attack_mult": 1.20}, {"attack_add": 5}, {"attack_mult": 1.20, "skill_cd_mult": 0.85}]},
+			"relay": {"label": "중계자", "ability": {"id": "dynamic_net", "type": "general", "cd": 6.0}, "tiers": [{"max_hp_mult": 1.15, "skill_power_mult": 1.15}, {"max_hp_mult": 1.10}, {"skill_power_mult": 1.20, "armor_add": 3}]},
+			"analyst": {"label": "분석자", "ability": {"id": "static_format", "type": "special", "charge_req": 3}, "tiers": [{"attack_mult": 1.20}, {"attack_add": 5}, {"attack_mult": 1.20, "skill_cd_mult": 0.85}]},
 			"planner": {"label": "기획자", "tiers": [{"skill_cd_mult": 0.85}, {"skill_power_mult": 1.20}, {"skill_cd_mult": 0.85, "attack_add": 4}]},
 		},
 	},

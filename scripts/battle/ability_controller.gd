@@ -92,6 +92,8 @@ func _cast() -> void:
 		"tactical_move": _cast_tactical_move()
 		"smoke_grenade": _cast_smoke_grenade()
 		"fallout_spray": _cast_fallout_spray()
+		"dynamic_net": _cast_dynamic_net()
+		"static_format": _cast_static_format()
 		_: pass
 
 
@@ -166,6 +168,25 @@ func _summon() -> void:
 	bf.spawn_minion(int(unit_owner.team), unit_owner.global_position + Vector2(0.0, 40.0), stats, "")
 
 
+func _tactical_power() -> float:
+	if unit_owner == null:
+		return 1.0
+	var n: Node = unit_owner
+	var p1: Node = n.get_parent()
+	if p1 != null:
+		n = p1
+	var p2: Node = n.get_parent()
+	if p2 != null:
+		n = p2
+	var p3: Node = n.get_parent()
+	if p3 != null:
+		n = p3
+	var td: Node = n.get_node_or_null("TacticalDeck")
+	if td != null and td.has_method("tactical_power"):
+		return float(td.tactical_power())
+	return 1.0
+
+
 # ── 레인저 ──
 ## 제압자 수류탄 투척: 220px AoE, 사격위력 300% +100%/공명등급, 방어도 관통 15%.
 func _cast_grenade() -> void:
@@ -199,7 +220,7 @@ func _cast_pierce_ammo() -> void:
 	var es: Array = _nearest_sorted()
 	if es.is_empty():
 		return
-	es[0].take_damage(maxi(1, int(round(float(unit_owner.attack)))))
+	es[0].take_damage(maxi(1, int(round(float(unit_owner.attack))) ))
 	if es[0].has_method("apply_status"):
 		es[0].apply_status("bleed", 2, 6.0, 5.0, "physical")
 
@@ -230,7 +251,7 @@ func _cast_rally_flag() -> void:
 		if unit_owner.global_position.distance_to(a.global_position) <= 200.0:
 			a.set("armor", int(a.get("armor")) + 4)
 			if a.has_method("add_shield"):
-				a.add_shield(int(round(float(a.get("max_hp")) * 0.10)))
+				a.add_shield(int(round(float(a.get("max_hp")) * 0.10) ))
 
 
 # ── 커맨더 ──
@@ -303,7 +324,7 @@ func _cast_demolition() -> void:
 	for n in _enemies():
 		if unit_owner.global_position.distance_to(n.global_position) <= radius:
 			n.take_damage(int(round(float(unit_owner.attack) * 2.0)))
-			n.set("armor", maxi(0, int(n.get("armor")) - maxi(1, int(round(float(n.get("armor")) * 0.10)))))
+			n.set("armor", maxi(0, int(n.get("armor")) - maxi(1, int(round(float(n.get("armor")) * 0.10) ))))
 
 ## 돌파자 전술 기동: 최근접 적으로 이동, 근접 시 200% 피해 및 1충전.
 func _cast_tactical_move() -> void:
@@ -349,3 +370,50 @@ func _cast_fallout_spray() -> void:
 			n.take_damage(maxi(1, int(round(float(unit_owner.attack) * 1.0))))
 			if n.has_method("apply_status"):
 				n.apply_status("poison", 1, 10.0, maxf(1.0, float(int(round(float(unit_owner.attack) * 0.2)))), "chemical")
+
+
+# ── 신규 사이퍼 서브캐스트 ──
+## 중계자 동적 네트워킹: 가장 실드가 높은 아군(동점 시 최저 HP 비율) 치료 + 실드 보충
+func _cast_dynamic_net() -> void:
+	if unit_owner == null:
+		return
+	var target: Node = null
+	var max_shield: int = -1
+	var min_hp_ratio: float = 1.1
+	for a in _allies():
+		if a == unit_owner:
+			continue
+		var current_shield: int = 0
+		var status_node: Node = a.get_node_or_null("Status")
+		if status_node != null and status_node.has_method("shield_amount"):
+			current_shield = int(status_node.shield_amount())
+		var hp_ratio: float = float(a.get("hp")) / float(a.get("max_hp"))
+		if current_shield > max_shield:
+			max_shield = current_shield
+			target = a
+			min_hp_ratio = hp_ratio
+		elif current_shield == max_shield:
+			if hp_ratio < min_hp_ratio:
+				target = a
+				min_hp_ratio = hp_ratio
+	if target != null:
+		_heal(target, int(round(float(unit_owner.attack) * 2.0 * _sp())))
+		if target.has_method("add_shield"):
+			target.add_shield(int(round(float(unit_owner.attack) * 1.0 * _sp())))
+
+## 분석자 정적 포매팅: 전체 적 전기 피해 + 실드 제거 및 보너스 피해
+func _cast_static_format() -> void:
+	if unit_owner == null:
+		return
+	var tac: float = _tactical_power()
+	var base: int = maxi(1, int(round(float(unit_owner.attack) * 0.30 * tac * _sp())))
+	var bonus: int = maxi(1, int(round(float(unit_owner.attack) * 0.15 * tac * _sp())))
+	for n in _enemies():
+		n.take_damage(base)
+		var status_node: Node = n.get_node_or_null("Status")
+		if status_node != null and status_node.has_method("shield_amount"):
+			var shield_val: int = int(status_node.shield_amount())
+			if shield_val > 0:
+				if status_node.has_method("add_shield"):
+					status_node.add_shield(-shield_val)
+				n.take_damage(bonus)
