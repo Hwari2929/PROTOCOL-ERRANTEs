@@ -69,9 +69,9 @@ const CLASSES: Dictionary = {
 		"stats": {"max_hp": 100, "attack": 8, "attack_interval": 1.1, "attack_range": 160.0, "move_speed": 65.0, "armor": 2},
 		"base": {"max_hp_mult": 1.10, "skill_cd_mult": 0.90},
 		"subclasses": {
-			"healer": {"label": "치유사", "tiers": [{"skill_cd_mult": 0.85, "max_hp_mult": 1.10}, {"max_hp_mult": 1.15}, {"skill_cd_mult": 0.85, "armor_add": 3}]},
-			"purifier": {"label": "정화자", "tiers": [{"attack_mult": 1.20, "skill_power_mult": 1.20}, {"attack_add": 4, "skill_cd_mult": 0.90, "skill_power_mult": 1.20}, {"attack_mult": 1.20, "max_hp_mult": 1.10}]},
-			"counselor": {"label": "조언자", "tiers": [{"skill_power_mult": 1.20, "max_hp_mult": 1.10}, {"skill_cd_mult": 0.85}, {"skill_power_mult": 1.20, "max_hp_mult": 1.10}]},
+			"healer": {"label": "치유사", "ability": {"id": "heal_turret", "type": "special", "charge_req": 4}, "tiers": [{"skill_cd_mult": 0.85, "max_hp_mult": 1.10}, {"max_hp_mult": 1.15}, {"skill_cd_mult": 0.85, "armor_add": 3}]},
+			"purifier": {"label": "정화자", "ability": {"id": "bio_radiation", "type": "special", "charge_req": 5}, "tiers": [{"attack_mult": 1.20, "skill_power_mult": 1.20}, {"attack_add": 4, "skill_cd_mult": 0.90, "skill_power_mult": 1.20}, {"attack_mult": 1.20, "max_hp_mult": 1.10}]},
+			"counselor": {"label": "조언자", "ability": {"id": "inspire", "type": "general", "cd": 8.0}, "tiers": [{"skill_power_mult": 1.20, "max_hp_mult": 1.10}, {"skill_cd_mult": 0.85}, {"skill_power_mult": 1.20, "max_hp_mult": 1.10}]},
 		},
 	},
 
