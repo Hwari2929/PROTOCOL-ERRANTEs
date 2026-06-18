@@ -11,6 +11,9 @@ var charge: int = 0
 var charge_req: int = 0
 var cooldown: float = 0.0
 var _cd_timer: float = 0.0
+var class_ability_id: String = ""
+var class_charge: int = 0
+var class_charge_req: int = 0
 
 
 func _ready() -> void:
@@ -29,6 +32,9 @@ func configure() -> void:
 	elif skill_type == "general":
 		cooldown = float(meta.get("cd", 8.0))
 		_cd_timer = cooldown
+	var cmeta: Dictionary = ClassData.class_ability(unit_owner.sprite_id)
+	class_ability_id = String(cmeta.get("id", ""))
+	class_charge_req = int(cmeta.get("charge_req", 4))
 
 
 func on_combat_start() -> void:
@@ -36,11 +42,15 @@ func on_combat_start() -> void:
 		gain_charge(1)
 	if summon_id != "":
 		_summon()
+	if class_ability_id != "":
+		class_charge += 1 + maxi(0, _grade() - 1)
 
 
 func gain_charge(n: int) -> void:
 	if skill_type == "special":
 		charge = mini(charge + n, charge_req * 2)
+	if class_ability_id != "":
+		class_charge = mini(class_charge + n, class_charge_req * 2)
 
 
 func is_ready() -> bool:
@@ -63,6 +73,9 @@ func tick(delta: float) -> void:
 		if charge >= charge_req:
 			_cast()
 			charge = 0
+	if class_ability_id != "" and class_charge >= class_charge_req:
+		_cast_class()
+		class_charge = 0
 
 
 func _cast() -> void:
@@ -76,6 +89,15 @@ func _cast() -> void:
 		"heal_turret": _cast_heal_turret()
 		"bio_radiation": _cast_bio_radiation()
 		"inspire": _cast_inspire()
+		"tactical_move": _cast_tactical_move()
+		"smoke_grenade": _cast_smoke_grenade()
+		"fallout_spray": _cast_fallout_spray()
+		_: pass
+
+
+func _cast_class() -> void:
+	match class_ability_id:
+		"demolition": _cast_demolition()
 		_: pass
 
 
@@ -152,7 +174,7 @@ func _cast_grenade() -> void:
 	var base: int = int(round(float(unit_owner.attack) * (3.0 + 1.0 * float(_grade() - 1))))
 	for n in _enemies():
 		if unit_owner.global_position.distance_to(n.global_position) <= 220.0:
-			n.take_damage(maxi(1, base - int(round(float(n.armor) * 0.85))))
+			n.take_damage(maxi(1, base - int(round(float(n.armor) * 0.85) )))
 
 ## 무법자 섬광 탄약: 무작위 3적 사격위력 50% + 실명.
 func _cast_flash_ammo() -> void:
@@ -269,4 +291,61 @@ func _cast_inspire() -> void:
 			target = a
 	if target != null:
 		target.set("attack", int(target.get("attack")) + maxi(1, int(round(3.0 * _sp()))))
-		_heal(target, int(round(float(unit_owner.attack) * 1.5 * _sp())))
+		_heal(target, int(round(float(unit_owner.attack) * 1.5 * _sp()) ))
+
+
+# ── 파괴 공작 (Class-Level) ──
+## 파괴 공작: 반경 내 적에게 공격력 200% 피해 및 방어도 10% 감소.
+func _cast_demolition() -> void:
+	if unit_owner == null:
+		return
+	var radius: float = float(unit_owner.attack_range) * 1.5
+	for n in _enemies():
+		if unit_owner.global_position.distance_to(n.global_position) <= radius:
+			n.take_damage(int(round(float(unit_owner.attack) * 2.0)))
+			n.set("armor", maxi(0, int(n.get("armor")) - maxi(1, int(round(float(n.get("armor")) * 0.10)))))
+
+## 돌파자 전술 기동: 최근접 적으로 이동, 근접 시 200% 피해 및 1충전.
+func _cast_tactical_move() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _nearest_sorted()
+	if es.is_empty():
+		return
+	var t: Node = es[0]
+	var dist: float = unit_owner.global_position.distance_to(t.global_position)
+	var move_dist: float = minf(dist, float(unit_owner.attack_range) * 0.5)
+	var dir: Vector2 = (t.global_position - unit_owner.global_position).normalized()
+	unit_owner.global_position = unit_owner.global_position + dir * move_dist
+	if unit_owner.global_position.distance_to(t.global_position) <= 60.0:
+		t.take_damage(int(round(float(unit_owner.attack) * 2.0)))
+	gain_charge(1)
+
+## 척후대 연막 유탄: 최고 공격력 적 기준 반경 내 적에게 25% 피해 및 실명.
+func _cast_smoke_grenade() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _enemies()
+	if es.is_empty():
+		return
+	var target: Node = es[0]
+	for n in es:
+		if int(n.get("attack")) > int(target.get("attack")):
+			target = n
+	var radius: float = float(unit_owner.attack_range) * 0.75
+	for n in es:
+		if target.global_position.distance_to(n.global_position) <= radius:
+			n.take_damage(maxi(1, int(round(float(unit_owner.attack) * 0.25))))
+			if n.has_method("apply_status"):
+				n.apply_status("blind", 1, 5.0, 0.0, "none")
+
+## 피폭자 낙진 분사: 자신 기준 반경 내 적에게 100% 피해 및 중독.
+func _cast_fallout_spray() -> void:
+	if unit_owner == null:
+		return
+	var radius: float = float(unit_owner.attack_range) * 0.8
+	for n in _enemies():
+		if unit_owner.global_position.distance_to(n.global_position) <= radius:
+			n.take_damage(maxi(1, int(round(float(unit_owner.attack) * 1.0))))
+			if n.has_method("apply_status"):
+				n.apply_status("poison", 1, 10.0, maxf(1.0, float(int(round(float(unit_owner.attack) * 0.2)))), "chemical")

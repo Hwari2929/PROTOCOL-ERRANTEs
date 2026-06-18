@@ -91,10 +91,11 @@ const CLASSES: Dictionary = {
 		"label": "브리처", "position": "돌격가", "tactical": "스페셜",
 		"stats": {"max_hp": 160, "attack": 13, "attack_interval": 0.95, "attack_range": 90.0, "move_speed": 90.0, "armor": 5},
 		"base": {"move_speed_mult": 1.10, "skill_power_mult": 1.15},
+		"class_ability": {"id": "demolition", "type": "special", "charge_req": 4},
 		"subclasses": {
-			"breakthrough": {"label": "돌파자", "tiers": [{"move_speed_mult": 1.20, "attack_mult": 1.15}, {"attack_add": 6}, {"attack_mult": 1.20, "skill_cd_mult": 0.85}]},
-			"skirmisher": {"label": "척후대", "tiers": [{"attack_interval_mult": 0.88, "move_speed_mult": 1.10}, {"attack_add": 5}, {"attack_interval_mult": 0.85}]},
-			"irradiator": {"label": "피폭자", "trait": {"on_hit": "poison"}, "tiers": [{"skill_power_mult": 1.25}, {"attack_mult": 1.15, "skill_power_mult": 1.15}, {"skill_power_mult": 1.20, "attack_add": 5}]},
+			"breakthrough": {"label": "돌파자", "ability": {"id": "tactical_move", "type": "general", "cd": 6.0}, "tiers": [{"move_speed_mult": 1.20, "attack_mult": 1.15}, {"attack_add": 6}, {"attack_mult": 1.20, "skill_cd_mult": 0.85}]},
+			"skirmisher": {"label": "척후대", "ability": {"id": "smoke_grenade", "type": "general", "cd": 10.0}, "tiers": [{"attack_interval_mult": 0.88, "move_speed_mult": 1.10}, {"attack_add": 5}, {"attack_interval_mult": 0.85}]},
+			"irradiator": {"label": "피폭자", "ability": {"id": "fallout_spray", "type": "general", "cd": 5.0}, "trait": {"on_hit": "poison"}, "tiers": [{"skill_power_mult": 1.25}, {"attack_mult": 1.15, "skill_power_mult": 1.15}, {"skill_power_mult": 1.20, "attack_add": 5}]},
 		},
 	},
 	"cipher": {
@@ -277,6 +278,11 @@ static func subclass_ability(class_id: String, sub_id: String) -> Dictionary:
 ## Class-level passive 고유 특성 metadata (e.g. 센티넬 제압 사격 suppression). {} if none.
 static func class_passive(class_id: String) -> Dictionary:
 	return CLASSES.get(class_id, {}).get("passive", {})
+
+
+## Class-level active ability shared by all subclasses (e.g. 브리처 파괴 공작). {} if none.
+static func class_ability(class_id: String) -> Dictionary:
+	return CLASSES.get(class_id, {}).get("class_ability", {})
 
 
 ## Per-subclass modifiers to the class passive (센티넬 군림자/조종자/분쇄자). {} if none.
