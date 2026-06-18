@@ -56,6 +56,12 @@ var crit_chance: float = 0.05
 var crit_mult: float = 2.0
 @onready var _ability: Node = get_node_or_null("Ability")
 
+# 센티넬 고유 특성 '제압 사격' (suppression): sustained fire on the same target
+# stacks attack speed; switching targets drops all stacks.
+var _supp_stacks: int = 0
+var _supp_target: Node = null
+var _supp_accum: float = 0.0
+
 func setup(team: int) -> void:
 	self.team = team
 	add_to_group("unit")
@@ -131,6 +137,10 @@ func configure_ability() -> void:
 func on_combat_start() -> void:
 	if _ability != null and _ability.has_method("on_combat_start"):
 		_ability.on_combat_start()
+	# 조종자: board the 기갑 메카 — a large durability shield at combat entry.
+	var supp: Dictionary = ClassData.subclass_supp(sprite_id, subclass_id)
+	if supp.get("mecha", false):
+		add_shield(maxi(0, int(round(float(max_hp) * float(supp.get("mecha_shield_mult", 2.5))))))
 
 func res_threshold_for(g: int) -> int:
 	if g <= 1: return 0
@@ -155,6 +165,26 @@ func current_res_grade() -> int:
 
 func current_res_points() -> int:
 	return res_points
+
+# ── 센티넬 제압 사격 (suppression passive) ──
+func _is_suppression() -> bool:
+	return String(ClassData.class_passive(sprite_id).get("kind", "")) == "suppression"
+
+func suppression_stacks() -> int:
+	return _supp_stacks
+
+func suppression_max() -> int:
+	var p: Dictionary = ClassData.class_passive(sprite_id)
+	if p.is_empty():
+		return 0
+	var m: int = int(p.get("base_max_stacks", 2)) + maxi(0, res_grade - 1)
+	m += int(ClassData.subclass_supp(sprite_id, subclass_id).get("max_stacks_add", 0))
+	return m
+
+func _supp_speed_per_stack() -> float:
+	var base: float = float(ClassData.class_passive(sprite_id).get("speed_per_stack", 0.25))
+	base += float(ClassData.subclass_supp(sprite_id, subclass_id).get("speed_per_stack_add", 0.0))
+	return maxf(0.0, base)
 
 func is_stunned() -> bool:
 	return _status != null and _status.has_method("has_effect") and _status.has_effect("stun")
@@ -196,6 +226,18 @@ func _physics_process(delta: float) -> void:
 		var dir: Vector2 = global_position.direction_to(target.global_position)
 		position += dir * move_speed * delta
 	else:
+		# 제압 사격: accumulate stacks while firing the same target, reset on switch.
+		if _is_suppression():
+			if target == _supp_target:
+				_supp_accum += delta
+				var si: float = float(ClassData.class_passive(sprite_id).get("stack_interval", 0.75))
+				while _supp_accum >= si:
+					_supp_accum -= si
+					_supp_stacks = mini(_supp_stacks + 1, suppression_max())
+			else:
+				_supp_target = target
+				_supp_stacks = 0
+				_supp_accum = 0.0
 		_attack_timer -= delta
 		if _attack_timer <= 0.0:
 			var dmg: int = maxi(1, attack - target.armor)
@@ -211,7 +253,11 @@ func _physics_process(delta: float) -> void:
 					_ability.gain_charge(1)
 			target.take_damage(dmg)
 			_apply_on_hit(target)
-			_attack_timer = attack_interval
+			_apply_suppression_hit(target, dmg)
+			var eff_interval: float = attack_interval
+			if _is_suppression():
+				eff_interval = attack_interval / (1.0 + _supp_speed_per_stack() * float(_supp_stacks))
+			_attack_timer = eff_interval
 
 func acquire_target() -> Node2D:
 	var candidates: Array[Node] = get_tree().get_nodes_in_group("unit")
@@ -237,6 +283,43 @@ func _apply_on_hit(target: Node) -> void:
 			target.apply_status("burn", 1, 4.0, 5.0, "physical")
 		"poison":
 			target.apply_status("poison", 1, 4.0, 6.0, "chemical")
+
+## 센티넬 subclass on-hit suppression effects (군림자 흡혈/처형, 분쇄자 관통/초과체력).
+func _apply_suppression_hit(target: Node, dmg: int) -> void:
+	if not _is_suppression() or _supp_stacks <= 0:
+		return
+	var supp: Dictionary = ClassData.subclass_supp(sprite_id, subclass_id)
+	# 군림자 흡혈: heal self by a fraction of damage per stack.
+	if supp.has("lifesteal_per_stack"):
+		var heal: int = int(round(float(dmg) * float(supp["lifesteal_per_stack"]) * float(_supp_stacks)))
+		if heal > 0:
+			hp = mini(max_hp, hp + heal)
+			queue_redraw()
+	# 군림자 처형: bonus damage to low-hp targets, scaling per stack.
+	if supp.has("execute_per_stack") and target != null and int(target.get("hp")) > 0:
+		var ratio: float = float(target.get("hp")) / float(target.get("max_hp"))
+		if ratio < 0.30:
+			var exec: int = int(round(float(target.get("hp")) * float(supp["execute_per_stack"]) * float(_supp_stacks)))
+			if exec > 0:
+				target.take_damage(exec)
+	# 분쇄자 초과체력 전환: convert a fraction of damage to overshield.
+	if supp.has("overheal_convert"):
+		add_shield(maxi(0, int(round(float(dmg) * float(supp["overheal_convert"])))))
+	# 분쇄자 관통: pierce the next nearest enemies for the same damage.
+	if supp.has("pierce"):
+		var pierces: int = int(supp["pierce"])
+		if pierces > 0:
+			var others: Array = []
+			for n in get_tree().get_nodes_in_group("unit"):
+				if n is Node2D and n != target and n.team != team and n.hp > 0:
+					others.append(n)
+			others.sort_custom(func(a, b): return global_position.distance_to(a.global_position) < global_position.distance_to(b.global_position))
+			var hit: int = 0
+			for n in others:
+				if hit >= pierces:
+					break
+				n.take_damage(dmg)
+				hit += 1
 
 func reason_output_mult() -> float:
 	return 1.0 + clampf((50.0 - reason) / 50.0, 0.0, 1.0) * 0.5

@@ -80,10 +80,11 @@ const CLASSES: Dictionary = {
 		"label": "센티넬", "position": "명사수", "tactical": "스페셜",
 		"stats": {"max_hp": 150, "attack": 14, "attack_interval": 0.6, "attack_range": 170.0, "move_speed": 50.0, "armor": 4},
 		"base": {"max_hp_mult": 1.20, "attack_interval_mult": 0.90},
+		"passive": {"kind": "suppression", "stack_interval": 0.75, "speed_per_stack": 0.25, "base_max_stacks": 2},
 		"subclasses": {
-			"overlord": {"label": "군림자", "tiers": [{"attack_mult": 1.20}, {"attack_add": 6}, {"attack_mult": 1.20, "attack_interval_mult": 0.90}]},
-			"pilot_mech": {"label": "조종자", "tiers": [{"max_hp_mult": 1.25, "armor_add": 5}, {"armor_add": 6}, {"max_hp_mult": 1.20, "attack_add": 6}]},
-			"crusher": {"label": "분쇄자", "trait": {"on_skill": "shield"}, "tiers": [{"attack_add": 8, "attack_range_add": 30.0}, {"attack_mult": 1.20}, {"max_hp_mult": 1.15, "attack_add": 6}]},
+			"overlord": {"label": "군림자", "supp": {"max_stacks_add": 3, "speed_per_stack_add": -0.10, "lifesteal_per_stack": 0.01, "execute_per_stack": 0.01}, "tiers": [{"attack_mult": 1.20}, {"attack_add": 6}, {"attack_mult": 1.20, "attack_interval_mult": 0.90}]},
+			"pilot_mech": {"label": "조종자", "supp": {"mecha": true, "hp_penalty": 0.40, "mecha_shield_mult": 2.5, "dmg_reduction_per_stack": 0.05, "dmg_per_stack": 0.15, "speed_per_stack_add": -0.15, "aoe": true}, "tiers": [{"max_hp_mult": 1.25, "armor_add": 5}, {"armor_add": 6}, {"max_hp_mult": 1.20, "attack_add": 6}]},
+			"crusher": {"label": "분쇄자", "supp": {"pierce": 1, "overheal_convert": 0.10}, "tiers": [{"attack_add": 8, "attack_range_add": 30.0}, {"attack_mult": 1.20}, {"max_hp_mult": 1.15, "attack_add": 6}]},
 		},
 	},
 	"breacher": {
@@ -271,6 +272,16 @@ static func subclass_trait(class_id: String, sub_id: String) -> Dictionary:
 
 static func subclass_ability(class_id: String, sub_id: String) -> Dictionary:
 	return CLASSES.get(class_id, {}).get("subclasses", {}).get(sub_id, {}).get("ability", {})
+
+
+## Class-level passive 고유 특성 metadata (e.g. 센티넬 제압 사격 suppression). {} if none.
+static func class_passive(class_id: String) -> Dictionary:
+	return CLASSES.get(class_id, {}).get("passive", {})
+
+
+## Per-subclass modifiers to the class passive (센티넬 군림자/조종자/분쇄자). {} if none.
+static func subclass_supp(class_id: String, sub_id: String) -> Dictionary:
+	return CLASSES.get(class_id, {}).get("subclasses", {}).get(sub_id, {}).get("supp", {})
 
 
 static func base_mods(class_id: String) -> Dictionary:
