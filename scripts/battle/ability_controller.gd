@@ -311,7 +311,7 @@ func _cast_point_mark() -> void:
 			if shield_val > 0:
 				if status_node.has_method("add_shield"):
 					status_node.add_shield(-shield_val)
-			break
+				break
 
 
 # ── 레인저 ──
@@ -348,27 +348,221 @@ func _cast_pierce_ammo() -> void:
 	if es.is_empty():
 		return
 	es[0].take_damage(maxi(1, int(round(float(unit_owner.attack))) ))
-	if es.size() > 1:
-		es[1].take_damage(maxi(1, int(round(float(unit_owner.attack))) ))
-		if es[1].has_method("apply_status"):
-			es[1].apply_status("bleed", 2, 5.0, 0.0, "none")
+	if es[0].has_method("apply_status"):
+		es[0].apply_status("bleed", 2, 6.0, 5.0, "physical")
 
-## (기존 케이스들 유지: charge_dash, rally_flag, bombardment, heal_turret, bio_radiation, inspire, tactical_move, smoke_grenade, fallout_spray, dynamic_net, static_format, forced_record, demolition)
-func _cast_charge_dash() -> void: pass
-func _cast_rally_flag() -> void: pass
-func _cast_bombardment() -> void: pass
-func _cast_heal_turret() -> void: pass
-func _cast_bio_radiation() -> void: pass
-func _cast_inspire() -> void: pass
-func _cast_tactical_move() -> void: pass
-func _cast_smoke_grenade() -> void: pass
-func _cast_fallout_spray() -> void: pass
-func _cast_dynamic_net() -> void: pass
-func _cast_static_format() -> void: pass
-func _cast_forced_record() -> void: pass
-func _cast_demolition() -> void: pass
 
-# ── 신규 파일럿 서브클래스 ──
+# ── 뱅가드 ──
+## 돌격자 돌진: 최근접 적 돌진, 타격위력 300% + 방어도 100%, 120px 밀쳐내기, 2초 기절.
+func _cast_charge_dash() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _nearest_sorted()
+	if es.is_empty():
+		return
+	var t: Node = es[0]
+	var dir_to: Vector2 = (t.global_position - unit_owner.global_position).normalized()
+	unit_owner.global_position = t.global_position - dir_to * 60.0
+	t.take_damage(int(round(float(unit_owner.attack) * 3.0 + float(unit_owner.armor))))
+	var away: Vector2 = (t.global_position - unit_owner.global_position).normalized()
+	if away.length() > 0.0:
+		t.global_position = t.global_position + away * 120.0
+	if t.has_method("apply_stun"):
+		t.apply_stun(2.0)
+
+## 수호자 깃발 전개: 200px 내 아군 방어도 +4, 최대체력 10% 실드.
+func _cast_rally_flag() -> void:
+	if unit_owner == null:
+		return
+	for a in _allies():
+		if unit_owner.global_position.distance_to(a.global_position) <= 200.0:
+			a.set("armor", int(a.get("armor")) + 4)
+			if a.has_method("add_shield"):
+				a.add_shield(int(round(float(a.get("max_hp")) * 0.10) ))
+
+
+# ── 커맨더 ──
+## 사령관 지정 포격: 최저 체력 적 기준 150px AoE 사격위력 200% + 40% 기절.
+func _cast_bombardment() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _enemies()
+	if es.is_empty():
+		return
+	var low: Node = es[0]
+	for n in es:
+		if int(n.get("hp")) < int(low.get("hp")):
+			low = n
+	var dmg: int = int(round(float(unit_owner.attack) * 2.0))
+	for n in es:
+		if low.global_position.distance_to(n.global_position) <= 150.0:
+			n.take_damage(dmg)
+			if randf() < 0.4 and n.has_method("apply_stun"):
+				n.apply_stun(2.0)
+
+
+# ── 메딕 ──
+## 치유사 치유 포탑: 전체 아군 회복 (기술 위력 기반).
+func _cast_heal_turret() -> void:
+	if unit_owner == null:
+		return
+	var amt: int = int(round(float(unit_owner.attack) * 2.0 * _sp()))
+	for a in _allies():
+		_heal(a, amt)
+
+## 정화자 생체 방사: 150px 적 화학 피해 + 중독, 아군 회복.
+func _cast_bio_radiation() -> void:
+	if unit_owner == null:
+		return
+	var dmg: int = int(round(float(unit_owner.attack) * _sp()))
+	for a in _allies():
+		if unit_owner.global_position.distance_to(a.global_position) <= 150.0:
+			_heal(a, dmg)
+	for n in _enemies():
+		if unit_owner.global_position.distance_to(n.global_position) <= 150.0:
+			n.take_damage(dmg)
+			if n.has_method("apply_status"):
+				n.apply_status("poison", 1, 4.0, 6.0, "chemical")
+
+## 조언자 고취(격려): 최저 체력 아군(자신 제외) 공격 강화 + 회복.
+func _cast_inspire() -> void:
+	if unit_owner == null:
+		return
+	var target: Node = null
+	var min_ratio: float = 1.1
+	for a in _allies():
+		if a == unit_owner or int(a.get("hp")) <= 0:
+			continue
+		var r: float = float(a.get("hp")) / float(a.get("max_hp"))
+		if r < min_ratio:
+			min_ratio = r
+			target = a
+	if target != null:
+		target.set("attack", int(target.get("attack")) + maxi(1, int(round(3.0 * _sp()))))
+		_heal(target, int(round(float(unit_owner.attack) * 1.5 * _sp()) ))
+
+
+# ── 파괴 공작 (Class-Level) ──
+## 파괴 공작: 반경 내 적에게 공격력 200% 피해 및 방어도 10% 감소.
+func _cast_demolition() -> void:
+	if unit_owner == null:
+		return
+	var radius: float = float(unit_owner.attack_range) * 1.5
+	for n in _enemies():
+		if unit_owner.global_position.distance_to(n.global_position) <= radius:
+			n.take_damage(int(round(float(unit_owner.attack) * 2.0)))
+			n.set("armor", maxi(0, int(n.get("armor")) - maxi(1, int(round(float(n.get("armor")) * 0.10) ))))
+
+## 돌파자 전술 기동: 최근접 적으로 이동, 근접 시 200% 피해 및 1충전.
+func _cast_tactical_move() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _nearest_sorted()
+	if es.is_empty():
+		return
+	var t: Node = es[0]
+	var dist: float = unit_owner.global_position.distance_to(t.global_position)
+	var move_dist: float = minf(dist, float(unit_owner.attack_range) * 0.5)
+	var dir: Vector2 = (t.global_position - unit_owner.global_position).normalized()
+	unit_owner.global_position = unit_owner.global_position + dir * move_dist
+	if unit_owner.global_position.distance_to(t.global_position) <= 60.0:
+		t.take_damage(int(round(float(unit_owner.attack) * 2.0)))
+	gain_charge(1)
+
+## 척후대 연막 유탄: 최고 공격력 적 기준 반경 내 적에게 25% 피해 및 실명.
+func _cast_smoke_grenade() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _enemies()
+	if es.is_empty():
+		return
+	var target: Node = es[0]
+	for n in es:
+		if int(n.get("attack")) > int(target.get("attack")):
+			target = n
+	var radius: float = float(unit_owner.attack_range) * 0.75
+	for n in es:
+		if target.global_position.distance_to(n.global_position) <= radius:
+			n.take_damage(maxi(1, int(round(float(unit_owner.attack) * 0.25))))
+			if n.has_method("apply_status"):
+				n.apply_status("blind", 1, 5.0, 0.0, "none")
+
+## 피폭자 낙진 분사: 자신 기준 반경 내 적에게 100% 피해 및 중독.
+func _cast_fallout_spray() -> void:
+	if unit_owner == null:
+		return
+	var radius: float = float(unit_owner.attack_range) * 0.8
+	for n in _enemies():
+		if unit_owner.global_position.distance_to(n.global_position) <= radius:
+			n.take_damage(maxi(1, int(round(float(unit_owner.attack) * 1.0))))
+			if n.has_method("apply_status"):
+				n.apply_status("poison", 1, 10.0, maxf(1.0, float(int(round(float(unit_owner.attack) * 0.2)))), "chemical")
+
+
+# ── 신규 사이퍼 서브캐스트 ──
+## 중계자 동적 네트워킹: 가장 실드가 높은 아군(동점 시 최저 HP 비율) 치료 + 실드 보충
+func _cast_dynamic_net() -> void:
+	if unit_owner == null:
+		return
+	var target: Node = null
+	var max_shield: int = -1
+	var min_hp_ratio: float = 1.1
+	for a in _allies():
+		if a == unit_owner:
+			continue
+		var current_shield: int = 0
+		var status_node: Node = a.get_node_or_null("Status")
+		if status_node != null and status_node.has_method("shield_amount"):
+			current_shield = int(status_node.shield_amount())
+		var hp_ratio: float = float(a.get("hp")) / float(a.get("max_hp"))
+		if current_shield > max_shield:
+			max_shield = current_shield
+			target = a
+			min_hp_ratio = hp_ratio
+		elif current_shield == max_shield:
+			if hp_ratio < min_hp_ratio:
+				target = a
+				min_hp_ratio = hp_ratio
+	if target != null:
+		_heal(target, int(round(float(unit_owner.attack) * 2.0 * _sp()) ))
+		if target.has_method("add_shield"):
+			target.add_shield(int(round(float(unit_owner.attack) * 1.0 * _sp()) ))
+
+## 분석자 정적 포매팅: 전체 적 전기 피해 + 실드 제거 및 보너스 피해
+func _cast_static_format() -> void:
+	if unit_owner == null:
+		return
+	var tac: float = _tactical_power()
+	var base: int = maxi(1, int(round(float(unit_owner.attack) * 0.30 * tac * _sp()) ))
+	var bonus: int = maxi(1, int(round(float(unit_owner.attack) * 0.15 * tac * _sp()) ))
+	for n in _enemies():
+		n.take_damage(base)
+		var status_node: Node = n.get_node_or_null("Status")
+		if status_node != null and status_node.has_method("shield_amount"):
+			var shield_val: int = int(status_node.shield_amount())
+			if shield_val > 0:
+				if status_node.has_method("add_shield"):
+					status_node.add_shield(-shield_val)
+				n.take_damage(bonus)
+
+
+# ── 기록자 강제 필사 ──
+func _cast_forced_record() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _nearest_sorted()
+	if es.is_empty():
+		return
+	var t: Node = es[0]
+	var st: Node = t.get_node_or_null("Status")
+	var fixed_dmg: int = maxi(1, int(round(float(unit_owner.armor) * 0.5)))
+	t.take_damage(fixed_dmg)
+	if st != null and st.has_method("record_judgment"):
+		var cap: int = int(round(float(unit_owner.attack) * 3.0))
+		st.record_judgment(int(round(float(cap) * 0.30)), cap, 5.0)
+
+# ── 파일럿 ──
+## 통제관 공중 포격: (2 + 제공권)명 무작위 적 지정, 각 대상 주변 AoE 물리 피해 (전술 위력).
 func _cast_air_bombard() -> void:
 	if unit_owner == null:
 		return
@@ -378,7 +572,7 @@ func _cast_air_bombard() -> void:
 	if es.is_empty():
 		return
 	es.shuffle()
-	var dmg: int = maxi(1, int(round(float(unit_owner.attack) * 0.5 * tac * _sp()) ))
+	var dmg: int = maxi(1, int(round(float(unit_owner.attack) * 0.5 * tac * _sp())))
 	var picked: int = 0
 	for center_unit in es:
 		if picked >= n_targets:
@@ -388,14 +582,15 @@ func _cast_air_bombard() -> void:
 			if center_unit.global_position.distance_to(m.global_position) <= unit_owner.attack_range:
 				m.take_damage(dmg)
 
+## 보급관 구호품 낙하: 체력 비율이 가장 낮은 (2 + 제공권)명 아군 회복 (전술 위력).
 func _cast_relief_drop() -> void:
 	if unit_owner == null:
 		return
 	var tac2: float = _tactical_power()
 	var n2: int = 2 + _air_superiority()
 	var al: Array = _allies()
-	al.sort_custom(func(a, b): return (float(a.get("hp"))/float(a.get("max_hp"))) < (float(b.get("hp"))/float(b.get("max_hp"))))
-	var heal: int = maxi(1, int(round(float(unit_owner.attack) * 1.0 * tac2 * _sp()) ))
+	al.sort_custom(func(a, b): return (float(a.get("hp")) / float(a.get("max_hp"))) < (float(b.get("hp")) / float(b.get("max_hp"))))
+	var heal: int = maxi(1, int(round(float(unit_owner.attack) * 1.0 * tac2 * _sp())))
 	var h: int = 0
 	for a in al:
 		if h >= n2:
@@ -403,6 +598,7 @@ func _cast_relief_drop() -> void:
 		h += 1
 		_heal(a, heal)
 
+## 지휘관 선두 지휘: 강하 후 아군 전체 공격 속도 +25%.
 func _cast_lead_drop() -> void:
 	if unit_owner == null:
 		return
