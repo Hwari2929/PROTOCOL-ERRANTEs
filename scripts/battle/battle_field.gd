@@ -212,4 +212,8 @@ func start_combat() -> void:
 	for u in units.get_children():
 		if is_instance_valid(u) and u.has_method("set_active"):
 			u.set_active(true)
+	# Trigger initial charge for abilities on player units.
+	for u in units_of(TEAM_PLAYER):
+		if u.has_method("on_combat_start"):
+			u.on_combat_start()
 	phase_changed.emit(PHASE_COMBAT)
