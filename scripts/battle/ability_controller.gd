@@ -58,6 +58,10 @@ func _cast() -> void:
 			_cast_flash_ammo()
 		"pierce_ammo":
 			_cast_pierce_ammo()
+		"charge_dash":
+			_cast_charge_dash()
+		"rally_flag":
+			_cast_rally_flag()
 		_:
 			pass
 
@@ -67,6 +71,15 @@ func _enemies() -> Array:
 		return out
 	for n in unit_owner.get_tree().get_nodes_in_group("unit"):
 		if n is Node2D and n.team != unit_owner.team and n.hp > 0:
+			out.append(n)
+	return out
+
+func _allies() -> Array:
+	var out: Array = []
+	if unit_owner == null:
+		return out
+	for n in unit_owner.get_tree().get_nodes_in_group("unit"):
+		if n is Node2D and n.team == unit_owner.team and n.hp > 0:
 			out.append(n)
 	return out
 
@@ -113,6 +126,53 @@ func _cast_pierce_ammo() -> void:
 	t.take_damage(maxi(1, int(round(float(unit_owner.attack) * 1.0))))
 	if t.has_method("apply_status"):
 		t.apply_status("bleed", 2, 6.0, 5.0, "physical")
+
+## 돌격자 특수기술 돌진: 최근접 적에게 돌진하여 타격위력 300% + 방어도 100% 피해 및 120px 후퇴, 2초 기절.
+func _cast_charge_dash() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _enemies()
+	if es.is_empty():
+		return
+	
+	var nearest: Node = es[0]
+	var min_dist: float = unit_owner.global_position.distance_to(nearest.global_position)
+	for n in es:
+		var d: float = unit_owner.global_position.distance_to(n.global_position)
+		if d < min_dist:
+			min_dist = d
+			nearest = n
+	
+	# Dash owner to within ~60px of target
+	var dir_to: Vector2 = (nearest.global_position - unit_owner.global_position).normalized()
+	var target_pos: Vector2 = nearest.global_position - dir_to * 60.0
+	unit_owner.global_position = target_pos
+	
+	# Deal damage
+	var dmg: int = int(round(float(unit_owner.attack) * 3.0 + float(unit_owner.armor) * 1.0))
+	if nearest.has_method("take_damage"):
+		nearest.take_damage(dmg)
+	
+	# Knock back target ~120px away from owner
+	var dir_away: Vector2 = (nearest.global_position - unit_owner.global_position).normalized()
+	if dir_away.length() > 0.0:
+		nearest.global_position = nearest.global_position + dir_away * 120.0
+	
+	# Stun target
+	if nearest.has_method("apply_stun"):
+		nearest.apply_stun(2.0)
+
+## 수호자 특수기술 깃발 전개: 200px 내 아군 방어력 +4, 최대 HP의 10% 실드 부여.
+func _cast_rally_flag() -> void:
+	if unit_owner == null:
+		return
+	var allies: Array = _allies()
+	for ally in allies:
+		if unit_owner.global_position.distance_to(ally.global_position) <= 200.0:
+			ally.armor += 4
+			if ally.has_method("add_shield"):
+				var shield_amt: int = int(round(float(ally.max_hp) * 0.10))
+				ally.add_shield(shield_amt)
 
 func has_ability() -> bool:
 	return ability_id != ""

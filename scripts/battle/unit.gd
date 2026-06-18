@@ -156,6 +156,13 @@ func current_res_grade() -> int:
 func current_res_points() -> int:
 	return res_points
 
+func is_stunned() -> bool:
+	return _status != null and _status.has_method("has_effect") and _status.has_effect("stun")
+
+func apply_stun(duration: float) -> void:
+	if _status != null and _status.has_method("apply_status"):
+		_status.apply_status("stun", 1, duration, 0.0, "none")
+
 func _physics_process(delta: float) -> void:
 	if not active:
 		return
@@ -165,6 +172,10 @@ func _physics_process(delta: float) -> void:
 	# Status tick
 	if _status != null:
 		_status.tick(delta)
+
+	if is_stunned():
+		return
+
 	_passive_tick(delta)
 	if _ability != null:
 		_ability.tick(delta)
