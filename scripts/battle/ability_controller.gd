@@ -53,6 +53,8 @@ func on_combat_start() -> void:
 		_build_facility(facility_id)
 	if unit_owner != null:
 		unit_owner.set("skill_power", float(unit_owner.get("skill_power")) * 1.01)
+	if String(ClassData.class_passive(unit_owner.sprite_id).get("kind", "")) == "marker":
+		_place_marker(_densest_enemy_point())
 
 
 func gain_charge(n: int) -> void:
@@ -104,6 +106,7 @@ func _cast() -> void:
 		"dynamic_net": _cast_dynamic_net()
 		"static_format": _cast_static_format()
 		"repair_facility": _cast_repair_facility()
+		"point_mark": _cast_point_mark()
 		_: pass
 
 
@@ -239,7 +242,53 @@ func _cast_repair_facility() -> void:
 	_heal(target, amt)
 	if overcharge:
 		target.set("attack_interval", maxf(0.2, float(target.get("attack_interval")) * 0.8))
-		_heal(target, int(round(float(target.get("max_hp")) * 0.025)))
+		_heal(target, int(round(float(target.get("max_hp")) * 0.025) ))
+
+
+# ── 스카웃 마커 & 유격수 지점 표시 ──
+func _densest_enemy_point() -> Vector2:
+	if unit_owner == null:
+		return Vector2.ZERO
+	var enemies: Array = _enemies()
+	if enemies.is_empty():
+		return unit_owner.global_position
+	var best_enemy: Node = enemies[0]
+	var max_count: int = 0
+	for candidate in enemies:
+		var count: int = 0
+		for other in enemies:
+			if candidate != other and candidate.global_position.distance_to(other.global_position) <= unit_owner.attack_range:
+				count += 1
+		if count > max_count:
+			max_count = count
+			best_enemy = candidate
+	return best_enemy.global_position
+
+
+func _place_marker(center: Vector2) -> void:
+	if unit_owner == null:
+		return
+	var dur: float = float(ClassData.class_passive(unit_owner.sprite_id).get("highlight_dur", 8.0))
+	for n in _enemies():
+		if center.distance_to(n.global_position) <= unit_owner.attack_range and n.has_method("apply_status"):
+			n.apply_status("highlight", 1, dur, 0.0, "none")
+
+
+func _cast_point_mark() -> void:
+	if unit_owner == null:
+		return
+	_place_marker(_densest_enemy_point())
+	var es: Array = _nearest_sorted()
+	if es.is_empty():
+		return
+	for n in es:
+		var status_node: Node = n.get_node_or_null("Status")
+		if status_node != null and status_node.has_method("shield_amount"):
+			var shield_val: int = int(status_node.shield_amount())
+			if shield_val > 0:
+				if status_node.has_method("add_shield"):
+					status_node.add_shield(-shield_val)
+				break
 
 
 # ── 레인저 ──
