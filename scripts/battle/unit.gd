@@ -254,6 +254,7 @@ func _physics_process(delta: float) -> void:
 			target.take_damage(dmg)
 			_apply_on_hit(target)
 			_apply_suppression_hit(target, dmg)
+			_apply_judgment_on_hit(target, dmg)
 			var eff_interval: float = attack_interval
 			if _is_suppression():
 				eff_interval = attack_interval / (1.0 + _supp_speed_per_stack() * float(_supp_stacks))
@@ -320,6 +321,19 @@ func _apply_suppression_hit(target: Node, dmg: int) -> void:
 					break
 				n.take_damage(dmg)
 				hit += 1
+
+## 아비터 심판(judgment): on hit, record a fraction of damage into the target,
+## detonating later for fixed damage (status_controller handles the detonation).
+func _apply_judgment_on_hit(target: Node, dmg: int) -> void:
+	var passive: Dictionary = ClassData.class_passive(sprite_id)
+	if String(passive.get("kind", "")) != "judgment" or target == null:
+		return
+	var st: Node = target.get_node_or_null("Status")
+	if st == null or not st.has_method("record_judgment"):
+		return
+	var rec: int = int(round(float(dmg) * float(passive.get("record_frac", 0.35))))
+	var cap: int = int(round(float(attack) * float(passive.get("cap_mult", 3.0))))
+	st.record_judgment(rec, cap, float(passive.get("dur", 5.0)))
 
 func reason_output_mult() -> float:
 	return 1.0 + clampf((50.0 - reason) / 50.0, 0.0, 1.0) * 0.5

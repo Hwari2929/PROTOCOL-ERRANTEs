@@ -135,10 +135,11 @@ const CLASSES: Dictionary = {
 		"label": "아비터", "position": "돌격가", "tactical": "마이너",
 		"stats": {"max_hp": 175, "attack": 13, "attack_interval": 0.95, "attack_range": 80.0, "move_speed": 80.0, "armor": 7},
 		"base": {"attack_mult": 1.10, "max_hp_mult": 1.10},
+		"passive": {"kind": "judgment", "record_frac": 0.35, "cap_mult": 3.0, "dur": 5.0},
 		"subclasses": {
 			"punisher": {"label": "징벌자", "tiers": [{"armor_add": 5, "max_hp_mult": 1.15}, {"armor_add": 5}, {"attack_mult": 1.20, "armor_add": 4}]},
 			"judge": {"label": "심판자", "tiers": [{"attack_mult": 1.20}, {"attack_add": 6}, {"attack_mult": 1.25, "skill_power_mult": 1.15}]},
-			"recorder": {"label": "기록자", "tiers": [{"skill_power_mult": 1.20}, {"attack_add": 5, "skill_power_mult": 1.15}, {"skill_power_mult": 1.20}]},
+			"recorder": {"label": "기록자", "ability": {"id": "forced_record", "type": "general", "cd": 8.0}, "tiers": [{"skill_power_mult": 1.20}, {"attack_add": 5, "skill_power_mult": 1.15}, {"skill_power_mult": 1.20}]},
 		},
 	},
 	"pilot": {

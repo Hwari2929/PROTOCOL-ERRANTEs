@@ -7,6 +7,11 @@ var shield: int = 0
 var _effects: Dictionary = {}
 var _timer: float = 0.0
 
+# 아비터 심판(judgment): records a fraction of damage dealt to this unit, then
+# detonates the recorded total as fixed damage when it expires.
+var _judgment: int = 0
+var _judgment_time: float = 0.0
+
 func apply_status(id: String, stacks: int, duration: float, per_sec_per_stack: float, dtype: String) -> void:
 	var existing: Dictionary = _effects.get(id, { "stacks": 0, "time_left": 0.0, "per_sec": 0.0, "dtype": "", "max_stacks": 5 })
 	var max_stacks: int = int(existing.get("max_stacks", 5))
@@ -51,6 +56,32 @@ func tick(delta: float) -> void:
 	
 	for id in ids_to_remove:
 		_effects.erase(id)
+
+	# 심판(judgment): tick down and detonate the recorded total on expiry.
+	if _judgment > 0:
+		_judgment_time -= delta
+		if _judgment_time <= 0.0:
+			var rec: int = _judgment
+			_judgment = 0
+			_judgment_time = 0.0
+			var jowner := get_parent()
+			if jowner and jowner.has_method("take_damage"):
+				jowner.take_damage(rec)
+
+## Record judgment damage (capped); refresh duration. Records accumulate per hit.
+func record_judgment(amount: int, cap: int, dur: float) -> void:
+	_judgment = mini(_judgment + maxi(0, amount), maxi(0, cap))
+	_judgment_time = maxf(_judgment_time, dur)
+
+func judgment_record() -> int:
+	return _judgment
+
+## Consume the recorded total immediately (e.g. 징벌자 반사) and return it.
+func detonate_judgment() -> int:
+	var r: int = _judgment
+	_judgment = 0
+	_judgment_time = 0.0
+	return r
 
 func apply_bleed(stacks: int, dur: float) -> void:
 	apply_status("bleed", stacks, dur, 5.0, "physical")
