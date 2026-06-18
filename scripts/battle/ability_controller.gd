@@ -130,6 +130,11 @@ func _cast() -> void:
 		"soul_reap": _cast_soul_reap()
 		"tailwind": _cast_tailwind()
 		"parry": _cast_parry()
+		"phantom_play": _cast_phantom_play()
+		"soothe_souls": _cast_soothe_souls()
+		"lightning": _cast_lightning()
+		"ignite": _cast_ignite()
+		"decompose": _cast_decompose()
 		_: pass
 
 
@@ -138,6 +143,8 @@ func _cast_class() -> void:
 		"demolition": _cast_demolition()
 		"gravity_release": _cast_gravity_release()
 		"sword_wind": _cast_sword_wind()
+		"oracle_skill": _cast_oracle()
+		"psi_arrow": _cast_psi_arrow()
 		_: pass
 
 
@@ -201,6 +208,8 @@ func _summon() -> void:
 		stats = {"max_hp": 40, "attack": int(round(float(unit_owner.attack) * 0.5)), "attack_interval": 0.8, "attack_range": 220.0, "move_speed": 70.0, "armor": 0}
 	elif summon_id == "beast":
 		stats = {"max_hp": 90, "attack": int(round(float(unit_owner.attack) * 0.7)), "attack_interval": 0.9, "attack_range": 70.0, "move_speed": 95.0, "armor": 1}
+	elif summon_id == "wraith":
+		stats = {"max_hp": 30, "attack": int(round(float(unit_owner.attack) * 0.4)), "attack_interval": 1.0, "attack_range": 200.0, "move_speed": 80.0, "armor": 0}
 	else:
 		return
 	bf.spawn_minion(int(unit_owner.team), unit_owner.global_position + Vector2(0.0, 40.0), stats, "")
@@ -748,3 +757,96 @@ func _cast_parry() -> void:
 	if unit_owner.has_method("add_shield"):
 		unit_owner.add_shield(int(round(float(unit_owner.get("max_hp")) * 0.3)))
 	_spend_reason(5.0)
+
+
+# ── 오라클 (사이오닉) ──
+## 신탁 (class general): 최근접 적 정신 피해 + 강조 표시, 이성 -5. (예언 카드 미구현 시 기본 효과)
+func _cast_oracle() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _nearest_sorted()
+	if es.is_empty():
+		return
+	var t: Node = es[0]
+	t.take_damage(int(round(float(unit_owner.attack) * 1.5 * _sp())))
+	if t.has_method("apply_status"):
+		t.apply_status("highlight", 1, 6.0, 0.0, "none")
+	_spend_reason(5.0)
+
+## 환술사 환상극 (special): 환조종(기동 드론) 소환.
+func _cast_phantom_play() -> void:
+	if unit_owner == null:
+		return
+	var bf: Node = unit_owner.get_parent()
+	if bf != null:
+		bf = bf.get_parent()
+	if bf == null or not bf.has_method("spawn_minion"):
+		return
+	var stats: Dictionary = {"max_hp": int(round(float(unit_owner.attack) * 2.0)), "attack": int(round(float(unit_owner.attack) * 0.6 * _sp())), "attack_interval": 0.8, "attack_range": 160.0, "move_speed": 110.0, "armor": 1}
+	bf.spawn_minion(int(unit_owner.team), unit_owner.global_position + Vector2(20.0, 0.0), stats, "")
+
+## 영매사 혼 달래기 (general): 전체 아군 회복.
+func _cast_soothe_souls() -> void:
+	if unit_owner == null:
+		return
+	var amt: int = int(round(float(unit_owner.attack) * 1.0 * _sp()))
+	for a in _allies():
+		_heal(a, amt)
+
+
+# ── 미스틱 (사이오닉) ──
+## 사이오닉 화살 (class general): 무작위 단일 적 피해, 이성 -5.
+func _cast_psi_arrow() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _enemies()
+	if es.is_empty():
+		return
+	es.shuffle()
+	es[0].take_damage(int(round(float(unit_owner.attack) * 1.5 * _sp())))
+	_spend_reason(5.0)
+
+## 해방자 낙뢰 (general): 최고 방어도 적 전기 피해, 이성 +5.
+func _cast_lightning() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _enemies()
+	if es.is_empty():
+		return
+	var hi: Node = es[0]
+	for n in es:
+		if int(n.get("armor")) > int(hi.get("armor")):
+			hi = n
+	hi.take_damage(int(round(float(unit_owner.attack) * 2.0 * _sp())))
+	_spend_reason(-5.0)
+
+## 방화자 점화 (general): 광역 + 연소; 이미 연소 중이면 정산(추가 피해), 이성 -10.
+func _cast_ignite() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _enemies()
+	if es.is_empty():
+		return
+	es.shuffle()
+	var center: Node = es[0]
+	for n in _enemies():
+		if center.global_position.distance_to(n.global_position) <= unit_owner.attack_range:
+			n.take_damage(int(round(float(unit_owner.attack) * 0.25 * _sp())))
+			var st: Node = n.get_node_or_null("Status")
+			if st != null and st.has_method("has_effect") and st.has_effect("burn"):
+				n.take_damage(int(round(float(unit_owner.attack) * 1.0 * _sp())))
+			elif n.has_method("apply_status"):
+				n.apply_status("burn", 1, 10.0, maxf(1.0, float(int(round(float(unit_owner.attack) * 0.3)))), "physical")
+	_spend_reason(10.0)
+
+## 분해자 분해 (general): 최근접 적 피해 + 부식(취약 — 받는 피해 증가).
+func _cast_decompose() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _nearest_sorted()
+	if es.is_empty():
+		return
+	var t: Node = es[0]
+	t.take_damage(int(round(float(unit_owner.attack) * 1.5 * _sp())))
+	if t.has_method("apply_status"):
+		t.apply_status("vulnerable", 2, 8.0, 0.0, "none")

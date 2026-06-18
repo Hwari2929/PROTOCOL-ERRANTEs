@@ -192,20 +192,22 @@ const CLASSES: Dictionary = {
 		"label": "오라클", "position": "통솔자", "tactical": "사이오닉",
 		"stats": {"max_hp": 105, "attack": 11, "attack_interval": 0.95, "attack_range": 185.0, "move_speed": 62.0, "armor": 3},
 		"base": {"skill_power_mult": 1.15, "skill_cd_mult": 0.92},
+		"class_ability": {"id": "oracle_skill", "type": "general", "cd": 6.0},
 		"subclasses": {
 			"diviner": {"label": "점술사", "tiers": [{"skill_cd_mult": 0.85}, {"skill_power_mult": 1.20}, {"skill_cd_mult": 0.85, "skill_power_mult": 1.10}]},
-			"illusionist": {"label": "환술사", "tiers": [{"skill_power_mult": 1.25}, {"skill_power_mult": 1.15}, {"attack_mult": 1.15, "skill_power_mult": 1.15}]},
-			"medium": {"label": "영매사", "tiers": [{"attack_mult": 1.15, "skill_power_mult": 1.10}, {"attack_add": 5}, {"skill_power_mult": 1.20}]},
+			"illusionist": {"label": "환술사", "ability": {"id": "phantom_play", "type": "special", "charge_req": 4}, "tiers": [{"skill_power_mult": 1.25}, {"skill_power_mult": 1.15}, {"attack_mult": 1.15, "skill_power_mult": 1.15}]},
+			"medium": {"label": "영매사", "ability": {"id": "soothe_souls", "type": "general", "cd": 4.0, "summon": "wraith"}, "tiers": [{"attack_mult": 1.15, "skill_power_mult": 1.10}, {"attack_add": 5}, {"skill_power_mult": 1.20}]},
 		},
 	},
 	"mystic": {
 		"label": "미스틱", "position": "전문가", "tactical": "사이오닉",
 		"stats": {"max_hp": 100, "attack": 10, "attack_interval": 1.05, "attack_range": 175.0, "move_speed": 62.0, "armor": 2},
 		"base": {"skill_power_mult": 1.25, "skill_cd_mult": 0.92},
+		"class_ability": {"id": "psi_arrow", "type": "general", "cd": 6.0},
 		"subclasses": {
-			"liberator": {"label": "해방자", "tiers": [{"skill_power_mult": 1.25}, {"skill_cd_mult": 0.88}, {"skill_power_mult": 1.20}]},
-			"pyro": {"label": "방화자", "trait": {"on_hit": "burn"}, "tiers": [{"attack_mult": 1.15, "skill_power_mult": 1.15}, {"skill_power_mult": 1.15}, {"skill_power_mult": 1.20, "attack_add": 4}]},
-			"decomposer": {"label": "분해자", "tiers": [{"attack_mult": 1.20}, {"skill_power_mult": 1.15}, {"attack_mult": 1.20, "skill_power_mult": 1.10}]},
+			"liberator": {"label": "해방자", "ability": {"id": "lightning", "type": "general", "cd": 6.0}, "tiers": [{"skill_power_mult": 1.25}, {"skill_cd_mult": 0.88}, {"skill_power_mult": 1.20}]},
+			"pyro": {"label": "방화자", "ability": {"id": "ignite", "type": "general", "cd": 6.0}, "trait": {"on_hit": "burn"}, "tiers": [{"attack_mult": 1.15, "skill_power_mult": 1.15}, {"skill_power_mult": 1.15}, {"skill_power_mult": 1.20, "attack_add": 4}]},
+			"decomposer": {"label": "분해자", "ability": {"id": "decompose", "type": "general", "cd": 8.0}, "tiers": [{"attack_mult": 1.20}, {"skill_power_mult": 1.15}, {"attack_mult": 1.20, "skill_power_mult": 1.10}]},
 		},
 	},
 }
@@ -323,6 +325,13 @@ const ABILITY_INFO: Dictionary = {
 	"soul_reap": {"name": "영혼 베기", "target": "최근접 적", "range": "단일+검흔 정산"},
 	"tailwind": {"name": "순풍", "target": "자신", "range": "버프"},
 	"parry": {"name": "튕겨내기", "target": "자신", "range": "방어"},
+	"oracle_skill": {"name": "신탁", "target": "최근접 적", "range": "단일+강조"},
+	"phantom_play": {"name": "환상극", "target": "소환(환조종)", "range": "기동"},
+	"soothe_souls": {"name": "혼 달래기", "target": "전체 아군", "range": "회복"},
+	"psi_arrow": {"name": "사이오닉 화살", "target": "무작위 적", "range": "단일"},
+	"lightning": {"name": "낙뢰", "target": "최고방어 적", "range": "단일(전기)"},
+	"ignite": {"name": "점화", "target": "적 광역", "range": "사거리+연소"},
+	"decompose": {"name": "분해", "target": "최근접 적", "range": "단일+부식"},
 }
 
 
