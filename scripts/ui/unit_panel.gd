@@ -52,6 +52,8 @@ func refresh() -> void:
 
     var _units: Array = _battle_field.units_of(0)
     for _unit in _units:
+        if bool(_unit.get("is_special")):
+            continue   # 특수 기물/시설은 공명도 강화 대상이 아님
         var _hbox: HBoxContainer = HBoxContainer.new()
 
         var _label: Label = Label.new()

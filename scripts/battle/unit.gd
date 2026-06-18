@@ -15,8 +15,8 @@ const SKILL_CD: Dictionary = {
 
 ## Floating text shown when a class casts its skill.
 const SKILL_NAME: Dictionary = {
-	"nova": "NOVA", "volley": "VOLLEY", "fortify": "FORTIFY",
-	"rally": "RALLY", "mend": "MEND",
+	"nova": "광역 폭발", "volley": "연사", "fortify": "요새화",
+	"rally": "독려", "mend": "치유",
 }
 
 var team: int = 0
@@ -38,6 +38,9 @@ var res_points: int = 0
 
 var active: bool = false
 var benched: bool = false   # left in the 대기실 during prep → sits out the fight
+var is_special: bool = false   # 특수 기물/시설 — 공명도 체계 미적용 (일반 기물 한정)
+var facility_kind: String = ""     # "base" = 시설 기반(업그레이드 가능), else 업그레이드된 시설 종류
+var facility_owner_atk: int = 0    # 건설한 엔지니어의 공격력(시설 스탯 스케일링용)
 
 var skill_cd: float = 0.0
 var skill_timer: float = 0.0
@@ -152,6 +155,8 @@ func res_threshold_for(g: int) -> int:
 	return 9999
 
 func gain_resonance(amount: int) -> int:
+	if is_special:
+		return 0   # 특수 기물/시설은 공명도 체계에서 제외
 	var grades_gained: int = 0
 	res_points += amount
 	while res_grade < 5 and res_points >= res_threshold_for(res_grade + 1):
@@ -466,6 +471,15 @@ func _fx_host() -> Node2D:
 	if host != null and host.get_parent() is Node2D:
 		host = host.get_parent()
 	return host as Node2D
+
+## 기술 시전 시 한글 기술명을 띄운다 (ability_controller가 호출).
+func show_skill_text(txt: String) -> void:
+	if txt == "":
+		return
+	var host: Node2D = _fx_host()
+	if host != null:
+		DamageNumber.spawn_text(host, global_position + Vector2(0.0, -16.0), txt, Color(0.6, 1.0, 1.0))
+	_skill_pulse()
 
 func _skill_nova(dmg: int, radius: float) -> void:
 	for n in _units_on(false):

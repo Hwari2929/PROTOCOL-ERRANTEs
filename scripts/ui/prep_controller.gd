@@ -16,6 +16,8 @@ var _is_prep: bool = true
 
 var _info_bg: ColorRect
 var _info_rt: RichTextLabel
+var _upgrade_box: VBoxContainer
+var _based_engineers: Dictionary = {}   # engineer instance_id → base spawned
 
 
 func _ready() -> void:
@@ -25,6 +27,12 @@ func _ready() -> void:
 	_bf = get_node_or_null("../../BattleField")
 	if _bf != null and _bf.has_signal("phase_changed"):
 		_bf.phase_changed.connect(_on_phase_changed)
+	# Team change frees old team-0 units (incl. facility bases) → re-arrange + respawn bases.
+	if EventBus.has_signal("team_changed"):
+		EventBus.team_changed.connect(func(_ids):
+			_arranged = false
+			_based_engineers.clear()
+			call_deferred("_try_arrange"))
 	set_process(true)
 	call_deferred("_try_arrange")
 
@@ -49,6 +57,24 @@ func _build_info_panel() -> void:
 	_info_rt.visible = false
 	add_child(_info_rt)
 
+	# 시설 기반 업그레이드 버튼 패널 (시설 기반 선택 시 표시).
+	_upgrade_box = VBoxContainer.new()
+	_upgrade_box.position = Vector2(640.0, 116.0)
+	_upgrade_box.add_theme_constant_override("separation", 8)
+	_upgrade_box.visible = false
+	add_child(_upgrade_box)
+	var ttl := Label.new()
+	ttl.text = "시설 업그레이드"
+	ttl.add_theme_font_size_override("font_size", 18)
+	_upgrade_box.add_child(ttl)
+	for opt in [["turret", "감시 포탑"], ["wall", "방벽 방패"], ["tesla", "테슬라 포탑"]]:
+		var b := Button.new()
+		b.text = String(opt[1])
+		b.custom_minimum_size = Vector2(180.0, 44.0)
+		b.add_theme_font_size_override("font_size", 16)
+		b.pressed.connect(_on_upgrade_pressed.bind(String(opt[0])))
+		_upgrade_box.add_child(b)
+
 
 func _process(_dt: float) -> void:
 	# Keep buffs/stats live while a unit is selected (combat).
@@ -62,6 +88,8 @@ func _on_phase_changed(phase: int) -> void:
 		_try_arrange()
 	else:
 		_dragging = null
+		if _upgrade_box != null:
+			_upgrade_box.visible = false
 	queue_redraw()
 
 
@@ -75,7 +103,56 @@ func _try_arrange() -> void:
 		var u: Node = players[i]
 		u.set("benched", false)
 		u.global_position = Vector2(DEPLOY.position.x + 88.0 + float(i % 2) * 150.0, DEPLOY.position.y + 70.0 + float(i / 2) * 96.0)
+	# 엔지니어마다 시설 기반을 배치 (전투 전 업그레이드 가능).
+	for u in players:
+		if String(u.get("sprite_id")) == "engineer":
+			_spawn_facility_base(u)
 	_arranged = true
+	queue_redraw()
+
+
+func _spawn_facility_base(eng: Node) -> void:
+	if _bf == null or not _bf.has_method("spawn_minion"):
+		return
+	var eid: int = eng.get_instance_id()
+	if _based_engineers.has(eid):
+		return
+	_based_engineers[eid] = true
+	var a: int = int(eng.get("attack"))
+	var stats: Dictionary = {"max_hp": a * 4, "attack": 0, "attack_interval": 2.0, "attack_range": 0.0, "move_speed": 0.0, "armor": a * 2}
+	var pos: Vector2 = eng.global_position + Vector2(70.0, 0.0)
+	pos.x = clampf(pos.x, DEPLOY.position.x + 24.0, DEPLOY.position.x + DEPLOY.size.x - 24.0)
+	var base: Node = _bf.spawn_minion(0, pos, stats, "facility_base")
+	if base != null:
+		base.set("facility_kind", "base")
+		base.set("facility_owner_atk", a)
+
+
+func _on_upgrade_pressed(kind: String) -> void:
+	if _selected == null or not is_instance_valid(_selected):
+		return
+	if String(_selected.get("facility_kind")) == "":
+		return
+	var a: int = int(_selected.get("facility_owner_atk"))
+	if a <= 0:
+		a = 20
+	var stats: Dictionary = {}
+	if kind == "turret":
+		stats = {"max_hp": a * 6, "attack": a, "attack_interval": 1.0, "attack_range": 200.0, "armor": a * 2}
+	elif kind == "tesla":
+		stats = {"max_hp": a * 6, "attack": a, "attack_interval": 1.0, "attack_range": 160.0, "armor": a * 2}
+	elif kind == "wall":
+		stats = {"max_hp": a * 10, "attack": 0, "attack_interval": 2.0, "attack_range": 0.0, "armor": a * 4}
+	else:
+		return
+	for k in stats:
+		_selected.set(k, stats[k])
+	_selected.set("hp", int(stats["max_hp"]))
+	_selected.set("sprite_id", kind)
+	_selected.set("facility_kind", kind)
+	if _selected.has_method("refresh_sprite"):
+		_selected.refresh_sprite()
+	_update_info()
 	queue_redraw()
 
 
@@ -134,13 +211,36 @@ func _update_info() -> void:
 	var show := _selected != null and is_instance_valid(_selected)
 	_info_bg.visible = show
 	_info_rt.visible = show
+	if _upgrade_box != null:
+		_upgrade_box.visible = show and _is_prep and String(_selected.get("facility_kind")) == "base"
 	if not show:
 		return
 	var u := _selected
 	var cid: String = String(u.sprite_id)
 	var sid: String = String(u.subclass_id)
-	var cl: Dictionary = LoreData.class_lore(cid)
 	var spd: float = (1.0 / float(u.attack_interval)) if float(u.attack_interval) > 0.0 else 0.0
+
+	# 특수 기물/시설 — 공명도 체계 없이 이름 + 능력치 + 상태만 표시.
+	if bool(u.get("is_special")):
+		var names: Dictionary = {
+			"drone": "수색 드론", "beast": "동물 동료", "wraith": "망령",
+			"turret": "감시 포탑", "tesla": "테슬라 포탑", "wall": "방벽",
+			"phantom": "환조종", "facility_base": "시설 기반",
+		}
+		var kind_label: String = "시설" if cid in ["turret", "tesla", "wall", "facility_base"] else "특수 기물"
+		var st: Array = []
+		st.append("[b]%s[/b]  [color=#9fb0c8](%s)[/color]" % [String(names.get(cid, "기물")), kind_label])
+		st.append("내구도 %d/%d   공격력 %d" % [int(u.hp), int(u.max_hp), int(u.attack)])
+		st.append("공속 %.2f/s   사거리 %d   방어도 %d" % [spd, int(round(float(u.attack_range))), int(u.armor)])
+		st.append("[color=#9fb0c8]공명도 미적용[/color]")
+		if u.has_method("buff_summary"):
+			var bf2: Array = u.buff_summary()
+			if not bf2.is_empty():
+				st.append("[b]현재 상태[/b]\n[color=#8fd6a0]%s[/color]" % ", ".join(bf2))
+		_info_rt.text = "\n".join(st)
+		return
+
+	var cl: Dictionary = LoreData.class_lore(cid)
 	var t: Array = []
 	var sub_label: String = ClassData.subclass_label(cid, sid) if sid != "" else "서브클래스 미선택"
 	t.append("[b]%s · %s[/b]" % [ClassData.class_label(cid), sub_label])

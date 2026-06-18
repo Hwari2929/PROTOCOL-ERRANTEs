@@ -171,6 +171,7 @@ func spawn_minion(team: int, pos: Vector2, stats: Dictionary, sprite_id: String 
 	u.set("hp", int(stats.get("max_hp", 100)))
 	u.set("sprite_id", sprite_id)
 	u.set("body_scale", 0.7)
+	u.set("is_special", true)   # 특수 기물/시설 — 공명도 제외
 	if u.has_method("refresh_sprite"):
 		u.refresh_sprite()
 	u.position = pos

@@ -55,7 +55,8 @@ func on_combat_start() -> void:
 		_summon()
 	if class_ability_id != "" and class_skill_type == "special":
 		class_charge += 1 + maxi(0, _grade() - 1)
-	if facility_id != "":
+	# 엔지니어는 준비 단계에서 시설 기반을 배치/업그레이드하므로 전투 진입 자동 건설 제외.
+	if facility_id != "" and String(unit_owner.sprite_id) != "engineer":
 		_build_facility(facility_id)
 	if unit_owner != null:
 		unit_owner.set("skill_power", float(unit_owner.get("skill_power")) * 1.01)
@@ -85,20 +86,33 @@ func tick(delta: float) -> void:
 		_cd_timer -= delta
 		if _cd_timer <= 0.0:
 			_cast()
+			_announce(ability_id)
 			_cd_timer = cooldown
 	elif skill_type == "special" and ability_id != "":
 		if charge >= charge_req:
 			_cast()
+			_announce(ability_id)
 			charge = 0
 	if class_ability_id != "":
 		if class_skill_type == "general":
 			class_cd_timer -= delta
 			if class_cd_timer <= 0.0:
 				_cast_class()
+				_announce(class_ability_id)
 				class_cd_timer = class_cooldown
 		elif class_charge >= class_charge_req:
 			_cast_class()
+			_announce(class_ability_id)
 			class_charge = 0
+
+
+## 시전한 기술의 한글명을 유닛 위에 띄운다.
+func _announce(id: String) -> void:
+	if unit_owner == null or not unit_owner.has_method("show_skill_text"):
+		return
+	var nm: String = String(ClassData.ability_display(id).get("name", ""))
+	if nm != "":
+		unit_owner.show_skill_text(nm)
 
 
 func _cast() -> void:
@@ -212,7 +226,7 @@ func _summon() -> void:
 		stats = {"max_hp": 30, "attack": int(round(float(unit_owner.attack) * 0.4)), "attack_interval": 1.0, "attack_range": 200.0, "move_speed": 80.0, "armor": 0}
 	else:
 		return
-	bf.spawn_minion(int(unit_owner.team), unit_owner.global_position + Vector2(0.0, 40.0), stats, "")
+	bf.spawn_minion(int(unit_owner.team), unit_owner.global_position + Vector2(0.0, 40.0), stats, summon_id)
 
 
 func _tactical_power() -> float:
@@ -272,7 +286,7 @@ func _build_facility(kind: String) -> void:
 		stats = {"max_hp": a * 10, "attack": 0, "attack_interval": 2.0, "attack_range": 0.0, "move_speed": 0.0, "armor": a * 4}
 	else:
 		return
-	var f: Node = bf.spawn_minion(int(unit_owner.team), unit_owner.global_position + Vector2(0.0, -40.0), stats, "")
+	var f: Node = bf.spawn_minion(int(unit_owner.team), unit_owner.global_position + Vector2(0.0, -40.0), stats, kind)
 	if f != null:
 		_facilities.append(f)
 
@@ -783,7 +797,7 @@ func _cast_phantom_play() -> void:
 	if bf == null or not bf.has_method("spawn_minion"):
 		return
 	var stats: Dictionary = {"max_hp": int(round(float(unit_owner.attack) * 2.0)), "attack": int(round(float(unit_owner.attack) * 0.6 * _sp())), "attack_interval": 0.8, "attack_range": 160.0, "move_speed": 110.0, "armor": 1}
-	bf.spawn_minion(int(unit_owner.team), unit_owner.global_position + Vector2(20.0, 0.0), stats, "")
+	bf.spawn_minion(int(unit_owner.team), unit_owner.global_position + Vector2(20.0, 0.0), stats, "phantom")
 
 ## 영매사 혼 달래기 (general): 전체 아군 회복.
 func _cast_soothe_souls() -> void:
