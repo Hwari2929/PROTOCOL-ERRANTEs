@@ -343,6 +343,9 @@ func _passive_tick(delta: float) -> void:
 func take_damage(amount: int) -> void:
 	if ClassData.tactical_of(sprite_id) == "사이오닉":
 		amount = int(round(float(amount) * reason_taken_mult()))
+	# 강조 표시(highlight)/취약(vulnerable) 등 받는 피해 증가 디버프.
+	if _status != null and _status.has_method("damage_taken_mult"):
+		amount = int(round(float(amount) * _status.damage_taken_mult()))
 	if _status != null and _status.has_method("absorb"):
 		amount = _status.absorb(amount)
 	hp -= amount

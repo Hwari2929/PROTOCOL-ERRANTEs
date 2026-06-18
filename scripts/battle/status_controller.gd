@@ -75,6 +75,16 @@ func absorb(amount: int) -> int:
 		remaining -= absorbed
 	return remaining
 
+## 강조 표시(highlight)/표적(target) 등 받는 피해 증가 디버프 배율. 1.0 = 증가 없음.
+## highlight = +15% (마커의 회피/효과저항 감소를 전투 피해로 환산), vulnerable는 추가 누적.
+func damage_taken_mult() -> float:
+	var m: float = 1.0
+	if _effects.has("highlight"):
+		m += 0.15
+	if _effects.has("vulnerable"):
+		m += 0.20 * float(maxi(1, int(_effects["vulnerable"].get("stacks", 1))))
+	return m
+
 func has_effect(id: String) -> bool:
 	return _effects.has(id)
 

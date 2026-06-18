@@ -124,8 +124,9 @@ const CLASSES: Dictionary = {
 		"label": "스카웃", "position": "명사수", "tactical": "마이너",
 		"stats": {"max_hp": 95, "attack": 17, "attack_interval": 0.8, "attack_range": 250.0, "move_speed": 68.0, "armor": 2},
 		"base": {"attack_mult": 1.15, "attack_range_add": 30.0},
+		"passive": {"kind": "marker", "highlight_dur": 8.0},
 		"subclasses": {
-			"ranger_skirm": {"label": "유격수", "tiers": [{"attack_range_add": 50.0}, {"attack_mult": 1.20}, {"attack_add": 6, "move_speed_mult": 1.10}]},
+			"ranger_skirm": {"label": "유격수", "ability": {"id": "point_mark", "type": "special", "charge_req": 3}, "tiers": [{"attack_range_add": 50.0}, {"attack_mult": 1.20}, {"attack_add": 6, "move_speed_mult": 1.10}]},
 			"recon": {"label": "수색대", "tiers": [{"attack_mult": 1.20}, {"attack_add": 5}, {"attack_mult": 1.20, "attack_range_add": 30.0}]},
 			"sentry": {"label": "파수꾼", "tiers": [{"attack_interval_mult": 0.85}, {"attack_add": 5}, {"attack_interval_mult": 0.85, "attack_mult": 1.15}]},
 		},
