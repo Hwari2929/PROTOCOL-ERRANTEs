@@ -340,6 +340,29 @@ func _apply_judgment_on_hit(target: Node, dmg: int) -> void:
 	var cap: int = int(round(float(attack) * float(passive.get("cap_mult", 3.0))))
 	st.record_judgment(rec, cap, float(passive.get("dur", 5.0)))
 
+## 전투 중 이 기물이 보유한 버프/디버프/상태 요약 (정보 패널용).
+func buff_summary() -> Array:
+	var out: Array = []
+	if _status != null:
+		if _status.has_method("shield_amount") and int(_status.shield_amount()) > 0:
+			out.append("초과 체력 %d" % int(_status.shield_amount()))
+		for pair in [["bleed", "출혈"], ["burn", "연소"], ["poison", "중독"], ["highlight", "강조 표시"], ["vulnerable", "취약"]]:
+			if _status.has_method("has_effect") and _status.has_effect(pair[0]):
+				var st: int = int(_status.stacks_of(pair[0])) if _status.has_method("stacks_of") else 0
+				out.append("%s%s" % [pair[1], (" %d중첩" % st) if st > 1 else ""])
+		if _status.has_method("judgment_record") and int(_status.judgment_record()) > 0:
+			out.append("심판 기록 %d" % int(_status.judgment_record()))
+	if is_stunned():
+		out.append("기절")
+	if _is_suppression() and _supp_stacks > 0:
+		out.append("제압 사격 %d중첩" % _supp_stacks)
+	if ClassData.tactical_of(sprite_id) == "스페셜" and _special_ramp > 0.0:
+		out.append("가속 +%d%%" % int(round(_special_ramp * 100.0)))
+	if ClassData.tactical_of(sprite_id) == "사이오닉":
+		out.append("이성 %d" % int(round(reason)))
+	return out
+
+
 func reason_output_mult() -> float:
 	return 1.0 + clampf((50.0 - reason) / 50.0, 0.0, 1.0) * 0.5
 
