@@ -49,8 +49,8 @@ const CLASSES: Dictionary = {
 		"stats": {"max_hp": 190, "attack": 11, "attack_interval": 1.0, "attack_range": 70.0, "move_speed": 85.0, "armor": 9},
 		"base": {"max_hp_mult": 1.15, "armor_add": 3},
 		"subclasses": {
-			"guardian": {"label": "수호자", "tiers": [{"armor_add": 5, "max_hp_mult": 1.15}, {"armor_add": 6}, {"max_hp_mult": 1.20, "skill_cd_mult": 0.85}]},
-			"charger": {"label": "돌격자", "trait": {"on_skill": "shield"}, "tiers": [{"move_speed_mult": 1.25, "attack_mult": 1.15}, {"attack_add": 5}, {"attack_mult": 1.25, "skill_cd_mult": 0.85}]},
+			"guardian": {"label": "수호자", "ability": {"id": "rally_flag", "type": "special", "charge_req": 4}, "tiers": [{"armor_add": 5, "max_hp_mult": 1.15}, {"armor_add": 6}, {"max_hp_mult": 1.20, "skill_cd_mult": 0.85}]},
+			"charger": {"label": "돌격자", "trait": {"on_skill": "shield"}, "ability": {"id": "charge_dash", "type": "special", "charge_req": 3}, "tiers": [{"move_speed_mult": 1.25, "attack_mult": 1.15}, {"attack_add": 5}, {"attack_mult": 1.25, "skill_cd_mult": 0.85}]},
 			"escort": {"label": "엄호자", "tiers": [{"max_hp_mult": 1.15, "armor_add": 4}, {"max_hp_mult": 1.15}, {"armor_add": 6, "skill_cd_mult": 0.85}]},
 		},
 	},
