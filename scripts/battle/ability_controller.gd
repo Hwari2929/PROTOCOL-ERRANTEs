@@ -107,6 +107,7 @@ func _cast() -> void:
 		"static_format": _cast_static_format()
 		"repair_facility": _cast_repair_facility()
 		"point_mark": _cast_point_mark()
+		"forced_record": _cast_forced_record()
 		_: pass
 
 
@@ -521,3 +522,19 @@ func _cast_static_format() -> void:
 				if status_node.has_method("add_shield"):
 					status_node.add_shield(-shield_val)
 				n.take_damage(bonus)
+
+
+# ── 기록자 강제 필사 ──
+func _cast_forced_record() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _nearest_sorted()
+	if es.is_empty():
+		return
+	var t: Node = es[0]
+	var st: Node = t.get_node_or_null("Status")
+	var fixed_dmg: int = maxi(1, int(round(float(unit_owner.armor) * 0.5)))
+	t.take_damage(fixed_dmg)
+	if st != null and st.has_method("record_judgment"):
+		var cap: int = int(round(float(unit_owner.attack) * 3.0))
+		st.record_judgment(int(round(float(cap) * 0.30)), cap, 5.0)
