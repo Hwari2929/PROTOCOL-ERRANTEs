@@ -111,6 +111,9 @@ func _cast() -> void:
 		"air_bombard": _cast_air_bombard()
 		"relief_drop": _cast_relief_drop()
 		"lead_drop": _cast_lead_drop()
+		"assault": _cast_assault()
+		"sec_breach": _cast_sec_breach()
+		"smoke_veil": _cast_smoke_veil()
 		_: pass
 
 
@@ -572,7 +575,7 @@ func _cast_air_bombard() -> void:
 	if es.is_empty():
 		return
 	es.shuffle()
-	var dmg: int = maxi(1, int(round(float(unit_owner.attack) * 0.5 * tac * _sp())))
+	var dmg: int = maxi(1, int(round(float(unit_owner.attack) * 0.5 * tac * _sp()) ))
 	var picked: int = 0
 	for center_unit in es:
 		if picked >= n_targets:
@@ -589,8 +592,8 @@ func _cast_relief_drop() -> void:
 	var tac2: float = _tactical_power()
 	var n2: int = 2 + _air_superiority()
 	var al: Array = _allies()
-	al.sort_custom(func(a, b): return (float(a.get("hp")) / float(a.get("max_hp"))) < (float(b.get("hp")) / float(b.get("max_hp"))))
-	var heal: int = maxi(1, int(round(float(unit_owner.attack) * 1.0 * tac2 * _sp())))
+	al.sort_custom(func(a, b): return (float(a.get("hp")) / float(a.get("max_hp"))) < (float(b.get("hp")) / float(b.get("max_hp"))) )
+	var heal: int = maxi(1, int(round(float(unit_owner.attack) * 1.0 * tac2 * _sp()) ))
 	var h: int = 0
 	for a in al:
 		if h >= n2:
@@ -604,3 +607,36 @@ func _cast_lead_drop() -> void:
 		return
 	for a in _allies():
 		a.set("attack_interval", maxf(0.2, float(a.get("attack_interval")) * 0.80))
+
+
+# ── 추가 고스트 서브캐스트 ──
+func _cast_assault() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _nearest_sorted()
+	if es.is_empty():
+		return
+	var t: Node = es[0]
+	var dir_to: Vector2 = (t.global_position - unit_owner.global_position).normalized()
+	unit_owner.global_position = t.global_position - dir_to * 50.0
+	var dmg: int = int(round(float(unit_owner.attack) * 2.5 * _sp() + float(t.get("max_hp")) * 0.10))
+	t.take_damage(dmg)
+
+func _cast_sec_breach() -> void:
+	if unit_owner == null:
+		return
+	var es2: Array = _nearest_sorted()
+	if es2.is_empty():
+		return
+	var t2: Node = es2[0]
+	if t2.has_method("apply_status"):
+		t2.apply_status("vulnerable", 3, 6.0, 0.0, "none")
+	t2.take_damage(maxi(1, int(round(float(unit_owner.attack) * 1.5 * _sp()) )))
+
+func _cast_smoke_veil() -> void:
+	if unit_owner == null:
+		return
+	var heal: int = maxi(1, int(round(float(unit_owner.attack) * 0.25 * _sp()) ))
+	for a in _allies():
+		if unit_owner.global_position.distance_to(a.global_position) <= unit_owner.attack_range * 0.5:
+			_heal(a, heal)
