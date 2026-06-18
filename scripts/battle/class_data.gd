@@ -147,9 +147,9 @@ const CLASSES: Dictionary = {
 		"stats": {"max_hp": 105, "attack": 12, "attack_interval": 0.9, "attack_range": 195.0, "move_speed": 66.0, "armor": 3},
 		"base": {"attack_range_add": 30.0, "skill_power_mult": 1.10},
 		"subclasses": {
-			"controller": {"label": "통제관", "tiers": [{"skill_power_mult": 1.25, "attack_range_add": 30.0}, {"skill_power_mult": 1.15}, {"attack_mult": 1.15, "skill_power_mult": 1.15}]},
-			"quartermaster": {"label": "보급관", "tiers": [{"skill_cd_mult": 0.85, "max_hp_mult": 1.10}, {"skill_cd_mult": 0.88}, {"skill_power_mult": 1.20}]},
-			"squad_lead": {"label": "지휘관", "tiers": [{"attack_add": 5, "max_hp_mult": 1.10}, {"attack_mult": 1.15}, {"attack_add": 6, "armor_add": 3}]},
+			"controller": {"label": "통제관", "ability": {"id": "air_bombard", "type": "general", "cd": 10.0}, "tiers": [{"skill_power_mult": 1.25, "attack_range_add": 30.0}, {"skill_power_mult": 1.15}, {"attack_mult": 1.15, "skill_power_mult": 1.15}]},
+			"quartermaster": {"label": "보급관", "ability": {"id": "relief_drop", "type": "general", "cd": 8.0}, "tiers": [{"skill_cd_mult": 0.85, "max_hp_mult": 1.10}, {"skill_cd_mult": 0.88}, {"skill_power_mult": 1.20}]},
+			"squad_lead": {"label": "지휘관", "ability": {"id": "lead_drop", "type": "general", "cd": 12.0}, "tiers": [{"attack_add": 5, "max_hp_mult": 1.10}, {"attack_mult": 1.15}, {"attack_add": 6, "armor_add": 3}]},
 		},
 	},
 	"ghost": {

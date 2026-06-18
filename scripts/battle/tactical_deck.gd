@@ -22,6 +22,10 @@ var assets: int = 0
 var tactical_power_mult: float = 1.0
 var _pinned: Array = []   # card ids kept in hand across nodes (고정 / pin)
 
+# 파일럿 제공권(air superiority) economy: +1 per 파일럿 each node.
+# 고유 '하늘의 공포': every point SPENT raises 전술 위력 by 3%p this quest.
+var air_sup: int = 0
+
 var _has_commander: bool = false
 var _built: bool = false
 var _bonus_draw: int = 0
@@ -36,20 +40,27 @@ func _ready() -> void:
 func _on_round_started(_round_number: int) -> void:
 	tp += 1
 	tp_changed.emit(tp)
-	# 사이퍼 자산 income: +1 per 사이퍼 on the team, each node.
-	var ciphers: int = _cipher_count()
+	# 사이퍼 자산 / 파일럿 제공권 income: +1 per matching class on the team, each node.
+	var ciphers: int = _count_class("cipher")
 	if ciphers > 0:
 		assets += ciphers
 		assets_changed.emit(assets)
+	var pilots: int = _count_class("pilot")
+	if pilots > 0:
+		air_sup += pilots
 	refresh_for_team(_current_team_ids())
 
 
-func _cipher_count() -> int:
+func _count_class(class_id: String) -> int:
 	var n: int = 0
 	for id in _current_team_ids():
-		if id == "cipher":
+		if id == class_id:
 			n += 1
 	return n
+
+
+func _cipher_count() -> int:
+	return _count_class("cipher")
 
 
 func _on_team_changed(ids: Array) -> void:
@@ -163,6 +174,24 @@ func pin_card(index: int) -> bool:
 
 func current_assets() -> int:
 	return assets
+
+
+## 파일럿 제공권 spend: each point raises 전술 위력 by 3%p (고유 하늘의 공포).
+func spend_air_sup(n: int) -> bool:
+	if n <= 0 or air_sup < n:
+		return false
+	air_sup -= n
+	tactical_power_mult += 0.03 * float(n)
+	return true
+
+
+func gain_air_sup(n: int) -> void:
+	if n > 0:
+		air_sup += n
+
+
+func air_superiority() -> int:
+	return air_sup
 
 
 func tactical_power() -> float:
