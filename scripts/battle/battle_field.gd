@@ -157,6 +157,25 @@ func _make_unit(team: int, cfg: Dictionary, sprite_id: String = "", subclass_id:
 	return u
 
 
+## Spawn a 특수 기물 (summoned ally/enemy unit) into the $Units container.
+## Applies basic stats, sets hp, sprite_id, body_scale ~0.7, and position.
+## Does NOT apply class inhesion/weapon/ability to minions (they are simple).
+func spawn_minion(team: int, pos: Vector2, stats: Dictionary, sprite_id: String = "") -> Node2D:
+	var u: Node2D = UNIT.instantiate()
+	units.add_child(u)
+	if u.has_method("setup"):
+		u.setup(team)
+	for key in stats:
+		u.set(key, stats[key])
+	u.set("hp", int(stats.get("max_hp", 100)))
+	u.set("sprite_id", sprite_id)
+	u.set("body_scale", 0.7)
+	if u.has_method("refresh_sprite"):
+		u.refresh_sprite()
+	u.position = pos
+	return u
+
+
 ## Unlock subclass inhesion on all player units up to the tier for `grade`
 ## (grade 2 -> 고유1, 3 -> 고유2, 4 -> 고유3).
 func apply_inhesion_for_grade(grade: int) -> void:

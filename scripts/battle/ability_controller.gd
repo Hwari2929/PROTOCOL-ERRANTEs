@@ -10,6 +10,7 @@ var charge: int = 0
 var charge_req: int = 0
 var cooldown: float = 0.0
 var _cd_timer: float = 0.0
+var summon_id: String = ""
 
 func _ready() -> void:
 	unit_owner = get_parent()
@@ -18,6 +19,7 @@ func configure() -> void:
 	var meta: Dictionary = ClassData.subclass_ability(unit_owner.sprite_id, unit_owner.subclass_id)
 	ability_id = String(meta.get("id", ""))
 	skill_type = String(meta.get("type", ""))
+	summon_id = String(meta.get("summon", ""))
 	if skill_type == "special":
 		charge_req = int(meta.get("charge_req", 3))
 	elif skill_type == "general":
@@ -27,6 +29,32 @@ func configure() -> void:
 func on_combat_start() -> void:
 	if skill_type == "special":
 		gain_charge(1)
+	
+	if summon_id != "":
+		var parent_node: Node = unit_owner.get_parent()
+		if parent_node != null:
+			var bf: Node = parent_node.get_parent()
+			if bf != null and bf.has_method("spawn_minion"):
+				var stats: Dictionary = {}
+				if summon_id == "drone":
+					stats = {
+						"max_hp": 40,
+						"attack": int(round(float(unit_owner.attack) * 0.5)),
+						"attack_interval": 0.8,
+						"attack_range": 220.0,
+						"move_speed": 70.0,
+						"armor": 0
+					}
+				elif summon_id == "beast":
+					stats = {
+						"max_hp": 90,
+						"attack": int(round(float(unit_owner.attack) * 0.7)),
+						"attack_interval": 0.9,
+						"attack_range": 70.0,
+						"move_speed": 95.0,
+						"armor": 1
+					}
+				bf.spawn_minion(unit_owner.team, unit_owner.global_position + Vector2(0, 40), stats, "")
 
 func gain_charge(n: int) -> void:
 	if skill_type == "special":
@@ -62,6 +90,8 @@ func _cast() -> void:
 			_cast_charge_dash()
 		"rally_flag":
 			_cast_rally_flag()
+		"bombardment":
+			_cast_bombardment()
 		_:
 			pass
 
@@ -173,6 +203,30 @@ func _cast_rally_flag() -> void:
 			if ally.has_method("add_shield"):
 				var shield_amt: int = int(round(float(ally.max_hp) * 0.10))
 				ally.add_shield(shield_amt)
+
+## 사령관 특수 5pt 지정 포격: LOWEST-hp 적을 표적으로 150px 반경 물리 피해 + 40% 기절.
+func _cast_bombardment() -> void:
+	if unit_owner == null:
+		return
+	var enemies: Array = _enemies()
+	if enemies.is_empty():
+		return
+	
+	var target: Node = enemies[0]
+	for e in enemies:
+		if e.hp < target.hp:
+			target = e
+	
+	var aoe_center: Vector2 = target.global_position
+	var aoe_radius: float = 150.0
+	var base_dmg: int = int(round(float(unit_owner.attack) * 2.0))
+	
+	for e in enemies:
+		if aoe_center.distance_to(e.global_position) <= aoe_radius:
+			e.take_damage(base_dmg)
+			if randf() < 0.4:
+				if e.has_method("apply_stun"):
+					e.apply_stun(2.0)
 
 func has_ability() -> bool:
 	return ability_id != ""
