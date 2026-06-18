@@ -113,9 +113,9 @@ const CLASSES: Dictionary = {
 		"stats": {"max_hp": 115, "attack": 9, "attack_interval": 1.1, "attack_range": 150.0, "move_speed": 58.0, "armor": 5},
 		"base": {"max_hp_mult": 1.15, "armor_add": 3},
 		"subclasses": {
-			"supervisor": {"label": "감독관", "tiers": [{"attack_add": 6, "attack_range_add": 40.0}, {"attack_mult": 1.15}, {"skill_power_mult": 1.20}]},
-			"fortifier": {"label": "축성가", "tiers": [{"armor_add": 6, "max_hp_mult": 1.15}, {"armor_add": 6}, {"max_hp_mult": 1.20}]},
-			"technician": {"label": "기술사", "tiers": [{"skill_cd_mult": 0.85, "attack_add": 4}, {"attack_interval_mult": 0.88}, {"skill_power_mult": 1.20}]},
+			"supervisor": {"label": "감독관", "ability": {"id": "repair_facility", "type": "general", "cd": 8.0, "facility": "turret"}, "tiers": [{"attack_add": 6, "attack_range_add": 40.0}, {"attack_mult": 1.15}, {"skill_power_mult": 1.20}]},
+			"fortifier": {"label": "축성가", "ability": {"id": "repair_facility", "type": "general", "cd": 8.0, "facility": "wall"}, "tiers": [{"armor_add": 6, "max_hp_mult": 1.15}, {"armor_add": 6}, {"max_hp_mult": 1.20}]},
+			"technician": {"label": "기술사", "ability": {"id": "repair_facility", "type": "general", "cd": 8.0, "facility": "tesla", "overcharge": true}, "tiers": [{"skill_cd_mult": 0.85, "attack_add": 4}, {"attack_interval_mult": 0.88}, {"skill_power_mult": 1.20}]},
 		},
 	},
 

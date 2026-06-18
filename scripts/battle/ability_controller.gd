@@ -14,6 +14,9 @@ var _cd_timer: float = 0.0
 var class_ability_id: String = ""
 var class_charge: int = 0
 var class_charge_req: int = 0
+var facility_id: String = ""
+var overcharge: bool = false
+var _facilities: Array = []
 
 
 func _ready() -> void:
@@ -35,6 +38,8 @@ func configure() -> void:
 	var cmeta: Dictionary = ClassData.class_ability(unit_owner.sprite_id)
 	class_ability_id = String(cmeta.get("id", ""))
 	class_charge_req = int(cmeta.get("charge_req", 4))
+	facility_id = String(meta.get("facility", ""))
+	overcharge = bool(meta.get("overcharge", false))
 
 
 func on_combat_start() -> void:
@@ -44,6 +49,10 @@ func on_combat_start() -> void:
 		_summon()
 	if class_ability_id != "":
 		class_charge += 1 + maxi(0, _grade() - 1)
+	if facility_id != "":
+		_build_facility(facility_id)
+	if unit_owner != null:
+		unit_owner.set("skill_power", float(unit_owner.get("skill_power")) * 1.01)
 
 
 func gain_charge(n: int) -> void:
@@ -94,6 +103,7 @@ func _cast() -> void:
 		"fallout_spray": _cast_fallout_spray()
 		"dynamic_net": _cast_dynamic_net()
 		"static_format": _cast_static_format()
+		"repair_facility": _cast_repair_facility()
 		_: pass
 
 
@@ -185,6 +195,51 @@ func _tactical_power() -> float:
 	if td != null and td.has_method("tactical_power"):
 		return float(td.tactical_power())
 	return 1.0
+
+
+func _build_facility(kind: String) -> void:
+	if unit_owner == null:
+		return
+	var bf: Node = unit_owner.get_parent()
+	if bf != null:
+		bf = bf.get_parent()
+	if bf == null or not bf.has_method("spawn_minion"):
+		return
+	var a: int = int(unit_owner.attack)
+	var sp: float = _sp()
+	var stats: Dictionary = {}
+	if kind == "turret":
+		stats = {"max_hp": a * 6, "attack": int(round(float(a) * 1.0 * sp)), "attack_interval": 1.0, "attack_range": 200.0, "move_speed": 0.0, "armor": a * 2}
+	elif kind == "tesla":
+		stats = {"max_hp": a * 6, "attack": int(round(float(a) * 1.0 * sp)), "attack_interval": 1.0, "attack_range": 160.0, "move_speed": 0.0, "armor": a * 2}
+	elif kind == "wall":
+		stats = {"max_hp": a * 10, "attack": 0, "attack_interval": 2.0, "attack_range": 0.0, "move_speed": 0.0, "armor": a * 4}
+	else:
+		return
+	var f: Node = bf.spawn_minion(int(unit_owner.team), unit_owner.global_position + Vector2(0.0, -40.0), stats, "")
+	if f != null:
+		_facilities.append(f)
+
+
+func _cast_repair_facility() -> void:
+	if unit_owner == null:
+		return
+	var valid: Array = []
+	for f in _facilities:
+		if is_instance_valid(f) and int(f.get("hp")) > 0:
+			valid.append(f)
+	_facilities = valid
+	if _facilities.is_empty():
+		return
+	var target: Node = _facilities[0]
+	for f in _facilities:
+		if int(f.get("hp")) < int(target.get("hp")):
+			target = f
+	var amt: int = int(round(float(unit_owner.attack) * 1.5 * _sp()))
+	_heal(target, amt)
+	if overcharge:
+		target.set("attack_interval", maxf(0.2, float(target.get("attack_interval")) * 0.8))
+		_heal(target, int(round(float(target.get("max_hp")) * 0.025)))
 
 
 # ── 레인저 ──
@@ -397,17 +452,17 @@ func _cast_dynamic_net() -> void:
 				target = a
 				min_hp_ratio = hp_ratio
 	if target != null:
-		_heal(target, int(round(float(unit_owner.attack) * 2.0 * _sp())))
+		_heal(target, int(round(float(unit_owner.attack) * 2.0 * _sp()) ))
 		if target.has_method("add_shield"):
-			target.add_shield(int(round(float(unit_owner.attack) * 1.0 * _sp())))
+			target.add_shield(int(round(float(unit_owner.attack) * 1.0 * _sp()) ))
 
 ## 분석자 정적 포매팅: 전체 적 전기 피해 + 실드 제거 및 보너스 피해
 func _cast_static_format() -> void:
 	if unit_owner == null:
 		return
 	var tac: float = _tactical_power()
-	var base: int = maxi(1, int(round(float(unit_owner.attack) * 0.30 * tac * _sp())))
-	var bonus: int = maxi(1, int(round(float(unit_owner.attack) * 0.15 * tac * _sp())))
+	var base: int = maxi(1, int(round(float(unit_owner.attack) * 0.30 * tac * _sp()) ))
+	var bonus: int = maxi(1, int(round(float(unit_owner.attack) * 0.15 * tac * _sp()) ))
 	for n in _enemies():
 		n.take_damage(base)
 		var status_node: Node = n.get_node_or_null("Status")
