@@ -116,6 +116,14 @@ func damage_taken_mult() -> float:
 		m += 0.20 * float(maxi(1, int(_effects["vulnerable"].get("stacks", 1))))
 	return m
 
+## Consume an effect's stacks (e.g. 검흔 정산): return current stacks and remove it.
+func consume_effect(id: String) -> int:
+	if not _effects.has(id):
+		return 0
+	var n: int = int(_effects[id].get("stacks", 0))
+	_effects.erase(id)
+	return n
+
 func has_effect(id: String) -> bool:
 	return _effects.has(id)
 

@@ -127,6 +127,9 @@ func _cast() -> void:
 		"sec_breach": _cast_sec_breach()
 		"smoke_veil": _cast_smoke_veil()
 		"field_collapse": _cast_field_collapse()
+		"soul_reap": _cast_soul_reap()
+		"tailwind": _cast_tailwind()
+		"parry": _cast_parry()
 		_: pass
 
 
@@ -134,6 +137,7 @@ func _cast_class() -> void:
 	match class_ability_id:
 		"demolition": _cast_demolition()
 		"gravity_release": _cast_gravity_release()
+		"sword_wind": _cast_sword_wind()
 		_: pass
 
 
@@ -691,3 +695,56 @@ func _cast_field_collapse() -> void:
 		if hi.global_position.distance_to(n.global_position) <= radius:
 			n.take_damage(int(round(float(unit_owner.attack) * 2.0 * _sp() + float(n.get("max_hp")) * 0.15)))
 	_spend_reason(10.0)
+
+
+# ── 템플러 (사이오닉) ──
+## 검흔(swordmark) 정산: 중첩 소모 → 중첩 당 타격 25% + 이성 소모. 정산량 반환.
+func _settle_swordmark(target: Node) -> int:
+	var st: Node = target.get_node_or_null("Status")
+	if st == null or not st.has_method("consume_effect"):
+		return 0
+	var n: int = int(st.consume_effect("swordmark"))
+	if n > 0:
+		target.take_damage(int(round(float(unit_owner.attack) * 0.25 * float(n))))
+		_spend_reason(float(n))
+	return n
+
+## 검풍 (class general): 직선 75% AoE attack×3 + 검흔 4중첩, 이성 -5.
+func _cast_sword_wind() -> void:
+	if unit_owner == null:
+		return
+	for n in _enemies():
+		if unit_owner.global_position.distance_to(n.global_position) <= unit_owner.attack_range * 0.75:
+			n.take_damage(int(round(float(unit_owner.attack) * 3.0 * _sp())))
+			if n.has_method("apply_status"):
+				n.apply_status("swordmark", 4, 8.0, 0.0, "none")
+	_spend_reason(5.0)
+
+## 수확자 영혼 베기: 최근접 적 attack×3 정신 + 검흔 전부 정산 + 흡혈.
+func _cast_soul_reap() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _nearest_sorted()
+	if es.is_empty():
+		return
+	var t: Node = es[0]
+	var dmg: int = int(round(float(unit_owner.attack) * 3.0 * _sp()))
+	t.take_damage(dmg)
+	_settle_swordmark(t)
+	var heal: int = int(round(float(dmg) * 0.5))
+	unit_owner.set("hp", mini(int(unit_owner.get("max_hp")), int(unit_owner.get("hp")) + heal))
+
+## 방랑자 순풍: 자신 타격/이동 속도 강화.
+func _cast_tailwind() -> void:
+	if unit_owner == null:
+		return
+	unit_owner.set("attack_interval", maxf(0.2, float(unit_owner.get("attack_interval")) * 0.8))
+	unit_owner.set("move_speed", float(unit_owner.get("move_speed")) * 1.2)
+
+## 저항자 튕겨내기: 집중 방어(초과 체력) + 이성 -5.
+func _cast_parry() -> void:
+	if unit_owner == null:
+		return
+	if unit_owner.has_method("add_shield"):
+		unit_owner.add_shield(int(round(float(unit_owner.get("max_hp")) * 0.3)))
+	_spend_reason(5.0)

@@ -180,10 +180,12 @@ const CLASSES: Dictionary = {
 		"label": "템플러", "position": "돌격가", "tactical": "사이오닉",
 		"stats": {"max_hp": 170, "attack": 14, "attack_interval": 0.9, "attack_range": 80.0, "move_speed": 82.0, "armor": 6},
 		"base": {"attack_mult": 1.15, "attack_interval_mult": 0.95},
+		"class_ability": {"id": "sword_wind", "type": "general", "cd": 8.0},
+		"passive": {"kind": "swordmark"},
 		"subclasses": {
-			"wanderer": {"label": "방랑자", "tiers": [{"move_speed_mult": 1.20, "attack_mult": 1.15}, {"attack_add": 6}, {"attack_interval_mult": 0.88}]},
-			"reaper": {"label": "수확자", "trait": {"on_hit": "bleed"}, "tiers": [{"attack_mult": 1.20}, {"attack_add": 6}, {"attack_mult": 1.25, "skill_power_mult": 1.15}]},
-			"resistor": {"label": "저항자", "tiers": [{"armor_add": 5, "max_hp_mult": 1.15}, {"armor_add": 5}, {"attack_mult": 1.15, "armor_add": 4}]},
+			"wanderer": {"label": "방랑자", "ability": {"id": "tailwind", "type": "general", "cd": 7.0}, "tiers": [{"move_speed_mult": 1.20, "attack_mult": 1.15}, {"attack_add": 6}, {"attack_interval_mult": 0.88}]},
+			"reaper": {"label": "수확자", "ability": {"id": "soul_reap", "type": "general", "cd": 5.0}, "trait": {"on_hit": "bleed"}, "tiers": [{"attack_mult": 1.20}, {"attack_add": 6}, {"attack_mult": 1.25, "skill_power_mult": 1.15}]},
+			"resistor": {"label": "저항자", "ability": {"id": "parry", "type": "special", "charge_req": 3}, "tiers": [{"armor_add": 5, "max_hp_mult": 1.15}, {"armor_add": 5}, {"attack_mult": 1.15, "armor_add": 4}]},
 		},
 	},
 	"oracle": {
@@ -317,6 +319,10 @@ const ABILITY_INFO: Dictionary = {
 	"smoke_veil": {"name": "위장 연막탄", "target": "주변 아군", "range": "사거리×0.5"},
 	"gravity_release": {"name": "인력 방출", "target": "최근접 적", "range": "단일+밀쳐냄"},
 	"field_collapse": {"name": "역장 붕괴", "target": "적 광역(최대체력)", "range": "기술×1.5"},
+	"sword_wind": {"name": "검풍", "target": "직선 적 광역", "range": "사거리×0.75"},
+	"soul_reap": {"name": "영혼 베기", "target": "최근접 적", "range": "단일+검흔 정산"},
+	"tailwind": {"name": "순풍", "target": "자신", "range": "버프"},
+	"parry": {"name": "튕겨내기", "target": "자신", "range": "방어"},
 }
 
 

@@ -254,6 +254,9 @@ func _physics_process(delta: float) -> void:
 				dmg = int(round(float(dmg) * crit_mult))
 				if _ability != null:
 					_ability.gain_charge(1)
+					# 템플러 고유 소리없는 자상: 타격 치명타가 검흔(swordmark)을 중첩.
+					if String(ClassData.class_passive(sprite_id).get("kind", "")) == "swordmark" and target.has_method("apply_status"):
+						target.apply_status("swordmark", 1, 8.0, 0.0, "none")
 			target.take_damage(dmg)
 			_apply_on_hit(target)
 			_apply_suppression_hit(target, dmg)
