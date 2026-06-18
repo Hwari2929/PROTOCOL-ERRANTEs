@@ -12,8 +12,11 @@ var charge_req: int = 0
 var cooldown: float = 0.0
 var _cd_timer: float = 0.0
 var class_ability_id: String = ""
+var class_skill_type: String = "special"   # class-level skill: special(charge) or general(cd)
 var class_charge: int = 0
 var class_charge_req: int = 0
+var class_cooldown: float = 0.0
+var class_cd_timer: float = 0.0
 var facility_id: String = ""
 var overcharge: bool = false
 var _facilities: Array = []
@@ -37,7 +40,10 @@ func configure() -> void:
 		_cd_timer = cooldown
 	var cmeta: Dictionary = ClassData.class_ability(unit_owner.sprite_id)
 	class_ability_id = String(cmeta.get("id", ""))
+	class_skill_type = String(cmeta.get("type", "special"))
 	class_charge_req = int(cmeta.get("charge_req", 4))
+	class_cooldown = float(cmeta.get("cd", 6.0))
+	class_cd_timer = class_cooldown
 	facility_id = String(meta.get("facility", ""))
 	overcharge = bool(meta.get("overcharge", false))
 
@@ -47,7 +53,7 @@ func on_combat_start() -> void:
 		gain_charge(1)
 	if summon_id != "":
 		_summon()
-	if class_ability_id != "":
+	if class_ability_id != "" and class_skill_type == "special":
 		class_charge += 1 + maxi(0, _grade() - 1)
 	if facility_id != "":
 		_build_facility(facility_id)
@@ -60,7 +66,7 @@ func on_combat_start() -> void:
 func gain_charge(n: int) -> void:
 	if skill_type == "special":
 		charge = mini(charge + n, charge_req * 2)
-	if class_ability_id != "":
+	if class_ability_id != "" and class_skill_type == "special":
 		class_charge = mini(class_charge + n, class_charge_req * 2)
 
 
@@ -84,9 +90,15 @@ func tick(delta: float) -> void:
 		if charge >= charge_req:
 			_cast()
 			charge = 0
-	if class_ability_id != "" and class_charge >= class_charge_req:
-		_cast_class()
-		class_charge = 0
+	if class_ability_id != "":
+		if class_skill_type == "general":
+			class_cd_timer -= delta
+			if class_cd_timer <= 0.0:
+				_cast_class()
+				class_cd_timer = class_cooldown
+		elif class_charge >= class_charge_req:
+			_cast_class()
+			class_charge = 0
 
 
 func _cast() -> void:
@@ -114,12 +126,14 @@ func _cast() -> void:
 		"assault": _cast_assault()
 		"sec_breach": _cast_sec_breach()
 		"smoke_veil": _cast_smoke_veil()
+		"field_collapse": _cast_field_collapse()
 		_: pass
 
 
 func _cast_class() -> void:
 	match class_ability_id:
 		"demolition": _cast_demolition()
+		"gravity_release": _cast_gravity_release()
 		_: pass
 
 
@@ -640,3 +654,40 @@ func _cast_smoke_veil() -> void:
 	for a in _allies():
 		if unit_owner.global_position.distance_to(a.global_position) <= unit_owner.attack_range * 0.5:
 			_heal(a, heal)
+
+
+# ── 리프터 (사이오닉) ──
+func _spend_reason(amount: float) -> void:
+	if unit_owner != null and unit_owner.get("reason") != null:
+		unit_owner.set("reason", maxf(-100.0, float(unit_owner.get("reason")) - amount))
+
+## 인력 방출 (class general): 최근접 적 단일 + 밀쳐냄, 이성 -5.
+func _cast_gravity_release() -> void:
+	if unit_owner == null:
+		return
+	var es: Array = _nearest_sorted()
+	if es.is_empty():
+		return
+	var t: Node = es[0]
+	t.take_damage(int(round(float(unit_owner.attack) * 3.0 * _sp())))
+	var away: Vector2 = (t.global_position - unit_owner.global_position).normalized()
+	if away.length() > 0.0:
+		t.global_position = t.global_position + away * (unit_owner.attack_range * 0.75)
+	_spend_reason(5.0)
+
+## 견인자 역장 붕괴 (special): 최대체력 적 기준 150% AoE, 이성 -10.
+func _cast_field_collapse() -> void:
+	if unit_owner == null:
+		return
+	var es2: Array = _enemies()
+	if es2.is_empty():
+		return
+	var hi: Node = es2[0]
+	for n in es2:
+		if int(n.get("max_hp")) > int(hi.get("max_hp")):
+			hi = n
+	var radius: float = unit_owner.attack_range * 1.5
+	for n in es2:
+		if hi.global_position.distance_to(n.global_position) <= radius:
+			n.take_damage(int(round(float(unit_owner.attack) * 2.0 * _sp() + float(n.get("max_hp")) * 0.15)))
+	_spend_reason(10.0)

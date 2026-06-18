@@ -241,7 +241,9 @@ func _physics_process(delta: float) -> void:
 				_supp_accum = 0.0
 		_attack_timer -= delta
 		if _attack_timer <= 0.0:
-			var dmg: int = maxi(1, attack - target.armor)
+			# 리프터 고유 반중력 탄약: 정신 피해 — 방어도 100% 관통(방어도 무시).
+			var antigrav: bool = String(ClassData.class_passive(sprite_id).get("kind", "")) == "antigrav"
+			var dmg: int = maxi(1, attack) if antigrav else maxi(1, attack - target.armor)
 			var tac: String = ClassData.tactical_of(sprite_id)
 			if tac == "사이오닉":
 				dmg = int(round(float(dmg) * reason_output_mult()))

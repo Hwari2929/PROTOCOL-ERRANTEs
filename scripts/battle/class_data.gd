@@ -168,10 +168,12 @@ const CLASSES: Dictionary = {
 		"label": "리프터", "position": "명사수", "tactical": "사이오닉",
 		"stats": {"max_hp": 100, "attack": 16, "attack_interval": 0.85, "attack_range": 240.0, "move_speed": 60.0, "armor": 2},
 		"base": {"skill_power_mult": 1.15, "attack_range_add": 20.0},
+		"class_ability": {"id": "gravity_release", "type": "general", "cd": 6.0},
+		"passive": {"kind": "antigrav"},
 		"subclasses": {
-			"tractor": {"label": "견인자", "tiers": [{"skill_power_mult": 1.25}, {"attack_add": 5, "skill_power_mult": 1.10}, {"skill_power_mult": 1.20}]},
-			"conveyor": {"label": "전달자", "tiers": [{"move_speed_mult": 1.20, "skill_power_mult": 1.10}, {"attack_mult": 1.15}, {"skill_cd_mult": 0.85}]},
-			"weaver": {"label": "방직자", "tiers": [{"armor_add": 4, "max_hp_mult": 1.15}, {"max_hp_mult": 1.10}, {"armor_add": 5, "skill_power_mult": 1.15}]},
+			"tractor": {"label": "견인자", "ability": {"id": "field_collapse", "type": "special", "charge_req": 4}, "tiers": [{"skill_power_mult": 1.25}, {"attack_add": 5, "skill_power_mult": 1.10}, {"skill_power_mult": 1.20}]},
+			"conveyor": {"label": "전달자", "ability": {"facility": "turret"}, "tiers": [{"move_speed_mult": 1.20, "skill_power_mult": 1.10}, {"attack_mult": 1.15}, {"skill_cd_mult": 0.85}]},
+			"weaver": {"label": "방직자", "ability": {"facility": "wall"}, "tiers": [{"armor_add": 4, "max_hp_mult": 1.15}, {"max_hp_mult": 1.10}, {"armor_add": 5, "skill_power_mult": 1.15}]},
 		},
 	},
 	"templar": {
@@ -313,6 +315,8 @@ const ABILITY_INFO: Dictionary = {
 	"assault": {"name": "암습", "target": "최근접 적", "range": "돌진"},
 	"sec_breach": {"name": "보안 탈취", "target": "최근접 적", "range": "단일"},
 	"smoke_veil": {"name": "위장 연막탄", "target": "주변 아군", "range": "사거리×0.5"},
+	"gravity_release": {"name": "인력 방출", "target": "최근접 적", "range": "단일+밀쳐냄"},
+	"field_collapse": {"name": "역장 붕괴", "target": "적 광역(최대체력)", "range": "기술×1.5"},
 }
 
 
