@@ -287,6 +287,39 @@ static func class_ability(class_id: String) -> Dictionary:
 	return CLASSES.get(class_id, {}).get("class_ability", {})
 
 
+## Human-readable display info per ability id: {name, target, range}. For the prep info panel.
+const ABILITY_INFO: Dictionary = {
+	"grenade": {"name": "수류탄 투척", "target": "적 광역", "range": "220"},
+	"flash_ammo": {"name": "섬광 탄약", "target": "무작위 적 3", "range": "전체"},
+	"pierce_ammo": {"name": "관통 탄환", "target": "최근접 적", "range": "단일"},
+	"charge_dash": {"name": "돌진", "target": "최근접 적", "range": "돌진"},
+	"rally_flag": {"name": "깃발 전개", "target": "아군 광역", "range": "200"},
+	"bombardment": {"name": "지정 포격", "target": "적 광역(최저체력)", "range": "150"},
+	"heal_turret": {"name": "치유 포탑", "target": "전체 아군", "range": "전체"},
+	"bio_radiation": {"name": "생체 방사", "target": "적/아군 광역", "range": "150"},
+	"inspire": {"name": "고취", "target": "최저체력 아군", "range": "단일"},
+	"demolition": {"name": "파괴 공작", "target": "적 광역", "range": "기술×1.5"},
+	"tactical_move": {"name": "전술 기동", "target": "최근접 적", "range": "돌진"},
+	"smoke_grenade": {"name": "연막 유탄", "target": "최고공격 적", "range": "사거리×0.75"},
+	"fallout_spray": {"name": "낙진 분사", "target": "적 광역", "range": "사거리×0.8"},
+	"dynamic_net": {"name": "동적 네트워킹", "target": "아군 1", "range": "단일"},
+	"static_format": {"name": "정적 포매팅", "target": "전체 적", "range": "전체"},
+	"repair_facility": {"name": "시설 수리", "target": "최저내구 시설", "range": "단일"},
+	"point_mark": {"name": "지점 표시", "target": "적 광역", "range": "마커"},
+	"forced_record": {"name": "강제 필사", "target": "최근접 적", "range": "단일"},
+	"air_bombard": {"name": "공중 포격", "target": "무작위 적 광역", "range": "사거리"},
+	"relief_drop": {"name": "구호품 낙하", "target": "최저체력 아군", "range": "다수"},
+	"lead_drop": {"name": "선두 지휘", "target": "전체 아군", "range": "버프"},
+	"assault": {"name": "암습", "target": "최근접 적", "range": "돌진"},
+	"sec_breach": {"name": "보안 탈취", "target": "최근접 적", "range": "단일"},
+	"smoke_veil": {"name": "위장 연막탄", "target": "주변 아군", "range": "사거리×0.5"},
+}
+
+
+static func ability_display(ability_id: String) -> Dictionary:
+	return ABILITY_INFO.get(ability_id, {})
+
+
 ## Per-subclass modifiers to the class passive (센티넬 군림자/조종자/분쇄자). {} if none.
 static func subclass_supp(class_id: String, sub_id: String) -> Dictionary:
 	return CLASSES.get(class_id, {}).get("subclasses", {}).get(sub_id, {}).get("supp", {})

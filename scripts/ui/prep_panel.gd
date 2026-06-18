@@ -11,29 +11,29 @@ func _ready() -> void:
 	_btn = Button.new()
 	_btn.text = "전투 시작"
 	_btn.add_theme_font_size_override("font_size", 22)
-	# Small button, bottom-centre (does NOT cover the deploy zone).
-	_btn.anchor_left = 0.5
-	_btn.anchor_right = 0.5
+	# Bottom-right corner — clear of the tactical card row and the deploy zone.
+	_btn.anchor_left = 1.0
+	_btn.anchor_right = 1.0
 	_btn.anchor_top = 1.0
 	_btn.anchor_bottom = 1.0
-	_btn.offset_left = -120.0
-	_btn.offset_right = 120.0
-	_btn.offset_top = -76.0
-	_btn.offset_bottom = -20.0
+	_btn.offset_left = -210.0
+	_btn.offset_right = -20.0
+	_btn.offset_top = -84.0
+	_btn.offset_bottom = -24.0
 	add_child(_btn)
 
 	_label = Label.new()
-	_label.text = "유닛을 배치한 뒤 전투를 시작하세요"
-	_label.add_theme_font_size_override("font_size", 18)
-	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_label.anchor_left = 0.5
-	_label.anchor_right = 0.5
+	_label.text = "유닛을 드래그해 배치 / 대기실로 이동 후 전투 시작"
+	_label.add_theme_font_size_override("font_size", 16)
+	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_label.anchor_left = 1.0
+	_label.anchor_right = 1.0
 	_label.anchor_top = 1.0
 	_label.anchor_bottom = 1.0
-	_label.offset_left = -180.0
-	_label.offset_right = 180.0
-	_label.offset_top = -206.0
-	_label.offset_bottom = -178.0
+	_label.offset_left = -420.0
+	_label.offset_right = -20.0
+	_label.offset_top = -116.0
+	_label.offset_bottom = -90.0
 	add_child(_label)
 
 	_btn.pressed.connect(_on_start_combat_pressed)

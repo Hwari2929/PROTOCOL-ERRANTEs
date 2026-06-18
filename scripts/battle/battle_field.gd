@@ -109,6 +109,7 @@ func _spawn_players() -> void:
 func set_player_team(ids: Array, subclasses: Dictionary = {}, weapons: Dictionary = {}) -> void:
 	for u in units.get_children():
 		if is_instance_valid(u) and u.is_in_group("unit") and int(u.get("team")) == TEAM_PLAYER:
+			u.remove_from_group("unit")  # exclude from units_of() immediately (queue_free is deferred)
 			u.queue_free()
 	var valid: Array = []
 	for id in ids:
@@ -229,7 +230,16 @@ func start_combat() -> void:
 	phase = PHASE_COMBAT
 	_resolved = false
 	for u in units.get_children():
-		if is_instance_valid(u) and u.has_method("set_active"):
+		if not is_instance_valid(u):
+			continue
+		# 대기실(bench)에 남은 아군은 이번 전투에서 제외(그룹 해제 → 승패 집계 제외).
+		if int(u.get("team")) == TEAM_PLAYER and bool(u.get("benched")):
+			if u.has_method("set_active"):
+				u.set_active(false)
+			u.remove_from_group("unit")
+			u.visible = false
+			continue
+		if u.has_method("set_active"):
 			u.set_active(true)
 	# Trigger initial charge for abilities on player units.
 	for u in units_of(TEAM_PLAYER):

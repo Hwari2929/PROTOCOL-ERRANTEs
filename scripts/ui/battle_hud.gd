@@ -10,6 +10,8 @@ var _retry: Button
 
 
 func _ready() -> void:
+	# Let world clicks (unit drag/select) pass through the HUD; only buttons grab input.
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var vbox: VBoxContainer = VBoxContainer.new()
 	vbox.position = Vector2(16.0, 12.0)
 	vbox.add_theme_constant_override("separation", 6)

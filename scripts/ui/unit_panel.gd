@@ -30,6 +30,10 @@ func _ready() -> void:
         _battle_field.phase_changed.connect(_on_battle_field_phase_changed)
     if _resonance:
         _resonance.credits_changed.connect(_on_resonance_credits_changed)
+    # Team changes free old units via queue_free (deferred) — refresh next frame so
+    # the panel reflects the new roster, not the just-freed default trio.
+    if EventBus.has_signal("team_changed"):
+        EventBus.team_changed.connect(func(_ids): call_deferred("refresh"))
 
 func _on_battle_field_phase_changed(phase: int) -> void:
     visible = (phase == 0)

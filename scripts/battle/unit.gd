@@ -37,6 +37,7 @@ var res_grade: int = 1
 var res_points: int = 0
 
 var active: bool = false
+var benched: bool = false   # left in the 대기실 during prep → sits out the fight
 
 var skill_cd: float = 0.0
 var skill_timer: float = 0.0
@@ -493,24 +494,7 @@ func _skill_pulse() -> void:
 	var t: Tween = create_tween()
 	t.tween_property(_sprite, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.18)
 
-func _unhandled_input(event: InputEvent) -> void:
-	if active or team != 0:
-		return
-
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			if event.pressed:
-				var dist: float = global_position.distance_to(event.position)
-				if dist <= 28.0:
-					_is_dragging = true
-					_drag_offset = global_position - event.position
-			else:
-				_is_dragging = false
-	elif _is_dragging and event is InputEventMouseMotion:
-		var new_pos: Vector2 = event.position + _drag_offset
-		new_pos.x = clampf(new_pos.x, 60.0, 600.0)
-		new_pos.y = clampf(new_pos.y, 80.0, 640.0)
-		global_position = new_pos
+# Prep-phase drag/selection is owned centrally by PrepController (scripts/ui/prep_controller.gd).
 
 func _draw() -> void:
 	if not _has_sprite:
