@@ -284,6 +284,10 @@ func _apply_on_hit(target: Node) -> void:
 			target.apply_status("burn", 1, 4.0, 5.0, "physical")
 		"poison":
 			target.apply_status("poison", 1, 4.0, 6.0, "chemical")
+		"vulnerable":
+			# 잠행자 취약점: 35% 기본 확률로 받는 피해 증가 디버프 중첩.
+			if randf() < 0.35:
+				target.apply_status("vulnerable", 1, 6.0, 0.0, "none")
 
 ## 센티넬 subclass on-hit suppression effects (군림자 흡혈/처형, 분쇄자 관통/초과체력).
 func _apply_suppression_hit(target: Node, dmg: int) -> void:

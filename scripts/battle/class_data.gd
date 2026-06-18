@@ -157,9 +157,9 @@ const CLASSES: Dictionary = {
 		"stats": {"max_hp": 100, "attack": 12, "attack_interval": 1.0, "attack_range": 150.0, "move_speed": 72.0, "armor": 2},
 		"base": {"skill_power_mult": 1.20, "move_speed_mult": 1.10},
 		"subclasses": {
-			"assassin": {"label": "암살자", "tiers": [{"attack_mult": 1.25, "skill_power_mult": 1.15}, {"attack_add": 6}, {"attack_mult": 1.25}]},
-			"infiltrator": {"label": "잠행자", "tiers": [{"skill_power_mult": 1.25}, {"skill_cd_mult": 0.88}, {"skill_power_mult": 1.20, "attack_add": 4}]},
-			"synchronizer": {"label": "동조자", "tiers": [{"max_hp_mult": 1.15, "skill_power_mult": 1.15}, {"skill_cd_mult": 0.88}, {"skill_power_mult": 1.20, "max_hp_mult": 1.10}]},
+			"assassin": {"label": "암살자", "ability": {"id": "assault", "type": "special", "charge_req": 2}, "tiers": [{"attack_mult": 1.25, "skill_power_mult": 1.15}, {"attack_add": 6}, {"attack_mult": 1.25}]},
+			"infiltrator": {"label": "잠행자", "ability": {"id": "sec_breach", "type": "special", "charge_req": 3}, "trait": {"on_hit": "vulnerable"}, "tiers": [{"skill_power_mult": 1.25}, {"skill_cd_mult": 0.88}, {"skill_power_mult": 1.20, "attack_add": 4}]},
+			"synchronizer": {"label": "동조자", "ability": {"id": "smoke_veil", "type": "special", "charge_req": 3}, "tiers": [{"max_hp_mult": 1.15, "skill_power_mult": 1.15}, {"skill_cd_mult": 0.88}, {"skill_power_mult": 1.20, "max_hp_mult": 1.10}]},
 		},
 	},
 
