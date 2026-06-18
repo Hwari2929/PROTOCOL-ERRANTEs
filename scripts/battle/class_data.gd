@@ -59,9 +59,9 @@ const CLASSES: Dictionary = {
 		"stats": {"max_hp": 110, "attack": 12, "attack_interval": 0.9, "attack_range": 190.0, "move_speed": 65.0, "armor": 3},
 		"base": {"attack_mult": 1.10, "attack_range_add": 20.0},
 		"subclasses": {
-			"overseer": {"label": "감시자", "tiers": [{"attack_range_add": 40.0, "attack_mult": 1.15}, {"attack_add": 5}, {"attack_mult": 1.20, "skill_cd_mult": 0.85}]},
-			"warlord": {"label": "사령관", "tiers": [{"attack_mult": 1.20}, {"attack_interval_mult": 0.88}, {"attack_add": 7, "skill_cd_mult": 0.85}]},
-			"beastmaster": {"label": "조련사", "tiers": [{"skill_power_mult": 1.25, "attack_mult": 1.10}, {"attack_add": 5, "skill_power_mult": 1.15}, {"skill_power_mult": 1.20, "attack_range_add": 30.0}]},
+			"overseer": {"label": "감시자", "ability": {"id": "watch_drone", "type": "summon", "summon": "drone"}, "tiers": [{"attack_range_add": 40.0, "attack_mult": 1.15}, {"attack_add": 5}, {"attack_mult": 1.20, "skill_cd_mult": 0.85}]},
+			"warlord": {"label": "사령관", "ability": {"id": "bombardment", "type": "special", "charge_req": 5}, "tiers": [{"attack_mult": 1.20}, {"attack_interval_mult": 0.88}, {"attack_add": 7, "skill_cd_mult": 0.85}]},
+			"beastmaster": {"label": "조련사", "ability": {"id": "beast_call", "type": "summon", "summon": "beast"}, "tiers": [{"skill_power_mult": 1.25, "attack_mult": 1.10}, {"attack_add": 5, "skill_power_mult": 1.15}, {"skill_power_mult": 1.20, "attack_range_add": 30.0}]},
 		},
 	},
 	"medic": {
