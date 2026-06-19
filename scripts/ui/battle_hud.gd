@@ -12,8 +12,14 @@ var _retry: Button
 func _ready() -> void:
 	# Let world clicks (unit drag/select) pass through the HUD; only buttons grab input.
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# 가독성용 패널 배경 (상단 좌측 상태 표시).
+	var hud_bg: Panel = Panel.new()
+	hud_bg.position = Vector2(8.0, 8.0)
+	hud_bg.size = Vector2(252.0, 92.0)
+	hud_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(hud_bg)
 	var vbox: VBoxContainer = VBoxContainer.new()
-	vbox.position = Vector2(16.0, 12.0)
+	vbox.position = Vector2(20.0, 14.0)
 	vbox.add_theme_constant_override("separation", 6)
 	add_child(vbox)
 	_progress = _make_label(vbox, 24)

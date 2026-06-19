@@ -8,15 +8,29 @@ var _rows: Array[Control] = []
 
 func _ready() -> void:
     mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+    # 가독성용 패널 배경.
+    var bg: Panel = Panel.new()
+    bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    bg.anchor_left = 1.0
+    bg.anchor_right = 1.0
+    bg.anchor_top = 0.0
+    bg.anchor_bottom = 0.0
+    bg.offset_left = -258.0
+    bg.offset_right = -8.0
+    bg.offset_top = 104.0
+    bg.offset_bottom = 320.0
+    add_child(bg)
+
     add_child(_content)
 
     _content.anchor_top = 0.0
     _content.anchor_bottom = 0.0
     _content.anchor_left = 1.0
     _content.anchor_right = 1.0
-    _content.offset_top = 110.0
-    _content.offset_right = -16.0
-    _content.offset_left = -250.0
+    _content.offset_top = 114.0
+    _content.offset_right = -18.0
+    _content.offset_left = -248.0
     _content.offset_bottom = 470.0
 
     var _title: Label = Label.new()

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/battle/battle_field.tscn" id="1_field"]
 [ext_resource type="Script" path="res://scripts/battle/resonance.gd" id="2_reso"]
@@ -13,8 +13,12 @@
 [ext_resource type="Script" path="res://scripts/ui/unit_panel.gd" id="11_unit"]
 [ext_resource type="Script" path="res://scripts/ui/subclass_menu.gd" id="12_sub"]
 [ext_resource type="Script" path="res://scripts/ui/prep_controller.gd" id="13_prepctl"]
+[ext_resource type="Script" path="res://scripts/ui/background.gd" id="14_bg"]
 
 [node name="Main" type="Node2D"]
+
+[node name="Background" type="CanvasLayer" parent="."]
+script = ExtResource("14_bg")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(640, 360)

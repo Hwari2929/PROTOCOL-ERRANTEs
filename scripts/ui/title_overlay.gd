@@ -9,9 +9,17 @@ var _record_label: Label
 var _start_button: Button
 
 func _ready() -> void:
-	# Full-screen dark background
+	# Full-screen atmospheric background image (falls back to flat dark).
+	if ResourceLoader.exists("res://assets/bg/bg_title.png"):
+		var tex := TextureRect.new()
+		tex.texture = load("res://assets/bg/bg_title.png")
+		tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tex.set_anchors_preset(Control.PRESET_FULL_RECT)
+		tex.mouse_filter = Control.MOUSE_FILTER_STOP
+		add_child(tex)
 	_background = ColorRect.new()
-	_background.color = Color(0.04, 0.04, 0.06, 1.0)
+	_background.color = Color(0.04, 0.05, 0.08, 0.6)  # darken for text legibility
 	_background.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_background.mouse_filter = Control.MOUSE_FILTER_STOP  # block the screen behind
 	add_child(_background)
@@ -35,8 +43,10 @@ func _ready() -> void:
 	var emphasis: FontFile = load("res://assets/fonts/Paperlogy-8ExtraBold.ttf")
 	if emphasis != null:
 		_title_label.add_theme_font_override("font", emphasis)
-	_title_label.add_theme_font_size_override("font_size", 60)
-	_title_label.add_theme_color_override("font_color", Color.WHITE)
+	_title_label.add_theme_font_size_override("font_size", 64)
+	_title_label.add_theme_color_override("font_color", Color(0.62, 0.97, 0.92))
+	_title_label.add_theme_color_override("font_outline_color", Color(0.03, 0.16, 0.18, 0.9))
+	_title_label.add_theme_constant_override("outline_size", 10)
 	_vbox.add_child(_title_label)
 
 	# Subtitle Label
@@ -58,10 +68,13 @@ func _ready() -> void:
 
 	# Start Button
 	_start_button = Button.new()
-	_start_button.text = "시작"
-	_start_button.add_theme_font_size_override("font_size", 24)
-	_start_button.add_theme_color_override("font_color", Color.WHITE)
+	_start_button.text = "▶  시작"
+	_start_button.add_theme_font_size_override("font_size", 26)
+	_start_button.custom_minimum_size = Vector2(260.0, 64.0)
 	_start_button.pressed.connect(dismiss)
+	var spacer := Control.new()
+	spacer.custom_minimum_size = Vector2(0.0, 16.0)
+	_vbox.add_child(spacer)
 	_vbox.add_child(_start_button)
 
 func dismiss() -> void:
