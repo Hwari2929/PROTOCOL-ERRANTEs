@@ -246,4 +246,15 @@ func start_combat() -> void:
 	for u in units_of(TEAM_PLAYER):
 		if u.has_method("on_combat_start"):
 			u.on_combat_start()
+	# 전투 진입 배치 모션 (좌→우 스태거).
+	var di: int = 0
+	for u in units_of(TEAM_PLAYER):
+		if u.has_method("play_deploy"):
+			u.play_deploy(float(di) * 0.06)
+			di += 1
+	di = 0
+	for u in units_of(TEAM_ENEMY):
+		if u.has_method("play_deploy"):
+			u.play_deploy(0.15 + float(di) * 0.06)
+			di += 1
 	phase_changed.emit(PHASE_COMBAT)

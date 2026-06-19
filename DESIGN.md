@@ -45,3 +45,18 @@
 2. 버튼/패널은 `Button`/`Panel` 노드 → 테마 자동. 폰트 사이즈만 오버라이드.
 3. 직접 그리는 요소(_draw)는 잉크/세피아/스탬프 레드로. 종이 위 어두운 잉크 원칙.
 4. RichTextLabel은 `default_color`를 잉크로 오버라이드 후 bbcode `[color=#5c4d39]`(세피아)/`#8a662a`(골드)/`#4d6a30`(올리브)/스탬프 레드만 사용.
+
+## 6. 모션 & 게임 필 (Tween 기반, 절대 정적 금지)
+
+- **카드** (`card_bar.gd`): 종이 페이스(종이 텍스처+잉크 테두리+코스트 원형 스탬프) + 우하단
+  덱 더미(`card_back.png` DIY 엠블럼). 드로우=덱→손패로 날아옴(BACK 이즈, 스태거),
+  호버=들어올림+확대, 사용=떠오르며 회전+페이드, 셔플=뒷면 카드 부채꼴(`shuffled` 시그널).
+- **배치 모션**: 전투 진입 시 `unit.play_deploy(delay)` — 작게 시작해 팝업(BACK), 좌→우 스태거.
+- **상태이상 그래픽**: `unit._draw`가 체력바 위에 색 점 배지(잉크 테두리) — 상태별 색
+  (출혈 적/연소 주황/중독 녹/강조 스탬프레드/취약 보라/검흔 회/심판 금/초과체력 청/기절 노/제압 갈).
+  `_status_badges()`가 활성 상태 색 목록 반환. 매 프레임 queue_redraw.
+- **기술 범위 표시**: `RangeFX.spawn(host, center, radius, color)` — 잉크 링이 퍼지며 소멸.
+  `unit.show_skill_text`에서 기술 시전 시 자동 호출(반경=사거리).
+- **에셋 생성 규칙**: 새 카드/아이콘/스프라이트는 **종이 질감 + 잉크/DIY 테두리** 유지
+  (Flux 프롬프트에 "aged sepia paper, hand-drawn DIY ink border, grunge, flat scan" 포함).
+  배경 3D/네온 금지.

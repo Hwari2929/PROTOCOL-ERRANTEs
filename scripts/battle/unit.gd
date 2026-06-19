@@ -208,6 +208,7 @@ func _physics_process(delta: float) -> void:
 	# Status tick
 	if _status != null:
 		_status.tick(delta)
+	queue_redraw()  # 체력바/상태이상 배지 갱신
 
 	if is_stunned():
 		return
@@ -479,6 +480,8 @@ func show_skill_text(txt: String) -> void:
 	var host: Node2D = _fx_host()
 	if host != null:
 		DamageNumber.spawn_text(host, global_position + Vector2(0.0, -16.0), txt, Color(0.62, 0.23, 0.18))
+		# 기술 범위 표시 (잉크 링).
+		RangeFX.spawn(host, global_position, maxf(60.0, float(attack_range)), Color(0.62, 0.23, 0.18))
 	_skill_pulse()
 
 func _skill_nova(dmg: int, radius: float) -> void:
@@ -542,10 +545,50 @@ func _draw() -> void:
 	if not _has_sprite:
 		var color: Color = Color.BLUE if team == 0 else Color.RED
 		draw_circle(Vector2.ZERO, 20.0, color)
-	# HP bar above the unit, shown only while damaged and alive.
+	# HP bar (잉크 테두리 + 체력 채움) — 손상 시 표시.
 	if hp > 0 and hp < max_hp:
 		var w: float = 40.0
-		var h: float = 4.0
-		var ratio: float = float(hp) / float(max_hp)
-		draw_rect(Rect2(-w / 2.0, -30.0, w * ratio, h), Color(0.2, 0.8, 0.2, 0.8))
-		draw_rect(Rect2(-w / 2.0, -30.0, w, h), Color(0.0, 0.0, 0.0, 0.5))
+		var h: float = 5.0
+		var ratio: float = clampf(float(hp) / float(max_hp), 0.0, 1.0)
+		var fill: Color = Color(0.3, 0.5, 0.22) if team == 0 else Color(0.62, 0.23, 0.18)
+		draw_rect(Rect2(-w / 2.0, -30.0, w, h), Color(0.16, 0.12, 0.08, 0.85))  # 종이 잉크 바탕
+		draw_rect(Rect2(-w / 2.0, -30.0, w * ratio, h), fill)
+		draw_rect(Rect2(-w / 2.0, -30.0, w, h), Color(0.1, 0.08, 0.05, 0.9), false, 1.0)
+	# 상태이상 배지 (잉크 테두리 색 점) — 체력바 위.
+	var badges: Array = _status_badges()
+	if not badges.is_empty():
+		var bw: float = 13.0
+		var bx: float = -float(badges.size()) * bw / 2.0 + bw / 2.0
+		for col in badges:
+			draw_circle(Vector2(bx, -40.0), 5.0, col)
+			draw_arc(Vector2(bx, -40.0), 5.0, 0.0, TAU, 14, Color(0.1, 0.08, 0.05, 0.85), 1.2)
+			bx += bw
+
+
+## 활성 상태이상의 색 목록 (배지 표시용).
+func _status_badges() -> Array:
+	var out: Array = []
+	if _status != null and _status.has_method("has_effect"):
+		if _status.has_method("shield_amount") and int(_status.shield_amount()) > 0:
+			out.append(Color(0.32, 0.55, 0.7))      # 초과 체력
+		if _status.has_effect("bleed"): out.append(Color(0.62, 0.12, 0.12))    # 출혈
+		if _status.has_effect("burn"): out.append(Color(0.85, 0.45, 0.12))     # 연소
+		if _status.has_effect("poison"): out.append(Color(0.32, 0.55, 0.2))    # 중독
+		if _status.has_effect("highlight"): out.append(Color(0.62, 0.23, 0.18))# 강조 표시
+		if _status.has_effect("vulnerable"): out.append(Color(0.45, 0.25, 0.55)) # 취약
+		if _status.has_effect("swordmark"): out.append(Color(0.45, 0.45, 0.45))# 검흔
+		if _status.has_method("judgment_record") and int(_status.judgment_record()) > 0:
+			out.append(Color(0.8, 0.65, 0.2))        # 심판
+	if is_stunned(): out.append(Color(0.9, 0.82, 0.2))                          # 기절
+	if _is_suppression() and _supp_stacks > 0: out.append(Color(0.5, 0.3, 0.15)) # 제압 사격
+	return out
+
+
+## 전투 진입 배치 모션 — 살짝 작게 시작해 팝업.
+func play_deploy(delay: float) -> void:
+	scale = Vector2(0.2, 0.2)
+	modulate.a = 0.0
+	var tw: Tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_interval(delay)
+	tw.tween_property(self, "scale", Vector2.ONE, 0.32)
+	tw.parallel().tween_property(self, "modulate:a", 1.0, 0.22)
