@@ -39,7 +39,7 @@ func _ready() -> void:
 
 func _build_info_panel() -> void:
 	_info_bg = ColorRect.new()
-	_info_bg.color = Color(0.04, 0.05, 0.08, 0.90)
+	_info_bg.color = Color(0.93, 0.88, 0.78, 0.96)
 	_info_bg.position = Vector2(6.0, 106.0)
 	_info_bg.size = Vector2(238.0, 516.0)
 	_info_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -53,6 +53,7 @@ func _build_info_panel() -> void:
 	_info_rt.size = Vector2(220.0, 500.0)
 	_info_rt.add_theme_font_size_override("normal_font_size", 14)
 	_info_rt.add_theme_font_size_override("bold_font_size", 15)
+	_info_rt.add_theme_color_override("default_color", Color(0.16, 0.12, 0.08))
 	_info_rt.mouse_filter = Control.MOUSE_FILTER_PASS
 	_info_rt.visible = false
 	add_child(_info_rt)
@@ -229,14 +230,14 @@ func _update_info() -> void:
 		}
 		var kind_label: String = "시설" if cid in ["turret", "tesla", "wall", "facility_base"] else "특수 기물"
 		var st: Array = []
-		st.append("[b]%s[/b]  [color=#9fb0c8](%s)[/color]" % [String(names.get(cid, "기물")), kind_label])
+		st.append("[b]%s[/b]  [color=#5c4d39](%s)[/color]" % [String(names.get(cid, "기물")), kind_label])
 		st.append("내구도 %d/%d   공격력 %d" % [int(u.hp), int(u.max_hp), int(u.attack)])
 		st.append("공속 %.2f/s   사거리 %d   방어도 %d" % [spd, int(round(float(u.attack_range))), int(u.armor)])
-		st.append("[color=#9fb0c8]공명도 미적용[/color]")
+		st.append("[color=#5c4d39]공명도 미적용[/color]")
 		if u.has_method("buff_summary"):
 			var bf2: Array = u.buff_summary()
 			if not bf2.is_empty():
-				st.append("[b]현재 상태[/b]\n[color=#8fd6a0]%s[/color]" % ", ".join(bf2))
+				st.append("[b]현재 상태[/b]\n[color=#4d6a30]%s[/color]" % ", ".join(bf2))
 		_info_rt.text = "\n".join(st)
 		return
 
@@ -256,7 +257,7 @@ func _update_info() -> void:
 		if cl.has("trait"):
 			t.append(String(cl["trait"]))
 		if cl.has("base"):
-			t.append("[color=#9fb0c8]%s[/color]" % String(cl["base"]))
+			t.append("[color=#5c4d39]%s[/color]" % String(cl["base"]))
 
 	# 서브클래스 기술 + 메커니즘
 	if sid != "":
@@ -268,10 +269,10 @@ func _update_info() -> void:
 			var tier_now: int = int(u.inhesion_tier)
 			for i in (sl["tiers"] as Array).size():
 				var mark: String = "✓" if i < tier_now else "·"
-				t.append("[color=#c8b86a]고유%d %s[/color] %s" % [i + 1, mark, String(sl["tiers"][i])])
+				t.append("[color=#8a662a]고유%d %s[/color] %s" % [i + 1, mark, String(sl["tiers"][i])])
 	else:
 		t.append("")
-		t.append("[color=#9fb0c8]공명 등급 2에서 서브클래스를 선택합니다.[/color]")
+		t.append("[color=#5c4d39]공명 등급 2에서 서브클래스를 선택합니다.[/color]")
 
 	# 현재 버프 (전투 중)
 	if u.has_method("buff_summary"):
@@ -279,7 +280,7 @@ func _update_info() -> void:
 		if not buffs.is_empty():
 			t.append("")
 			t.append("[b]현재 상태[/b]")
-			t.append("[color=#8fd6a0]%s[/color]" % ", ".join(buffs))
+			t.append("[color=#4d6a30]%s[/color]" % ", ".join(buffs))
 
 	_info_rt.text = "\n".join(t)
 
@@ -298,7 +299,7 @@ func _skill_block(u: Node, sl: Dictionary) -> String:
 	var nm: String = String(sl.get("skill_name", ""))
 	if nm == "":
 		# 패시브 클래스: 기술 대신 고유 특성으로 동작
-		return "[b]기술[/b]\n[color=#9fb0c8]고유 특성 기반 (액티브 기술 없음)[/color]\n"
+		return "[b]기술[/b]\n[color=#5c4d39]고유 특성 기반 (액티브 기술 없음)[/color]\n"
 	var out: String = "[b]기술 — %s%s[/b]\n" % [nm, cost]
 	if sl.has("skill"):
 		out += String(sl["skill"]) + "\n"
@@ -307,12 +308,13 @@ func _skill_block(u: Node, sl: Dictionary) -> String:
 
 func _draw() -> void:
 	if _is_prep:
-		draw_rect(DEPLOY, Color(0.25, 0.7, 0.4, 0.10), true)
-		draw_rect(DEPLOY, Color(0.35, 0.85, 0.5, 0.55), false, 2.0)
-		draw_rect(BENCH, Color(0.7, 0.6, 0.25, 0.10), true)
-		draw_rect(BENCH, Color(0.9, 0.75, 0.35, 0.55), false, 2.0)
+		# 영수증/도면 느낌: 종이 위 잉크 테두리.
+		draw_rect(DEPLOY, Color(0.16, 0.12, 0.08, 0.05), true)
+		draw_rect(DEPLOY, Color(0.18, 0.14, 0.1, 0.7), false, 2.0)
+		draw_rect(BENCH, Color(0.62, 0.23, 0.18, 0.05), true)
+		draw_rect(BENCH, Color(0.5, 0.32, 0.18, 0.7), false, 2.0)
 		var font := ThemeDB.fallback_font
-		draw_string(font, DEPLOY.position + Vector2(8.0, 20.0), "배치 구역", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0.6, 1.0, 0.7, 0.8))
-		draw_string(font, BENCH.position + Vector2(8.0, 20.0), "대기실", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(1.0, 0.9, 0.55, 0.8))
+		draw_string(font, DEPLOY.position + Vector2(8.0, 20.0), "■ 배치 구역", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0.22, 0.17, 0.11, 0.9))
+		draw_string(font, BENCH.position + Vector2(8.0, 20.0), "□ 대기실", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0.5, 0.3, 0.18, 0.9))
 	if _selected != null and is_instance_valid(_selected):
-		draw_arc(_selected.global_position, 30.0, 0.0, TAU, 32, Color(1.0, 0.95, 0.4, 0.9), 2.5)
+		draw_arc(_selected.global_position, 30.0, 0.0, TAU, 32, Color(0.62, 0.23, 0.18, 0.95), 2.5)

@@ -463,7 +463,7 @@ func _use_skill() -> void:
 	_skill_pulse()
 	var host: Node2D = _fx_host()
 	if host != null and SKILL_NAME.has(kind):
-		DamageNumber.spawn_text(host, global_position + Vector2(0.0, -16.0), String(SKILL_NAME.get(kind, "SKILL")), Color(0.6, 1.0, 1.0))
+		DamageNumber.spawn_text(host, global_position + Vector2(0.0, -16.0), String(SKILL_NAME.get(kind, "SKILL")), Color(0.62, 0.23, 0.18))
 
 ## Returns the BattleField (or nearest Node2D ancestor) to host floating FX.
 func _fx_host() -> Node2D:
@@ -478,7 +478,7 @@ func show_skill_text(txt: String) -> void:
 		return
 	var host: Node2D = _fx_host()
 	if host != null:
-		DamageNumber.spawn_text(host, global_position + Vector2(0.0, -16.0), txt, Color(0.6, 1.0, 1.0))
+		DamageNumber.spawn_text(host, global_position + Vector2(0.0, -16.0), txt, Color(0.62, 0.23, 0.18))
 	_skill_pulse()
 
 func _skill_nova(dmg: int, radius: float) -> void:
