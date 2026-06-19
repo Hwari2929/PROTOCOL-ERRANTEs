@@ -8,6 +8,8 @@ extends Node
 signal hand_changed(hand: Array)
 signal tp_changed(tp: int)
 signal assets_changed(assets: int)
+signal shuffled()
+signal card_drawn(card: Dictionary)
 
 const HAND_SIZE: int = 3
 
@@ -95,6 +97,7 @@ func refresh_for_team(ids: Array) -> void:
 		graveyard = []
 		hand = []
 		_built = true
+		shuffled.emit()
 	else:
 		# 고정(pin)된 카드는 다음 노드 패에 잔류하고 고정이 해제된다; 나머지는 묘지로.
 		var kept: Array = []
@@ -117,7 +120,10 @@ func _draw(n: int) -> void:
 			deck = graveyard.duplicate()
 			deck.shuffle()
 			graveyard = []
-		hand.append(deck.pop_back())
+			shuffled.emit()
+		var c: Variant = deck.pop_back()
+		hand.append(c)
+		card_drawn.emit(c)
 
 
 ## Play a card from the hand (spend TP, apply effect to player team, discard).
