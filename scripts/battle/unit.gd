@@ -410,7 +410,7 @@ func take_damage(amount: int) -> void:
 	if host != null and host.get_parent() is Node2D:
 		host = host.get_parent()
 	if host is Node2D:
-		var col: Color = Color(1.0, 0.85, 0.3) if team == 1 else Color(1.0, 0.5, 0.5)
+		var col: Color = Color(0.62, 0.23, 0.18) if team == 1 else Color(0.4, 0.16, 0.12)
 		DamageNumber.spawn(host, global_position, amount, col)
 	if hp <= 0:
 		die()

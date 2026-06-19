@@ -62,11 +62,24 @@ func show_menu(n: int) -> void:
 	add_child(_layer)
 
 	var bg: ColorRect = ColorRect.new()
-	bg.color = Color(0.0, 0.0, 0.0, 0.7)
+	bg.color = Color(0.16, 0.12, 0.08, 0.62)   # 잉크 세피아 딤
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_STOP  # block clicks behind
 	bg.process_mode = Node.PROCESS_MODE_ALWAYS
 	_layer.add_child(bg)
+
+	# 종이 카드 패널.
+	var card: Panel = Panel.new()
+	card.anchor_left = 0.5
+	card.anchor_top = 0.5
+	card.anchor_right = 0.5
+	card.anchor_bottom = 0.5
+	card.offset_left = -256.0
+	card.offset_right = 256.0
+	card.offset_top = -170.0
+	card.offset_bottom = 170.0
+	card.process_mode = Node.PROCESS_MODE_ALWAYS
+	bg.add_child(card)
 
 	var vbox: VBoxContainer = VBoxContainer.new()
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -86,6 +99,7 @@ func show_menu(n: int) -> void:
 	title.text = "증강 선택 (1택)"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 28)
+	title.add_theme_color_override("font_color", Color(0.62, 0.23, 0.18))
 	vbox.add_child(title)
 
 	for c in choices:

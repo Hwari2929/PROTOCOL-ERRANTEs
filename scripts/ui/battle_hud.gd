@@ -6,6 +6,7 @@ extends Control
 var _progress: Label
 var _grade: Label
 var _banner: Label
+var _banner_panel: Panel
 var _retry: Button
 
 
@@ -25,17 +26,40 @@ func _ready() -> void:
 	_progress = _make_label(vbox, 24)
 	_grade = _make_label(vbox, 24)
 
+	# 결과 배너 — 종이 카드 + 중앙 정렬.
+	_banner_panel = Panel.new()
+	_banner_panel.anchor_left = 0.5
+	_banner_panel.anchor_top = 0.5
+	_banner_panel.anchor_right = 0.5
+	_banner_panel.anchor_bottom = 0.5
+	_banner_panel.offset_left = -180.0
+	_banner_panel.offset_right = 180.0
+	_banner_panel.offset_top = -70.0
+	_banner_panel.offset_bottom = 24.0
+	_banner_panel.visible = false
+	add_child(_banner_panel)
+
 	_banner = Label.new()
-	_banner.add_theme_font_size_override("font_size", 48)
-	_banner.position = Vector2(540.0, 300.0)
-	_banner.visible = false
-	add_child(_banner)
+	_banner.add_theme_font_size_override("font_size", 52)
+	var emph: FontFile = load("res://assets/fonts/Paperlogy-9Black.ttf")
+	if emph != null:
+		_banner.add_theme_font_override("font", emph)
+	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_banner.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_banner.offset_top = 14.0
+	_banner_panel.add_child(_banner)
 
 	_retry = Button.new()
 	_retry.text = "다시 시작"
 	_retry.add_theme_font_size_override("font_size", 24)
-	_retry.position = Vector2(560.0, 370.0)
-	_retry.custom_minimum_size = Vector2(160.0, 52.0)
+	_retry.anchor_left = 0.5
+	_retry.anchor_right = 0.5
+	_retry.anchor_top = 0.5
+	_retry.anchor_bottom = 0.5
+	_retry.offset_left = -90.0
+	_retry.offset_right = 90.0
+	_retry.offset_top = 44.0
+	_retry.offset_bottom = 96.0
 	_retry.visible = false
 	_retry.process_mode = Node.PROCESS_MODE_ALWAYS
 	_retry.pressed.connect(_on_retry_pressed)
@@ -69,7 +93,8 @@ func _on_grade_changed(_new_grade: int) -> void:
 
 func _on_session_ended(victory: bool) -> void:
 	_banner.text = "승리" if victory else "패배"
-	_banner.modulate = Color(0.6, 1.0, 0.6) if victory else Color(1.0, 0.5, 0.5)
+	_banner.add_theme_color_override("font_color", Color(0.3, 0.42, 0.2) if victory else Color(0.62, 0.23, 0.18))
+	_banner_panel.visible = true
 	_banner.visible = true
 	_retry.visible = true
 

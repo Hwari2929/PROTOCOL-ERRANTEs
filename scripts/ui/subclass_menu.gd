@@ -20,11 +20,24 @@ func show_for(unit: Node) -> void:
 	_menu_layer.process_mode = Node.PROCESS_MODE_ALWAYS
 
 	var bg := ColorRect.new()
-	bg.color = Color(0.0, 0.0, 0.0, 0.78)
+	bg.color = Color(0.16, 0.12, 0.08, 0.66)   # 잉크 세피아 딤
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_STOP
 	bg.process_mode = Node.PROCESS_MODE_ALWAYS
 	_menu_layer.add_child(bg)
+
+	# 종이 카드 패널.
+	var card := Panel.new()
+	card.anchor_left = 0.5
+	card.anchor_top = 0.5
+	card.anchor_right = 0.5
+	card.anchor_bottom = 0.5
+	card.offset_left = -224.0
+	card.offset_right = 224.0
+	card.offset_top = -180.0
+	card.offset_bottom = 180.0
+	card.process_mode = Node.PROCESS_MODE_ALWAYS
+	bg.add_child(card)
 
 	var vbox := VBoxContainer.new()
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -44,6 +57,7 @@ func show_for(unit: Node) -> void:
 	title_label.text = "%s — 서브클래스 선택" % ClassData.class_label(unit.sprite_id)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_label.add_theme_font_size_override("font_size", 26)
+	title_label.add_theme_color_override("font_color", Color(0.62, 0.23, 0.18))
 	title_label.process_mode = Node.PROCESS_MODE_ALWAYS
 	vbox.add_child(title_label)
 

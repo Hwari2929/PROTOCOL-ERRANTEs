@@ -24,9 +24,21 @@ func _ready() -> void:
 
 func _build_ui() -> void:
 	var bg: ColorRect = ColorRect.new()
-	bg.color = Color(0.0, 0.0, 0.0, 0.6)
+	bg.color = Color(0.16, 0.12, 0.08, 0.5)   # 잉크 세피아 딤 (종이 배경이 비침)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
+
+	# 종이 카드(서류철) 배경.
+	var card: Panel = Panel.new()
+	card.anchor_left = 0.5
+	card.anchor_top = 0.5
+	card.anchor_right = 0.5
+	card.anchor_bottom = 0.5
+	card.offset_left = -246.0
+	card.offset_right = 246.0
+	card.offset_top = -268.0
+	card.offset_bottom = 268.0
+	add_child(card)
 
 	var outer: VBoxContainer = VBoxContainer.new()
 	outer.alignment = BoxContainer.ALIGNMENT_CENTER
