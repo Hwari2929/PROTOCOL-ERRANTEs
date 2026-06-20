@@ -8,6 +8,8 @@ var _rows: Array[Control] = []
 
 func _ready() -> void:
     mouse_filter = Control.MOUSE_FILTER_IGNORE
+    # 빈 영역 클릭이 뒤(전투 시작 버튼 등)로 통과하도록 — 자식 버튼은 그대로 입력 받음.
+    _content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
     # 가독성용 패널 배경.
     var bg: Panel = Panel.new()

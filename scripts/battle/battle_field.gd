@@ -73,27 +73,33 @@ func _spawn_normal_wave(node_index: int) -> void:
 	var stat_scale: float = 1.0 + 0.25 * float(node_index - 1)
 	for i in count:
 		var cfg: Dictionary
+		var spr: String = "swarm"
 		# i==0 is always a normal frontliner; from node 2, the rest are randomized.
 		if node_index >= 2 and i > 0:
 			var roll: int = randi() % 3
 			if roll == 1:
 				cfg = RANGED_STATS.duplicate()      # spitter
+				spr = "spitter"
 			elif roll == 2:
 				cfg = SWARMLING_STATS.duplicate()   # fast
+				spr = "swarmling"
 			else:
 				cfg = ENEMY_STATS.duplicate()       # normal
 		else:
 			cfg = ENEMY_STATS.duplicate()
 		cfg["max_hp"] = int(round(float(cfg["max_hp"]) * stat_scale))
 		cfg["attack"] = int(round(float(cfg["attack"]) * stat_scale))
-		var u: Node2D = _make_unit(TEAM_ENEMY, cfg, "swarm")
+		var u: Node2D = _make_unit(TEAM_ENEMY, cfg, spr)
 		var offset: float = (float(i) - float(count - 1) / 2.0) * 84.0
 		u.position = Vector2(900.0, 360.0 + offset)
 
 
 ## Final node: one big boss flanked by two swarm minions.
 func _spawn_boss_wave() -> void:
-	var boss: Node2D = _make_unit(TEAM_ENEMY, BOSS_STATS.duplicate(), "swarm")
+	var boss: Node2D = _make_unit(TEAM_ENEMY, BOSS_STATS.duplicate(), "boss")
+	boss.set("body_scale", 1.5)
+	if boss.has_method("refresh_sprite"):
+		boss.refresh_sprite()
 	boss.position = Vector2(930.0, 360.0)
 	for i in 2:
 		var u: Node2D = _make_unit(TEAM_ENEMY, ENEMY_STATS.duplicate(), "swarm")
