@@ -60,3 +60,16 @@
 - **에셋 생성 규칙**: 새 카드/아이콘/스프라이트는 **종이 질감 + 잉크/DIY 테두리** 유지
   (Flux 프롬프트에 "aged sepia paper, hand-drawn DIY ink border, grunge, flat scan" 포함).
   배경 3D/네온 금지.
+
+## 7. 카드 레이아웃 & 기물/지도 (확립됨)
+
+- **카드** (슬더슬식, `card_bar.gd`): 상단=카테고리 색 띠 + 이름 + 코스트 원형 스탬프,
+  중앙=일러스트(카테고리별 `assets/ui/cards/<cat>.png`, 평면 벡터+그레인), 하단=효과.
+  종이 텍스처는 alpha 0.22 은은한 오버레이. 카테고리: fire/melee/vitality/armor/speed/
+  range/skill/tactic (CARD_CAT 매핑 + CAT_COLOR 액센트). 새 카드 추가 시 CARD_CAT에 매핑.
+- **기물 스프라이트**: 손그림 두들(볼펜+마커) 스타일, 모던~근미래 전술 요원, 경장비/개성 위주
+  (중장갑 금지). 스페이스 오페라 크루 감성. magenta 배경 생성 후 **flood-fill 제거**
+  (`agent_harness/reprocess_art.py` — 코너 키 방식은 Flux가 종이 테두리를 그려 실패하므로
+  가장자리 연결된 마젠타+크림을 BFS 제거, 중앙 도형 보존). 생성: `agent_harness/gen_art2.py`.
+- **맵-핀 연출**: 배경 = 손그림 전술 지도(`assets/bg/bg_map.png`, background.gd가 우선 사용).
+  유닛은 `unit._draw_map_pin()`으로 바닥 그림자 + 압정(스탬프 레드 머리)을 그려 지도에 꽂힌 핀처럼.

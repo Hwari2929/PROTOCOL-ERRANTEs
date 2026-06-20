@@ -11,9 +11,13 @@ func _ready() -> void:
 	paper.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	paper.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	paper.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if ResourceLoader.exists("res://assets/ui/paper.png"):
+	# 전술 지도(진짜 종이) 우선, 없으면 종이 텍스처.
+	if ResourceLoader.exists("res://assets/bg/bg_map.png"):
+		paper.texture = load("res://assets/bg/bg_map.png")
+		paper.modulate = Color(0.98, 0.95, 0.88, 1.0)
+	elif ResourceLoader.exists("res://assets/ui/paper.png"):
 		paper.texture = load("res://assets/ui/paper.png")
-		paper.modulate = Color(0.97, 0.93, 0.84, 1.0)  # 세피아 톤 보정
+		paper.modulate = Color(0.97, 0.93, 0.84, 1.0)
 	else:
 		paper.self_modulate = Color(0.9, 0.85, 0.74)
 	add_child(paper)

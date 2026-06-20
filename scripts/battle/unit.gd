@@ -542,6 +542,8 @@ func _skill_pulse() -> void:
 # Prep-phase drag/selection is owned centrally by PrepController (scripts/ui/prep_controller.gd).
 
 func _draw() -> void:
+	# 전술 지도에 핀처럼 꽂힌 느낌: 바닥 그림자 + 압정.
+	_draw_map_pin()
 	if not _has_sprite:
 		var color: Color = Color.BLUE if team == 0 else Color.RED
 		draw_circle(Vector2.ZERO, 20.0, color)
@@ -563,6 +565,16 @@ func _draw() -> void:
 			draw_circle(Vector2(bx, -40.0), 5.0, col)
 			draw_arc(Vector2(bx, -40.0), 5.0, 0.0, TAU, 14, Color(0.1, 0.08, 0.05, 0.85), 1.2)
 			bx += bw
+
+
+## 전술 지도 위 핀처럼 보이도록 — 바닥 그림자 + 압정.
+func _draw_map_pin() -> void:
+	draw_circle(Vector2(0, 26), 14.0, Color(0.12, 0.09, 0.06, 0.14))
+	draw_circle(Vector2(0, 26), 9.0, Color(0.12, 0.09, 0.06, 0.12))
+	draw_line(Vector2(9, -20), Vector2(12, -30), Color(0.2, 0.16, 0.11), 1.6)
+	draw_circle(Vector2(12, -31), 4.5, Color(0.62, 0.23, 0.18))
+	draw_arc(Vector2(12, -31), 4.5, 0.0, TAU, 14, Color(0.1, 0.08, 0.05, 0.7), 1.0)
+	draw_circle(Vector2(10.6, -32.5), 1.6, Color(0.95, 0.85, 0.75, 0.85))
 
 
 ## 활성 상태이상의 색 목록 (배지 표시용).
