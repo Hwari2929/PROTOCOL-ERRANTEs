@@ -93,7 +93,7 @@ func _on_grade_changed(_new_grade: int) -> void:
 
 func _on_session_ended(victory: bool) -> void:
 	_banner.text = "승리" if victory else "패배"
-	_banner.add_theme_color_override("font_color", Color(0.3, 0.42, 0.2) if victory else Color(0.62, 0.23, 0.18))
+	_banner.add_theme_color_override("font_color", Palette.SUCCESS if victory else Palette.ACCENT)
 	_banner_panel.visible = true
 	_banner.visible = true
 	_retry.visible = true

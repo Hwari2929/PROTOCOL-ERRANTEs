@@ -24,7 +24,7 @@ func _ready() -> void:
 
 func _build_ui() -> void:
 	var bg: ColorRect = ColorRect.new()
-	bg.color = Color(0.16, 0.12, 0.08, 0.5)   # 잉크 세피아 딤 (종이 배경이 비침)
+	bg.color = Color(Palette.INK0, 0.5)   # 잉크 딤 (종이 배경이 비침)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 
