@@ -8,6 +8,14 @@ const SEP := 12.0
 const DECK_POS := Vector2(1150.0, 498.0)
 const HAND_Y := 504.0
 
+# 카드 기울임(틸트) — 누른 채 끌면 포인터 방향으로 기욺. Node2D 래퍼의 skew/scale/rotation으로
+# 2D 의사-원근 구현(셰이더/3D 없이 전단(shear)이 깊이감의 핵심 단서).
+const TILT_ROT := 0.00095   # dx → z-회전(rad/px)
+const TILT_SKEW := 0.0016   # dy → 전단(rad/px)
+const TILT_SCALE := 0.00065 # |drag| → 약한 포어쇼트닝
+const TILT_ROT_MAX := 0.17
+const TILT_SKEW_MAX := 0.32
+
 # 카드 → 일러스트 카테고리
 const CARD_CAT := {
 	"focus_fire": "fire", "heavy_rounds": "fire", "overdrive": "fire", "joint_effort": "fire",
@@ -35,6 +43,8 @@ var _card_sb: StyleBoxFlat
 var _paper: Texture2D
 var _back: Texture2D
 var _illo_cache: Dictionary = {}
+var _tilt_vis: Node2D = null
+var _tilt_start: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
@@ -162,12 +172,23 @@ func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hand_root.add_child(root)
 
+	# 비주얼을 Node2D(vis) 아래 inner Control에 담고 vis를 카드 중앙에 둠 → skew/scale/rotation이
+	# 카드 중심을 기준으로 돈다. 입력 Button은 root 직속(형제, 비주얼 위).
+	var vis := Node2D.new()
+	vis.position = Vector2(CARD_W * 0.5, CARD_H * 0.5)
+	root.add_child(vis)
+	var inner := Control.new()
+	inner.position = Vector2(-CARD_W * 0.5, -CARD_H * 0.5)
+	inner.size = Vector2(CARD_W, CARD_H)
+	inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vis.add_child(inner)
+
 	# 카드 페이스
 	var face := Panel.new()
 	face.add_theme_stylebox_override("panel", _card_sb)
 	face.size = Vector2(CARD_W, CARD_H)
 	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(face)
+	inner.add_child(face)
 	# 종이 은은한 오버레이
 	if _paper != null:
 		var pap := TextureRect.new()
@@ -186,7 +207,7 @@ func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
 	band.position = Vector2(2, 2)
 	band.size = Vector2(CARD_W - 4, 30)
 	band.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(band)
+	inner.add_child(band)
 	# 이름
 	var title := Label.new()
 	title.text = String(card.get("label", cid))
@@ -197,7 +218,7 @@ func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
 	title.position = Vector2(28, 4)
 	title.size = Vector2(CARD_W - 40, 26)
 	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(title)
+	inner.add_child(title)
 
 	# 일러스트 박스
 	var box := ColorRect.new()
@@ -205,7 +226,7 @@ func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
 	box.position = Vector2(10, 38)
 	box.size = Vector2(CARD_W - 20, 112)
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(box)
+	inner.add_child(box)
 	var box_border := Panel.new()
 	var bsb := StyleBoxFlat.new()
 	bsb.bg_color = Color(0, 0, 0, 0)
@@ -216,7 +237,7 @@ func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
 	box_border.position = box.position
 	box_border.size = box.size
 	box_border.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(box_border)
+	inner.add_child(box_border)
 	var illo := _illo(cat)
 	if illo != null:
 		var ir := TextureRect.new()
@@ -226,7 +247,7 @@ func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
 		ir.position = box.position + Vector2(6, 4)
 		ir.size = box.size - Vector2(12, 8)
 		ir.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		root.add_child(ir)
+		inner.add_child(ir)
 
 	# 효과 설명 (하단)
 	var desc := Label.new()
@@ -239,7 +260,7 @@ func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
 	desc.position = Vector2(8, 154)
 	desc.size = Vector2(CARD_W - 16, CARD_H - 160)
 	desc.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(desc)
+	inner.add_child(desc)
 
 	# 코스트 스탬프
 	var badge := Panel.new()
@@ -252,7 +273,7 @@ func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
 	badge.position = Vector2(-7, -7)
 	badge.size = Vector2(32, 32)
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(badge)
+	inner.add_child(badge)
 	var clab := Label.new()
 	clab.text = str(cost)
 	clab.add_theme_font_size_override("font_size", 17)
@@ -276,6 +297,8 @@ func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
 	btn.mouse_entered.connect(func(): _hover(root, target, true))
 	btn.mouse_exited.connect(func(): _hover(root, target, false))
 	btn.pressed.connect(func(): _play_card(root, idx))
+	btn.button_down.connect(func(): _begin_tilt(vis))
+	btn.button_up.connect(func(): _end_tilt(vis))
 
 	# 드로우 모션
 	root.position = DECK_POS
@@ -286,6 +309,37 @@ func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
 	tw.tween_property(root, "position", target, 0.32).set_delay(float(idx) * 0.07)
 	tw.tween_property(root, "scale", Vector2.ONE, 0.32).set_delay(float(idx) * 0.07)
 	tw.tween_property(root, "rotation", 0.0, 0.32).set_delay(float(idx) * 0.07)
+
+
+func _begin_tilt(vis: Node2D) -> void:
+	_tilt_vis = vis
+	_tilt_start = get_global_mouse_position()
+
+
+func _end_tilt(vis: Node2D) -> void:
+	if _tilt_vis == vis:
+		_tilt_vis = null
+	if vis != null and is_instance_valid(vis):
+		# ease-pop 복귀(톡 하고 펴짐)
+		var tw := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_parallel(true)
+		tw.tween_property(vis, "rotation", 0.0, 0.28)
+		tw.tween_property(vis, "skew", 0.0, 0.28)
+		tw.tween_property(vis, "scale", Vector2.ONE, 0.28)
+
+
+func _process(_dt: float) -> void:
+	# 누른 채 끌면 포인터 방향으로 카드가 기욺.
+	if _tilt_vis == null or not is_instance_valid(_tilt_vis):
+		_tilt_vis = null
+		return
+	if not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		return
+	var off: Vector2 = get_global_mouse_position() - _tilt_start
+	_tilt_vis.rotation = clampf(off.x * TILT_ROT, -TILT_ROT_MAX, TILT_ROT_MAX)
+	_tilt_vis.skew = clampf(off.y * TILT_SKEW, -TILT_SKEW_MAX, TILT_SKEW_MAX)
+	var sh: float = minf(abs(off.x), 200.0) * TILT_SCALE
+	var sv: float = minf(abs(off.y), 200.0) * TILT_SCALE
+	_tilt_vis.scale = Vector2(maxf(0.82, 1.0 - sh), maxf(0.82, 1.0 - sv))
 
 
 func _hover(root: Control, base: Vector2, on: bool) -> void:

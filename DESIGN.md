@@ -35,9 +35,11 @@
 
 ## 4. 텍스처 처리
 
-- 배경: `scripts/ui/background.gd` (CanvasLayer −10) = `assets/ui/paper.png` 종이 베이스
-  + 절차적 **필름 그레인**(FastNoiseLite, 낮은 불투명도) 오버레이.
-- **3D/사실적 배경 그래픽은 숨김** (assets/bg/* 미사용). 분위기는 종이+그레인으로만.
+- 배경: `scripts/ui/background.gd` (CanvasLayer −10) = **크림 `clear_color`(0.82,0.76,0.64)
+  위에 절차적 필름 그레인(FastNoiseLite, 낮은 불투명도)만**. 배경 이미지 없음.
+- **전투 배경 그래픽은 전면 제거** (2026-06-20). 종이 텍스처/지도/3D 모두 미사용
+  (`assets/ui/paper.png`, `assets/bg/*`는 카드·생성용으로만 잔존, 화면 배경엔 안 씀).
+  분위기는 크림 톤 + 그레인으로만.
 
 ## 5. 새 UI를 추가할 때
 
@@ -71,5 +73,7 @@
   (중장갑 금지). 스페이스 오페라 크루 감성. magenta 배경 생성 후 **flood-fill 제거**
   (`agent_harness/reprocess_art.py` — 코너 키 방식은 Flux가 종이 테두리를 그려 실패하므로
   가장자리 연결된 마젠타+크림을 BFS 제거, 중앙 도형 보존). 생성: `agent_harness/gen_art2.py`.
-- **맵-핀 연출**: 배경 = 손그림 전술 지도(`assets/bg/bg_map.png`, background.gd가 우선 사용).
-  유닛은 `unit._draw_map_pin()`으로 바닥 그림자 + 압정(스탬프 레드 머리)을 그려 지도에 꽂힌 핀처럼.
+- **핀 연출**: 유닛은 `unit._draw_map_pin()`으로 바닥 그림자 + 압정(스탬프 레드 머리)을 그려
+  종이에 꽂힌 핀처럼 표현. (배경 지도는 제거됨 — §4 참고. 평평한 크림 종이 위 핀으로만 유지.)
+- **적(군체) 디자인**: 웨이브 유형별 스프라이트 분리 — swarm/spitter/swarmling + boss(1.5배).
+  `battle_field._spawn_normal_wave`가 유형별 sprite_id 전달, 동일 디자인 금지.
