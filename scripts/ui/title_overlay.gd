@@ -13,14 +13,14 @@ func _ready() -> void:
 	if ResourceLoader.exists("res://assets/ui/paper.png"):
 		var tex := TextureRect.new()
 		tex.texture = load("res://assets/ui/paper.png")
-		tex.modulate = Color(0.97, 0.93, 0.84, 1.0)
+		tex.modulate = Palette.PAPER0
 		tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		tex.set_anchors_preset(Control.PRESET_FULL_RECT)
 		tex.mouse_filter = Control.MOUSE_FILTER_STOP
 		add_child(tex)
 	_background = ColorRect.new()
-	_background.color = Color(0.86, 0.8, 0.68, 0.35) if ResourceLoader.exists("res://assets/ui/paper.png") else Color(0.86, 0.8, 0.68, 1.0)
+	_background.color = Color(Palette.PAPER2, 0.35) if ResourceLoader.exists("res://assets/ui/paper.png") else Palette.PAPER1
 	_background.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_background.mouse_filter = Control.MOUSE_FILTER_STOP  # block the screen behind
 	add_child(_background)
@@ -45,8 +45,8 @@ func _ready() -> void:
 	if emphasis != null:
 		_title_label.add_theme_font_override("font", emphasis)
 	_title_label.add_theme_font_size_override("font_size", 66)
-	_title_label.add_theme_color_override("font_color", Color(0.62, 0.23, 0.18))  # 스탬프 레드
-	_title_label.add_theme_color_override("font_outline_color", Color(0.93, 0.88, 0.78, 0.9))
+	_title_label.add_theme_color_override("font_color", Palette.ACCENT)
+	_title_label.add_theme_color_override("font_outline_color", Palette.PAPER0)
 	_title_label.add_theme_constant_override("outline_size", 6)
 	_vbox.add_child(_title_label)
 
@@ -55,16 +55,19 @@ func _ready() -> void:
 	_subtitle_label.text = "전술 오토배틀러"
 	_subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_subtitle_label.add_theme_font_size_override("font_size", 24)
-	_subtitle_label.add_theme_color_override("font_color", Color(0.36, 0.3, 0.22))
+	_subtitle_label.add_theme_color_override("font_color", Palette.INK2)
 	_vbox.add_child(_subtitle_label)
 
-	# Persistent record line
+	# Persistent record line — 모노 카탈로그 라벨(대문자)
 	_record_label = Label.new()
 	var rec: Dictionary = SaveStore.load_record()
-	_record_label.text = "Best: %d nodes   ·   Wins %d / %d runs" % [int(rec["best_nodes"]), int(rec["wins"]), int(rec["runs"])]
+	_record_label.text = "BEST %d NODES   ·   WINS %d / %d RUNS" % [int(rec["best_nodes"]), int(rec["wins"]), int(rec["runs"])]
 	_record_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_record_label.add_theme_font_size_override("font_size", 16)
-	_record_label.add_theme_color_override("font_color", Color(0.45, 0.38, 0.28))
+	_record_label.add_theme_font_size_override("font_size", 14)
+	var mono: FontFile = Palette.font(Palette.F_MONO)
+	if mono != null:
+		_record_label.add_theme_font_override("font", mono)
+	_record_label.add_theme_color_override("font_color", Palette.INK3)
 	_vbox.add_child(_record_label)
 
 	# Start Button

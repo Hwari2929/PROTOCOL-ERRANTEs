@@ -14,7 +14,7 @@ var _drag_offset: Vector2 = Vector2.ZERO
 var _arranged: bool = false
 var _is_prep: bool = true
 
-var _info_bg: ColorRect
+var _info_bg: Panel
 var _info_rt: RichTextLabel
 var _upgrade_box: VBoxContainer
 var _based_engineers: Dictionary = {}   # engineer instance_id → base spawned
@@ -38,8 +38,8 @@ func _ready() -> void:
 
 
 func _build_info_panel() -> void:
-	_info_bg = ColorRect.new()
-	_info_bg.color = Color(0.93, 0.88, 0.78, 0.96)
+	_info_bg = Panel.new()
+	_info_bg.add_theme_stylebox_override("panel", Palette.card_face(Palette.R_MD, Vector2(3, 3)))
 	_info_bg.position = Vector2(6.0, 106.0)
 	_info_bg.size = Vector2(238.0, 516.0)
 	_info_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -53,7 +53,7 @@ func _build_info_panel() -> void:
 	_info_rt.size = Vector2(220.0, 500.0)
 	_info_rt.add_theme_font_size_override("normal_font_size", 14)
 	_info_rt.add_theme_font_size_override("bold_font_size", 15)
-	_info_rt.add_theme_color_override("default_color", Color(0.16, 0.12, 0.08))
+	_info_rt.add_theme_color_override("default_color", Palette.INK0)
 	_info_rt.mouse_filter = Control.MOUSE_FILTER_PASS
 	_info_rt.visible = false
 	add_child(_info_rt)
@@ -308,13 +308,15 @@ func _skill_block(u: Node, sl: Dictionary) -> String:
 
 func _draw() -> void:
 	if _is_prep:
-		# 영수증/도면 느낌: 종이 위 잉크 테두리.
-		draw_rect(DEPLOY, Color(0.16, 0.12, 0.08, 0.05), true)
-		draw_rect(DEPLOY, Color(0.18, 0.14, 0.1, 0.7), false, 2.0)
-		draw_rect(BENCH, Color(0.62, 0.23, 0.18, 0.05), true)
-		draw_rect(BENCH, Color(0.5, 0.32, 0.18, 0.7), false, 2.0)
-		var font := ThemeDB.fallback_font
-		draw_string(font, DEPLOY.position + Vector2(8.0, 20.0), "■ 배치 구역", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0.22, 0.17, 0.11, 0.9))
-		draw_string(font, BENCH.position + Vector2(8.0, 20.0), "□ 대기실", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0.5, 0.3, 0.18, 0.9))
+		# 도면 느낌: 종이 위 잉크 테두리(배치 구역=잉크, 대기실=아카이브 레드).
+		draw_rect(DEPLOY, Color(Palette.INK0, 0.05), true)
+		draw_rect(DEPLOY, Color(Palette.INK0, 0.7), false, 2.0)
+		draw_rect(BENCH, Color(Palette.ACCENT, 0.05), true)
+		draw_rect(BENCH, Color(Palette.ACCENT, 0.6), false, 2.0)
+		var font: Font = Palette.font(Palette.F_BODY)
+		if font == null:
+			font = ThemeDB.fallback_font
+		draw_string(font, DEPLOY.position + Vector2(8.0, 20.0), "■ 배치 구역", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(Palette.INK0, 0.9))
+		draw_string(font, BENCH.position + Vector2(8.0, 20.0), "□ 대기실", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(Palette.ACCENT, 0.9))
 	if _selected != null and is_instance_valid(_selected):
-		draw_arc(_selected.global_position, 30.0, 0.0, TAU, 32, Color(0.62, 0.23, 0.18, 0.95), 2.5)
+		draw_arc(_selected.global_position, 30.0, 0.0, TAU, 32, Color(Palette.ACCENT, 0.95), 2.5)
