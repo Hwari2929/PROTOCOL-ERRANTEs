@@ -13,18 +13,26 @@ var _retry: Button
 func _ready() -> void:
 	# Let world clicks (unit drag/select) pass through the HUD; only buttons grab input.
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# 가독성용 패널 배경 (상단 좌측 상태 표시).
+	# 가독성용 패널 배경 (상단 좌측 상태 표시) — 모서리 테이프.
 	var hud_bg: Panel = Panel.new()
 	hud_bg.position = Vector2(8.0, 8.0)
-	hud_bg.size = Vector2(252.0, 92.0)
+	hud_bg.size = Vector2(244.0, 84.0)
 	hud_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(hud_bg)
+	var htape := Decor.tape(64.0, 22.0, -6.0)
+	htape.position = Vector2(168.0, -11.0)
+	hud_bg.add_child(htape)
 	var vbox: VBoxContainer = VBoxContainer.new()
 	vbox.position = Vector2(20.0, 14.0)
-	vbox.add_theme_constant_override("separation", 6)
+	vbox.add_theme_constant_override("separation", 4)
 	add_child(vbox)
-	_progress = _make_label(vbox, 24)
-	_grade = _make_label(vbox, 24)
+	# 노드 카운터=모노 카탈로그(영문), 공명/크레딧=본문 명조.
+	_progress = _make_label(vbox, 22)
+	var mono: FontFile = Palette.font(Palette.F_MONO_BOLD)
+	if mono != null:
+		_progress.add_theme_font_override("font", mono)
+	_progress.add_theme_color_override("font_color", Palette.ACCENT)
+	_grade = _make_label(vbox, 16)
 
 	# 결과 배너 — 종이 카드 + 중앙 정렬.
 	_banner_panel = Panel.new()
@@ -113,7 +121,7 @@ func refresh() -> void:
 			node_i = sess.current_node()
 		if sess.has_method("node_count"):
 			node_n = sess.node_count()
-	_progress.text = "노드 %d / %d" % [node_i, node_n]
+	_progress.text = "NODE %d / %d" % [node_i, node_n]
 
 	var grade: int = 1
 	var credits: int = 0

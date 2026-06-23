@@ -23,6 +23,9 @@ func _ready() -> void:
     bg.offset_top = 104.0
     bg.offset_bottom = 320.0
     add_child(bg)
+    var tape: Decor = Decor.tape(70.0, 22.0, -6.0)
+    tape.position = Vector2(16.0, -11.0)
+    bg.add_child(tape)
 
     add_child(_content)
 
@@ -37,7 +40,11 @@ func _ready() -> void:
 
     var _title: Label = Label.new()
     _title.text = "공명 강화"
-    _title.add_theme_font_size_override("font_size", 20)
+    _title.add_theme_font_size_override("font_size", 19)
+    var _hf: FontFile = Palette.font(Palette.F_HEAD)
+    if _hf != null:
+        _title.add_theme_font_override("font", _hf)
+    _title.add_theme_color_override("font_color", Palette.ACCENT)
     _content.add_child(_title)
 
     refresh()

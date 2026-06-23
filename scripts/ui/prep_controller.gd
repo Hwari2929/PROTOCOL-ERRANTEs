@@ -92,7 +92,10 @@ func _on_phase_changed(phase: int) -> void:
 	if _is_prep:
 		_try_arrange()
 	else:
+		# 전투 진입: 드래그/선택 해제 + 정보·업그레이드 패널 숨김(선택 링 잔상 방지).
 		_dragging = null
+		_selected = null
+		_update_info()
 		if _upgrade_box != null:
 			_upgrade_box.visible = false
 	queue_redraw()
