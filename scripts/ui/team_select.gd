@@ -40,6 +40,18 @@ func _build_ui() -> void:
 	card.offset_bottom = 268.0
 	add_child(card)
 
+	# BINDER 재질 사물: 모서리 마스킹 테이프 + 상단 종이 클립.
+	var cw: float = 492.0
+	var t1 := Decor.tape(80.0, 26.0, -7.0)
+	t1.position = Vector2(-16.0, -13.0)
+	card.add_child(t1)
+	var t2 := Decor.tape(80.0, 26.0, 7.0)
+	t2.position = Vector2(cw - 64.0, -13.0)
+	card.add_child(t2)
+	var clip := Decor.clip()
+	clip.position = Vector2(cw * 0.5 - 13.0, -22.0)
+	card.add_child(clip)
+
 	var outer: VBoxContainer = VBoxContainer.new()
 	outer.alignment = BoxContainer.ALIGNMENT_CENTER
 	outer.add_theme_constant_override("separation", 8)

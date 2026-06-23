@@ -119,6 +119,10 @@ func _build_deck_pile() -> void:
 		shadow.position = DECK_POS + Vector2(float(-i) * 1.6, float(-i) * 2.5)
 		shadow.modulate = Color(1, 1, 1, 0.45 + 0.11 * float(i))
 		_deck_pile.add_child(shadow)
+	# 종이 클립을 덱 상단에 끼운 느낌.
+	var clip := Decor.clip()
+	clip.position = DECK_POS + Vector2(CARD_W * 0.5 - 13.0, -16.0)
+	_deck_pile.add_child(clip)
 	_deck_count = Label.new()
 	_deck_count.add_theme_font_size_override("font_size", 13)
 	var mono := Palette.font(Palette.F_MONO)
@@ -380,16 +384,19 @@ func _make_card(card: Dictionary, idx: int, n: int, target: Vector2) -> void:
 	btn.button_down.connect(func(): _begin_tilt(vis))
 	btn.button_up.connect(func(): _end_tilt(vis))
 
-	# 드로우/딜 모션(BINDER tDeal): 덱에서 살짝 회전·축소된 채 날아와 팬 위치에 안착.
+	# 드로우/딜 모션(BINDER tDeal + 플립): 덱에서 엣지온(scale.x≈0)으로 날아와 팬 위치에서
+	# scale.x가 펼쳐지며 정면을 보이는 2D 가짜 Y플립.
 	root.position = DECK_POS
-	root.scale = Vector2(0.62, 0.62)
+	root.scale = Vector2(0.06, 0.66)
 	root.rotation = 0.5
 	var dly: float = float(idx) * 0.08
 	var tw := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.set_parallel(true)
 	tw.tween_property(root, "position", base, 0.36).set_delay(dly)
-	tw.tween_property(root, "scale", Vector2.ONE, 0.36).set_delay(dly)
+	tw.tween_property(root, "scale:y", 1.0, 0.36).set_delay(dly)
 	tw.tween_property(root, "rotation", fan_rot, 0.36).set_delay(dly)
+	# 플립: 도착 직전 빠르게 펼쳐짐(BACK 오버슈트 = 톡 펴짐).
+	tw.tween_property(root, "scale:x", 1.0, 0.3).set_delay(dly + 0.12)
 
 
 func _begin_tilt(vis: Node2D) -> void:

@@ -81,6 +81,11 @@ func _ready() -> void:
 	_vbox.add_child(spacer)
 	_vbox.add_child(_start_button)
 
+	# BINDER 재질: 비스듬한 고무 도장(아카이브 표지 느낌).
+	var stamp := Decor.stamp("CASE No.2049", -11.0, 186.0, 48.0)
+	stamp.position = Vector2(936.0, 96.0)
+	add_child(stamp)
+
 func dismiss() -> void:
 	visible = false
 
