@@ -44,6 +44,10 @@ func _build_info_panel() -> void:
 	_info_bg.size = Vector2(238.0, 516.0)
 	_info_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_info_bg.visible = false
+	# BINDER 재질: 상단 마스킹 테이프.
+	var tape := Decor.tape(72.0, 24.0, -6.0)
+	tape.position = Vector2(14.0, -12.0)
+	_info_bg.add_child(tape)
 	add_child(_info_bg)
 
 	_info_rt = RichTextLabel.new()

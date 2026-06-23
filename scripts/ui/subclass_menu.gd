@@ -39,6 +39,17 @@ func show_for(unit: Node) -> void:
 	card.process_mode = Node.PROCESS_MODE_ALWAYS
 	bg.add_child(card)
 
+	# BINDER 재질 사물: 모서리 마스킹 테이프.
+	var cw: float = 448.0
+	var t1 := Decor.tape(76.0, 24.0, -8.0)
+	t1.position = Vector2(-14.0, -12.0)
+	t1.process_mode = Node.PROCESS_MODE_ALWAYS
+	card.add_child(t1)
+	var t2 := Decor.tape(76.0, 24.0, 8.0)
+	t2.position = Vector2(cw - 62.0, -12.0)
+	t2.process_mode = Node.PROCESS_MODE_ALWAYS
+	card.add_child(t2)
+
 	var vbox := VBoxContainer.new()
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	vbox.anchor_left = 0.5
