@@ -23,7 +23,7 @@ func _ready() -> void:
 	add_child(_btn)
 
 	_label = Label.new()
-	_label.text = "유닛을 드래그해 배치 / 대기실로 이동 후 전투 시작"
+	_label.text = "유닛 배치 · 카드를 눌러 사용 대기 등록(재클릭=취소) 후 전투 시작"
 	_label.add_theme_font_size_override("font_size", 16)
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_label.add_theme_font_size_override("font_size", 13)
@@ -45,6 +45,10 @@ func _ready() -> void:
 
 
 func _on_start_combat_pressed() -> void:
+	# 전투 시작 직전, 사용 대기 카드를 일괄 사용(효과 적용 → 그다음 전투 진입).
+	var card_bar: Node = get_parent().get_node_or_null("CardBar")
+	if card_bar != null and card_bar.has_method("commit_pending"):
+		card_bar.commit_pending()
 	var bf: Node = get_parent().get_parent().get_node_or_null("BattleField")
 	if bf != null and bf.has_method("start_combat"):
 		bf.start_combat()
