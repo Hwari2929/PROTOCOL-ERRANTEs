@@ -19,6 +19,9 @@ const TILT_SKEW_MAX := 0.32
 # 사용 대기(큐) 연출 높이
 const PENDING_LIFT := 36.0
 const HOVER_LIFT := 18.0
+# BINDER 팬(부채꼴): 손패를 가운데 기준 완만한 호로 펼침(중앙↑, 가장자리↓+회전).
+const FAN_STEP := 0.085   # 카드당 회전(rad, 중앙 기준)
+const FAN_ARC_Y := 8.0    # 중앙에서 멀수록 아래로(px)
 
 # 카드 → 일러스트 카테고리
 const CARD_CAT := {
@@ -110,10 +113,11 @@ func _build_deck_pile() -> void:
 	_deck_pile = Control.new()
 	_deck_pile.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_deck_pile)
-	for i in range(3):
+	# BINDER 덱 더미: 다층 face-down, 각 층 좌상 2.5px 오프셋(깊이감).
+	for i in range(6):
 		var shadow := _card_face_back()
-		shadow.position = DECK_POS + Vector2(float(i) * 2.5, float(-i) * 2.5)
-		shadow.modulate = Color(1, 1, 1, 0.5 + 0.16 * float(i))
+		shadow.position = DECK_POS + Vector2(float(-i) * 1.6, float(-i) * 2.5)
+		shadow.modulate = Color(1, 1, 1, 0.45 + 0.11 * float(i))
 		_deck_pile.add_child(shadow)
 	_deck_count = Label.new()
 	_deck_count.add_theme_font_size_override("font_size", 13)
@@ -180,17 +184,23 @@ func _refresh() -> void:
 	var start_x: float = (1280.0 - total_w) * 0.5 + 110.0
 	for i in n:
 		var target := Vector2(start_x + float(i) * (CARD_W + SEP), HAND_Y)
-		_make_card(hand[i], i, target)
+		_make_card(hand[i], i, n, target)
 	_update_affordability()
 	_refresh_tp()
 
 
-func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
+func _make_card(card: Dictionary, idx: int, n: int, target: Vector2) -> void:
 	var cid: String = String(card.get("id", ""))
 	var cost: int = int(card.get("cost", 1))
 	var affordable: bool = int(_deck.get_tp()) >= cost
 	var cat: String = String(CARD_CAT.get(cid, "tactic"))
 	var accent: Color = CAT_COLOR.get(cat, Color(0.5, 0.3, 0.2))
+
+	# 팬: 중앙 기준 회전 + 호(중앙은 높고 가장자리는 낮음).
+	var d: float = float(idx) - float(n - 1) * 0.5
+	var fan_rot: float = d * FAN_STEP
+	var fan_y: float = absf(d) * FAN_ARC_Y
+	var base := Vector2(target.x, target.y + fan_y)
 
 	var root := Control.new()
 	root.size = Vector2(CARD_W, CARD_H)
@@ -359,7 +369,7 @@ func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
 
 	var meta := {
 		"root": root, "vis": vis, "card": card, "cost": cost,
-		"base": target, "pending": false, "sel": sel, "tab": tab,
+		"base": base, "fan_rot": fan_rot, "pending": false, "sel": sel, "tab": tab,
 		"btn": btn, "badge_sb": bs,
 	}
 	_cards.append(meta)
@@ -370,15 +380,16 @@ func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
 	btn.button_down.connect(func(): _begin_tilt(vis))
 	btn.button_up.connect(func(): _end_tilt(vis))
 
-	# 드로우 모션
+	# 드로우/딜 모션(BINDER tDeal): 덱에서 살짝 회전·축소된 채 날아와 팬 위치에 안착.
 	root.position = DECK_POS
-	root.scale = Vector2(0.6, 0.6)
+	root.scale = Vector2(0.62, 0.62)
 	root.rotation = 0.5
+	var dly: float = float(idx) * 0.08
 	var tw := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.set_parallel(true)
-	tw.tween_property(root, "position", target, 0.32).set_delay(float(idx) * 0.07)
-	tw.tween_property(root, "scale", Vector2.ONE, 0.32).set_delay(float(idx) * 0.07)
-	tw.tween_property(root, "rotation", 0.0, 0.32).set_delay(float(idx) * 0.07)
+	tw.tween_property(root, "position", base, 0.36).set_delay(dly)
+	tw.tween_property(root, "scale", Vector2.ONE, 0.36).set_delay(dly)
+	tw.tween_property(root, "rotation", fan_rot, 0.36).set_delay(dly)
 
 
 func _begin_tilt(vis: Node2D) -> void:
@@ -418,6 +429,11 @@ func _settle_y(meta: Dictionary) -> float:
 	return base.y - (PENDING_LIFT if bool(meta["pending"]) else 0.0)
 
 
+func _settle_rot(meta: Dictionary) -> float:
+	# 안착 회전(대기/호버 시 똑바로 펴짐, 평시엔 팬 회전).
+	return 0.0 if bool(meta["pending"]) else float(meta["fan_rot"])
+
+
 func _hover(meta: Dictionary, on: bool) -> void:
 	var root: Control = meta["root"]
 	if not is_instance_valid(root):
@@ -425,10 +441,12 @@ func _hover(meta: Dictionary, on: bool) -> void:
 	var pending: bool = bool(meta["pending"])
 	var y := _settle_y(meta) - (HOVER_LIFT if on else 0.0)
 	var sc := 1.08 if on else (1.04 if pending else 1.0)
+	var rot := 0.0 if (on or pending) else float(meta["fan_rot"])
 	var tw := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw.set_parallel(true)
 	tw.tween_property(root, "position:y", y, 0.12)
 	tw.tween_property(root, "scale", Vector2(sc, sc), 0.12)
+	tw.tween_property(root, "rotation", rot, 0.12)
 
 
 ## 카드 클릭 = 사용 대기 큐 토글(즉시 사용 아님). 전투 시작 시 일괄 사용.
@@ -458,6 +476,7 @@ func _apply_pending_visual(meta: Dictionary) -> void:
 	var tw := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_parallel(true)
 	tw.tween_property(root, "position:y", _settle_y(meta), 0.2)
 	tw.tween_property(root, "scale", Vector2(sc, sc), 0.2)
+	tw.tween_property(root, "rotation", _settle_rot(meta), 0.2)
 
 
 ## 잔여 TP로 등록 불가한(대기 아님) 카드는 흐리게 + 비활성. 대기 카드는 항상 토글 가능.
@@ -496,18 +515,25 @@ func commit_pending() -> void:
 
 
 func _play_shuffle_fx() -> void:
+	# BINDER 리플 셔플: 두 더미로 갈라졌다 호를 그리며 맞물려 복귀(좌/우 교대, 스태거).
 	if not visible:
 		return
-	for i in range(6):
+	for i in range(8):
 		var card := _card_face_back()
 		card.position = DECK_POS
 		card.pivot_offset = Vector2(CARD_W * 0.5, CARD_H * 0.5)
 		add_child(card)
-		var off := Vector2(randf_range(-70, 70), randf_range(-40, 20))
-		var tw := create_tween().set_trans(Tween.TRANS_QUAD)
+		var s := -1.0 if i % 2 == 0 else 1.0   # 좌/우 더미
+		var tw := create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 		tw.set_parallel(true)
-		tw.tween_property(card, "position", DECK_POS + off, 0.16).set_delay(float(i) * 0.03)
-		tw.tween_property(card, "rotation", randf_range(-0.4, 0.4), 0.16).set_delay(float(i) * 0.03)
-		tw.chain().tween_property(card, "position", DECK_POS, 0.16)
-		tw.parallel().tween_property(card, "rotation", 0.0, 0.16)
+		var dly: float = float(i) * 0.06
+		# 0→30%: 갈라짐(바깥 위로)
+		tw.tween_property(card, "position", DECK_POS + Vector2(s * 74.0, -26.0), 0.33).set_delay(dly)
+		tw.tween_property(card, "rotation", s * -0.23, 0.33).set_delay(dly)
+		# 30→60%: 맞물리며 안쪽으로
+		tw.chain().tween_property(card, "position", DECK_POS + Vector2(s * 30.0, 8.0), 0.27)
+		tw.parallel().tween_property(card, "rotation", s * -0.07, 0.27)
+		# 60→100%: 복귀
+		tw.chain().tween_property(card, "position", DECK_POS, 0.3)
+		tw.parallel().tween_property(card, "rotation", 0.0, 0.3)
 		tw.chain().tween_callback(card.queue_free)
