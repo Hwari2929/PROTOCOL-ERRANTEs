@@ -16,6 +16,10 @@ const TILT_SCALE := 0.00065 # |drag| → 약한 포어쇼트닝
 const TILT_ROT_MAX := 0.17
 const TILT_SKEW_MAX := 0.32
 
+# 사용 대기(큐) 연출 높이
+const PENDING_LIFT := 36.0
+const HOVER_LIFT := 18.0
+
 # 카드 → 일러스트 카테고리
 const CARD_CAT := {
 	"focus_fire": "fire", "heavy_rounds": "fire", "overdrive": "fire", "joint_effort": "fire",
@@ -45,6 +49,9 @@ var _back: Texture2D
 var _illo_cache: Dictionary = {}
 var _tilt_vis: Node2D = null
 var _tilt_start: Vector2 = Vector2.ZERO
+# 카드 즉시 사용 대신 "사용 대기" 큐에 토글 등록 → 전투 시작 시 일괄 사용.
+var _cards: Array = []        # 표시 중 카드 메타({root,vis,card,cost,base,pending,sel,tab,btn})
+var _pending: Array = []      # 대기 중 카드(dict 참조) 순서 목록
 
 
 func _ready() -> void:
@@ -142,18 +149,31 @@ func _card_face_back() -> Control:
 
 
 func _refresh_tp() -> void:
-	if _deck != null:
-		_tp_label.text = "TP %d" % int(_deck.get_tp())
+	if _deck == null:
+		return
+	var tp: int = int(_deck.get_tp())
+	var q: int = _pending_cost()
+	# 대기 중이면 잔여 TP와 큐 소모량을 함께 표기(모노 라벨 → 영문).
+	_tp_label.text = "TP %d  USE %d" % [tp - q, q] if q > 0 else "TP %d" % tp
+
+
+func _pending_cost() -> int:
+	var s: int = 0
+	for c in _pending:
+		s += int(c.get("cost", 1))
+	return s
 
 
 func _refresh() -> void:
 	if _deck == null:
 		return
-	_refresh_tp()
-	if _deck_count != null:
-		_deck_count.text = "DECK %d" % int(_deck.deck_count())
+	# 새 패(노드 전환 등)면 대기 큐는 무효 → 초기화.
+	_pending.clear()
+	_cards.clear()
 	for c in _hand_root.get_children():
 		c.queue_free()
+	if _deck_count != null:
+		_deck_count.text = "DECK %d" % int(_deck.deck_count())
 	var hand: Array = _deck.get_hand()
 	var n: int = hand.size()
 	var total_w: float = float(n) * CARD_W + float(max(0, n - 1)) * SEP
@@ -161,6 +181,8 @@ func _refresh() -> void:
 	for i in n:
 		var target := Vector2(start_x + float(i) * (CARD_W + SEP), HAND_Y)
 		_make_card(hand[i], i, target)
+	_update_affordability()
+	_refresh_tp()
 
 
 func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
@@ -292,19 +314,59 @@ func _make_card(card: Dictionary, idx: int, target: Vector2) -> void:
 	clab.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	badge.add_child(clab)
 
+	# 사용 대기 강조: 아카이브 레드 외곽선(평시 숨김) — vis 안이라 카드와 함께 기욺.
+	var sel := Panel.new()
+	var ssb := StyleBoxFlat.new()
+	ssb.bg_color = Color(0, 0, 0, 0)
+	ssb.set_border_width_all(Palette.BW_BOLD)
+	ssb.border_color = Palette.ACCENT
+	ssb.set_corner_radius_all(Palette.R_SM)
+	Palette.with_key_shadow(ssb, Vector2(0, 0))
+	sel.add_theme_stylebox_override("panel", ssb)
+	sel.size = Vector2(CARD_W, CARD_H)
+	sel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sel.visible = false
+	inner.add_child(sel)
+
+	# "출격 대기" 탭 리본 — 카드 위쪽(root 직속, 기울지 않음).
+	var tab := Panel.new()
+	var tsb := Palette.chip_box(Palette.ACCENT, Palette.R_XS)
+	Palette.with_key_shadow(tsb, Vector2(2, 2))
+	tab.add_theme_stylebox_override("panel", tsb)
+	tab.position = Vector2(CARD_W * 0.5 - 47.0, -26.0)
+	tab.size = Vector2(94.0, 24.0)
+	tab.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tab.visible = false
+	root.add_child(tab)
+	var tlab := Label.new()
+	tlab.text = "▲ 출격 대기"
+	tlab.add_theme_font_size_override("font_size", 13)
+	tlab.add_theme_color_override("font_color", Palette.PAPER0)
+	tlab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tlab.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	tlab.set_anchors_preset(Control.PRESET_FULL_RECT)
+	tlab.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tab.add_child(tlab)
+
 	# 클릭/호버
 	var btn := Button.new()
 	btn.flat = true
 	btn.size = Vector2(CARD_W, CARD_H)
-	btn.disabled = not affordable
 	var empty := StyleBoxEmpty.new()
 	for s in ["normal", "hover", "pressed", "disabled", "focus"]:
 		btn.add_theme_stylebox_override(s, empty)
 	root.add_child(btn)
-	root.modulate = Color(1, 1, 1, 1) if affordable else Color(0.86, 0.83, 0.77, 0.9)
-	btn.mouse_entered.connect(func(): _hover(root, target, true))
-	btn.mouse_exited.connect(func(): _hover(root, target, false))
-	btn.pressed.connect(func(): _play_card(root, idx))
+
+	var meta := {
+		"root": root, "vis": vis, "card": card, "cost": cost,
+		"base": target, "pending": false, "sel": sel, "tab": tab,
+		"btn": btn, "badge_sb": bs,
+	}
+	_cards.append(meta)
+
+	btn.mouse_entered.connect(func(): _hover(meta, true))
+	btn.mouse_exited.connect(func(): _hover(meta, false))
+	btn.pressed.connect(func(): _toggle_card(meta))
 	btn.button_down.connect(func(): _begin_tilt(vis))
 	btn.button_up.connect(func(): _end_tilt(vis))
 
@@ -350,26 +412,87 @@ func _process(_dt: float) -> void:
 	_tilt_vis.scale = Vector2(maxf(0.82, 1.0 - sh), maxf(0.82, 1.0 - sv))
 
 
-func _hover(root: Control, base: Vector2, on: bool) -> void:
+func _settle_y(meta: Dictionary) -> float:
+	# 카드가 안착할 y(대기 중이면 들려 있음).
+	var base: Vector2 = meta["base"]
+	return base.y - (PENDING_LIFT if bool(meta["pending"]) else 0.0)
+
+
+func _hover(meta: Dictionary, on: bool) -> void:
+	var root: Control = meta["root"]
 	if not is_instance_valid(root):
 		return
+	var pending: bool = bool(meta["pending"])
+	var y := _settle_y(meta) - (HOVER_LIFT if on else 0.0)
+	var sc := 1.08 if on else (1.04 if pending else 1.0)
 	var tw := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw.set_parallel(true)
-	tw.tween_property(root, "position:y", base.y - (22.0 if on else 0.0), 0.12)
-	tw.tween_property(root, "scale", Vector2(1.08, 1.08) if on else Vector2.ONE, 0.12)
+	tw.tween_property(root, "position:y", y, 0.12)
+	tw.tween_property(root, "scale", Vector2(sc, sc), 0.12)
 
 
-func _play_card(root: Control, idx: int) -> void:
+## 카드 클릭 = 사용 대기 큐 토글(즉시 사용 아님). 전투 시작 시 일괄 사용.
+func _toggle_card(meta: Dictionary) -> void:
+	var card: Dictionary = meta["card"]
+	if bool(meta["pending"]):
+		_pending.erase(card)
+		meta["pending"] = false
+	else:
+		var cost: int = int(meta["cost"])
+		if cost > int(_deck.get_tp()) - _pending_cost():
+			_reject(meta)   # TP 부족 → 등록 거부
+			return
+		_pending.append(card)
+		meta["pending"] = true
+	_apply_pending_visual(meta)
+	_update_affordability()
+	_refresh_tp()
+
+
+func _apply_pending_visual(meta: Dictionary) -> void:
+	var root: Control = meta["root"]
+	var pending: bool = bool(meta["pending"])
+	(meta["sel"] as CanvasItem).visible = pending
+	(meta["tab"] as CanvasItem).visible = pending
+	var sc := 1.04 if pending else 1.0
+	var tw := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).set_parallel(true)
+	tw.tween_property(root, "position:y", _settle_y(meta), 0.2)
+	tw.tween_property(root, "scale", Vector2(sc, sc), 0.2)
+
+
+## 잔여 TP로 등록 불가한(대기 아님) 카드는 흐리게 + 비활성. 대기 카드는 항상 토글 가능.
+func _update_affordability() -> void:
+	var remain: int = int(_deck.get_tp()) - _pending_cost()
+	for meta in _cards:
+		var root: Control = meta["root"]
+		if not is_instance_valid(root):
+			continue
+		var pending: bool = bool(meta["pending"])
+		var ok: bool = pending or int(meta["cost"]) <= remain
+		(meta["btn"] as Button).disabled = not ok and not pending
+		root.modulate = Color(1, 1, 1, 1) if ok else Color(0.84, 0.82, 0.77, 0.85)
+
+
+func _reject(meta: Dictionary) -> void:
+	# TP 부족 피드백: 코스트 배지를 잠깐 흔든다.
+	var root: Control = meta["root"]
 	if not is_instance_valid(root):
 		return
-	var tw := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tw.set_parallel(true)
-	tw.tween_property(root, "position:y", root.position.y - 100.0, 0.22)
-	tw.tween_property(root, "rotation", 0.25, 0.22)
-	tw.tween_property(root, "modulate:a", 0.0, 0.22)
-	tw.chain().tween_callback(func():
-		if _deck != null:
-			_deck.play_card(idx))
+	var x: float = (meta["base"] as Vector2).x
+	var tw := create_tween().set_trans(Tween.TRANS_SINE)
+	tw.tween_property(root, "position:x", x - 6.0, 0.04)
+	tw.tween_property(root, "position:x", x + 6.0, 0.06)
+	tw.tween_property(root, "position:x", x, 0.05)
+
+
+## 전투 시작 직전 호출(prep_panel) — 대기 카드를 등록 순서대로 일괄 사용.
+func commit_pending() -> void:
+	if _deck == null:
+		return
+	var queue: Array = _pending.duplicate()
+	_pending.clear()
+	for card in queue:
+		_deck.play_card_ref(card)
 
 
 func _play_shuffle_fx() -> void:

@@ -149,6 +149,15 @@ func play_card(index: int) -> bool:
 	return true
 
 
+## Play a specific card instance (by reference identity) — 사용 대기 목록 일괄 사용용.
+## 인덱스가 아닌 카드 참조로 찾으므로 여러 장을 순차 사용해도 인덱스 시프트 영향 없음.
+func play_card_ref(card: Dictionary) -> bool:
+	for i in hand.size():
+		if is_same(hand[i], card):
+			return play_card(i)
+	return false
+
+
 ## 사이퍼 자산 spend: returns false if insufficient. Each point spent raises
 ## 전술 위력 by 2%p (고유 가려진 흉계).
 func spend_assets(n: int) -> bool:
