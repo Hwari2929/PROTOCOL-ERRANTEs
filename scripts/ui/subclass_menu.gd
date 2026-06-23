@@ -68,6 +68,9 @@ func show_for(unit: Node) -> void:
 	title_label.text = "%s — 서브클래스 선택" % ClassData.class_label(unit.sprite_id)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_label.add_theme_font_size_override("font_size", 26)
+	var hf := Palette.font(Palette.F_HEAD)
+	if hf != null:
+		title_label.add_theme_font_override("font", hf)
 	title_label.add_theme_color_override("font_color", Palette.ACCENT)
 	title_label.process_mode = Node.PROCESS_MODE_ALWAYS
 	vbox.add_child(title_label)

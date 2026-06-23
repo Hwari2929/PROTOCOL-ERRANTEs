@@ -69,6 +69,10 @@ func _build_ui() -> void:
 	title.text = "팀 편성 (3명)"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 24)
+	var hf: FontFile = Palette.font(Palette.F_HEAD)
+	if hf != null:
+		title.add_theme_font_override("font", hf)
+	title.add_theme_color_override("font_color", Palette.ACCENT)
 	outer.add_child(title)
 
 	var scroll: ScrollContainer = ScrollContainer.new()
